@@ -22,42 +22,56 @@ export default function ResumeForm({ formData, setFormData }) {
   const addSection = (setter) => setter((prev) => [...prev, ""]);
 
   return (
-    <form className="space-y-4 overflow-y-auto max-h-screen pr-2">
-      <h2 className="text-lg font-bold">Contact Details</h2>
-      <input type="text" placeholder="Name" className="input" onChange={(e) => updateField('contact', 'name', e.target.value)} />
-      <input type="text" placeholder="Phone" className="input" onChange={(e) => updateField('contact', 'phone', e.target.value)} />
-      <input type="email" placeholder="Email" className="input" onChange={(e) => updateField('contact', 'email', e.target.value)} />
-      <input type="text" placeholder="Address" className="input" onChange={(e) => updateField('contact', 'address', e.target.value)} />
+    <form className="space-y-6 overflow-y-auto max-h-screen pr-4">
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">Contact Details</h2>
+        <input type="text" placeholder="Name" className="input w-full mb-2" onChange={(e) => updateField('contact', 'name', e.target.value)} />
+        <input type="text" placeholder="Phone" className="input w-full mb-2" onChange={(e) => updateField('contact', 'phone', e.target.value)} />
+        <input type="email" placeholder="Email" className="input w-full mb-2" onChange={(e) => updateField('contact', 'email', e.target.value)} />
+        <input type="text" placeholder="Address" className="input w-full" onChange={(e) => updateField('contact', 'address', e.target.value)} />
+      </section>
 
-      <h2 className="text-lg font-bold">Profile Info</h2>
-      <textarea rows="3" placeholder="Profile Summary" className="input" onChange={(e) => setFormData({ ...formData, profile: e.target.value })} />
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">Profile Info</h2>
+        <textarea rows="3" placeholder="Profile Summary" className="input w-full" onChange={(e) => setFormData({ ...formData, profile: e.target.value })} />
+      </section>
 
-      <h2 className="text-lg font-bold">Experience</h2>
-      {experiences.map((exp, idx) => (
-        <textarea key={idx} rows="3" placeholder={`Experience #${idx + 1}`} className="input" onChange={(e) => handleArrayChange(setExperiences, idx, e.target.value)} />
-      ))}
-      <button type="button" onClick={() => addSection(setExperiences)} className="text-blue-600">+ Add Experience</button>
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">Experience</h2>
+        {experiences.map((exp, idx) => (
+          <textarea key={idx} rows="3" placeholder={`Experience #${idx + 1}`} className="input w-full mb-2" onChange={(e) => handleArrayChange(setExperiences, idx, e.target.value)} />
+        ))}
+        <button type="button" onClick={() => addSection(setExperiences)} className="text-blue-600">+ Add Experience</button>
+      </section>
 
-      <h2 className="text-lg font-bold">Education</h2>
-      {educations.map((edu, idx) => (
-        <textarea key={idx} rows="3" placeholder={`Education #${idx + 1}`} className="input" onChange={(e) => handleArrayChange(setEducations, idx, e.target.value)} />
-      ))}
-      <button type="button" onClick={() => addSection(setEducations)} className="text-blue-600">+ Add Education</button>
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">Education</h2>
+        {educations.map((edu, idx) => (
+          <textarea key={idx} rows="3" placeholder={`Education #${idx + 1}`} className="input w-full mb-2" onChange={(e) => handleArrayChange(setEducations, idx, e.target.value)} />
+        ))}
+        <button type="button" onClick={() => addSection(setEducations)} className="text-blue-600">+ Add Education</button>
+      </section>
 
-      <h2 className="text-lg font-bold">Achievements</h2>
-      {achievements.map((ach, idx) => (
-        <textarea key={idx} rows="2" placeholder={`Achievement #${idx + 1}`} className="input" onChange={(e) => handleArrayChange(setAchievements, idx, e.target.value)} />
-      ))}
-      <button type="button" onClick={() => addSection(setAchievements)} className="text-blue-600">+ Add Achievement</button>
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">Achievements</h2>
+        {achievements.map((ach, idx) => (
+          <textarea key={idx} rows="2" placeholder={`Achievement #${idx + 1}`} className="input w-full mb-2" onChange={(e) => handleArrayChange(setAchievements, idx, e.target.value)} />
+        ))}
+        <button type="button" onClick={() => addSection(setAchievements)} className="text-blue-600">+ Add Achievement</button>
+      </section>
 
-      <h2 className="text-lg font-bold">Skills and Abilities</h2>
-      {skills.map((skill, idx) => (
-        <textarea key={idx} rows="2" placeholder={`Skill or Ability #${idx + 1}`} className="input" onChange={(e) => handleArrayChange(setSkills, idx, e.target.value)} />
-      ))}
-      <button type="button" onClick={() => addSection(setSkills)} className="text-blue-600">+ Add Skill</button>
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">Skills and Abilities</h2>
+        {skills.map((skill, idx) => (
+          <textarea key={idx} rows="2" placeholder={`Skill or Ability #${idx + 1}`} className="input w-full mb-2" onChange={(e) => handleArrayChange(setSkills, idx, e.target.value)} />
+        ))}
+        <button type="button" onClick={() => addSection(setSkills)} className="text-blue-600">+ Add Skill</button>
+      </section>
 
-      <h2 className="text-lg font-bold">References</h2>
-      <textarea rows="2" placeholder="References (optional)" className="input" onChange={(e) => setFormData({ ...formData, references: e.target.value })} />
+      <section className="bg-white shadow p-4 rounded">
+        <h2 className="text-xl font-semibold mb-2">References</h2>
+        <textarea rows="2" placeholder="References (optional)" className="input w-full" onChange={(e) => setFormData({ ...formData, references: e.target.value })} />
+      </section>
     </form>
   );
 }
