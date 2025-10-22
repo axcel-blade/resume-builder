@@ -35,12 +35,14 @@ export function Dot() {
   return <span className="mx-2 text-gray-400">•</span>;
 }
 
+/* 🗓️ Consistent Month-Year formatter */
 export function monthYYYY(s) {
   if (!s) return "";
+  if (s.toLowerCase() === "present") return "Present";
   if (/^\d{4}-\d{2}$/.test(s)) {
     const [y, m] = s.split("-");
     const d = new Date(Number(y), Number(m) - 1, 1);
-    return d.toLocaleString(undefined, { month: "short", year: "numeric" });
+    return d.toLocaleString("en-US", { month: "short", year: "numeric" });
   }
   return s;
 }
@@ -48,6 +50,7 @@ export function monthYYYY(s) {
 export const prefixHttp = (url) =>
   url?.startsWith("http") ? url : `https://${url}`;
 
+/* EXPERIENCE */
 export function ExperienceBlock({ e }) {
   return (
     <div>
@@ -61,7 +64,7 @@ export function ExperienceBlock({ e }) {
         )}
         {(e.start || e.end) && (
           <span className="ml-auto text-xs text-gray-500">
-            {monthYYYY(e.start)} – {monthYYYY(e.end)}
+            {monthYYYY(e.start)} – {monthYYYY(e.end) || "Present"}
           </span>
         )}
       </div>
@@ -83,6 +86,7 @@ export function ExperienceBlock({ e }) {
   );
 }
 
+/* EDUCATION */
 export function EducationBlock({ e }) {
   return (
     <div>
@@ -96,7 +100,7 @@ export function EducationBlock({ e }) {
         )}
         {(e.start || e.end) && (
           <span className="ml-auto text-xs text-gray-500">
-            {e.start} – {e.end}
+            {monthYYYY(e.start)} – {monthYYYY(e.end) || "Present"}
           </span>
         )}
       </div>
@@ -118,6 +122,7 @@ export function EducationBlock({ e }) {
   );
 }
 
+/* ACHIEVEMENTS */
 export function AchievementsBlock({ a }) {
   return (
     <div>
@@ -130,7 +135,9 @@ export function AchievementsBlock({ a }) {
           </>
         )}
         {a.year && (
-          <span className="ml-auto text-xs text-gray-500">{a.year}</span>
+          <span className="ml-auto text-xs text-gray-500">
+            {monthYYYY(a.year)}
+          </span>
         )}
       </div>
       {a.bullets?.length > 0 && (
@@ -144,6 +151,7 @@ export function AchievementsBlock({ a }) {
   );
 }
 
+/* PROJECTS */
 export function ProjectsBlock({ p }) {
   return (
     <div>
@@ -157,7 +165,7 @@ export function ProjectsBlock({ p }) {
         )}
         {(p.start || p.end) && (
           <span className="ml-auto text-xs text-gray-500">
-            {monthYYYY(p.start)} – {monthYYYY(p.end)}
+            {monthYYYY(p.start)} – {monthYYYY(p.end) || "Present"}
           </span>
         )}
       </div>
