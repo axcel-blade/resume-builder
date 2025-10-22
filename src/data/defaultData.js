@@ -18,13 +18,6 @@ export const defaultData = {
     { id: "3", label: "Portfolio", url: "janedoe.dev/portfolio" },
   ],
 
-  skills: {
-    hard: ["Programming", "Data Analysis", "UI Design", "Project Management"],
-    soft: ["Communication", "Teamwork", "Leadership", "Adaptability"],
-    transferable: ["Problem Solving", "Organization", "Time Management"],
-    technical: ["React.js", "Node.js", "Docker", "AWS", "TypeScript"],
-  },
-
   experience: [
     {
       id: "exp1",
@@ -79,4 +72,11 @@ export const defaultData = {
       ],
     },
   ],
+
+  skills: {
+    hard: ["Programming", "Data Analysis", "UI Design", "Project Management"],
+    soft: ["Communication", "Teamwork", "Leadership", "Adaptability"],
+    transferable: ["Problem Solving", "Organization", "Time Management"],
+    technical: ["React.js", "Node.js", "Docker", "AWS", "TypeScript"],
+  },
 };
