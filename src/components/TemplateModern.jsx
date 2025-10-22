@@ -24,6 +24,7 @@ export default function TemplateModern({ data }) {
 
   return (
     <div className="p-8 text-[14px] leading-5">
+      {/* Header */}
       <div className="mb-4">
         <h1 className="text-3xl font-bold leading-tight" style={{ color: accent }}>
           {profile.fullName}
@@ -36,8 +37,26 @@ export default function TemplateModern({ data }) {
           {profile.location && <span>{profile.location}</span>}
           {profile.website && <span>{profile.website}</span>}
         </div>
+
+        {/* Profile Links */}
+        {data.links?.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
+            {data.links.map((l) => (
+              <a
+                key={l.id}
+                href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline text-sky-600 print:no-underline"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Summary */}
       {profile.summary && (
         <Section title="Summary" accent={accent}>
           <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
@@ -46,6 +65,7 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
+      {/* Experience */}
       {data.experience?.length > 0 && (
         <Section title="Experience" accent={accent}>
           {data.experience.map((e) => (
@@ -54,6 +74,7 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
+      {/* Projects */}
       {data.projects?.length > 0 && (
         <Section title="Projects" accent={accent}>
           {data.projects.map((p) => (
@@ -62,6 +83,7 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
+      {/* Education */}
       {data.education?.length > 0 && (
         <Section title="Education" accent={accent}>
           {data.education.map((e) => (
@@ -70,6 +92,7 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
+      {/* Achievements */}
       {data.achievements?.length > 0 && (
         <Section title="Achievements" accent={accent}>
           {data.achievements.map((a) => (
@@ -78,7 +101,7 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* New categorized skills */}
+      {/* Categorized Skills */}
       {renderSkillSection("Hard Skills", data.skills?.hard)}
       {renderSkillSection("Soft Skills", data.skills?.soft)}
       {renderSkillSection("Transferable Skills", data.skills?.transferable)}

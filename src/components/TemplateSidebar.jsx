@@ -24,6 +24,7 @@ export default function TemplateSidebar({ data }) {
 
   return (
     <div className="print-page mx-auto flex text-[13px]">
+      {/* Sidebar */}
       <aside className="w-[30%] bg-gray-50 p-6 border-r border-gray-200">
         <h1 className="text-2xl font-bold mb-1" style={{ color: accent }}>
           {profile.fullName}
@@ -37,13 +38,31 @@ export default function TemplateSidebar({ data }) {
           {profile.website && <p>{profile.website}</p>}
         </div>
 
-        {/* Categorized Skills as bullet points */}
+        {/* Profile Links */}
+        {data.links?.length > 0 && (
+          <div className="mt-3 text-xs space-y-1">
+            {data.links.map((l) => (
+              <a
+                key={l.id}
+                href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
+                target="_blank"
+                rel="noreferrer"
+                className="block text-sky-600 hover:underline print:no-underline"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        )}
+
+        {/* Categorized Skills */}
         {renderSkillList("Hard Skills", data.skills?.hard)}
         {renderSkillList("Soft Skills", data.skills?.soft)}
         {renderSkillList("Transferable Skills", data.skills?.transferable)}
         {renderSkillList("Technical Skills", data.skills?.technical)}
       </aside>
 
+      {/* Main Content */}
       <main className="flex-1 p-8 leading-5">
         {profile.summary && (
           <Section title="Summary" accent={accent}>
@@ -64,15 +83,11 @@ export default function TemplateSidebar({ data }) {
                 <div key={item.id}>
                   <div className="text-[13px] font-medium">
                     <span>{item.role || item.title || item.degree}</span>
-                    {item.company ||
-                    item.organization ||
-                    item.school ? (
+                    {item.company || item.organization || item.school ? (
                       <>
                         <span className="mx-2 text-gray-400">•</span>
                         <span className="text-gray-600">
-                          {item.company ||
-                            item.organization ||
-                            item.school}
+                          {item.company || item.organization || item.school}
                         </span>
                       </>
                     ) : null}
