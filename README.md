@@ -87,7 +87,7 @@ resume-builder/
 ## 📸 Preview
 
 ## 🧑‍🎨 Author
-Developed by Ferx Technologies
+Developed by **Ferx Technologies**<br>
 Maintained by Joseph Fernando
 
 ## 📜 License
