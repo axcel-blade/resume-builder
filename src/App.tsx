@@ -40,9 +40,10 @@ export default function App() {
         }
       `}</style>
 
+      {/* HEADER */}
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-bold tracking-tight">Resume Builder</h1>
-        <div className="text-xs text-gray-500">Inspired by app.resume.lk • React + Tailwind</div>
+        {/* 🔥 Removed “Inspired by...” line */}
       </header>
 
       <Toolbar data={data} set={set} onPrint={onPrint} />
@@ -66,8 +67,9 @@ export default function App() {
         </div>
       </div>
 
+      {/* ✅ Updated Footer */}
       <footer className="mt-6 text-center text-xs text-gray-400 print:hidden">
-        Pro tip: Use “Save as PDF” in your browser print dialog for the best results.
+        Developed by <span className="font-semibold text-gray-500">Ferx Technologies</span>.
       </footer>
     </div>
   );
