@@ -6,7 +6,7 @@ import ExperienceEditor from "./components/ExperienceEditor";
 import EducationEditor from "./components/EducationEditor";
 import AchievementsEditor from "./components/AchievementsEditor";
 import SkillsEditor from "./components/SkillsEditor";
-import ProjectsEditor from "./components/ProjectsEditor"; // ✅ NEW IMPORT
+import ProjectsEditor from "./components/ProjectsEditor";
 import TemplateModern from "./components/TemplateModern";
 import TemplateBasic from "./components/TemplateBasic";
 import TemplateSidebar from "./components/TemplateSidebar";
