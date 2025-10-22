@@ -32,7 +32,7 @@ export default function App() {
     }
   }, [data.meta.template]);
 
-  // ✅ Clean export using react-to-print
+  // Clean export using react-to-print
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: `${data.profile.fullName || "resume"}`,
