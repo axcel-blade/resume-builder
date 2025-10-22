@@ -6,6 +6,7 @@ import ExperienceEditor from "./components/ExperienceEditor";
 import EducationEditor from "./components/EducationEditor";
 import AchievementsEditor from "./components/AchievementsEditor";
 import SkillsEditor from "./components/SkillsEditor";
+import ProjectsEditor from "./components/ProjectsEditor"; // ✅ NEW IMPORT
 import TemplateModern from "./components/TemplateModern";
 import TemplateBasic from "./components/TemplateBasic";
 import TemplateSidebar from "./components/TemplateSidebar";
@@ -13,14 +14,15 @@ import { defaultData } from "./data/defaultData";
 
 function useResumeState() {
   const [data, setData] = useState(defaultData);
-  const set = (patch) => setData((d) => ({ ...d, ...patch }));
+  const set = (patch: any) => setData((d) => ({ ...d, ...patch }));
   return { data, set };
 }
 
 export default function App() {
   const { data, set } = useResumeState();
-  const printRef = useRef();
+  const printRef = useRef<HTMLDivElement>(null);
 
+  // Dynamically select template
   const Preview = useMemo(() => {
     switch (data.meta.template) {
       case "basic":
@@ -32,7 +34,7 @@ export default function App() {
     }
   }, [data.meta.template]);
 
-  // Clean export using react-to-print
+  // PDF print/export handler
   const handlePrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: `${data.profile.fullName || "resume"}`,
@@ -50,8 +52,6 @@ export default function App() {
             -webkit-print-color-adjust: exact !important;
             color-adjust: exact !important;
           }
-
-          /* Hide browser headers/footers */
           body::before, body::after { display: none !important; content: none !important; }
 
           @page {
@@ -67,23 +67,26 @@ export default function App() {
         }
       `}</style>
 
+      {/* Header */}
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-bold tracking-tight">Resume Builder</h1>
       </header>
 
+      {/* Toolbar for template, accent, and file actions */}
       <Toolbar data={data} set={set} onPrint={handlePrint} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Left side: forms */}
+        {/* Left side: form editors */}
         <div className="space-y-4 print:hidden">
           <ProfileEditor data={data} set={set} />
           <ExperienceEditor data={data} set={set} />
+          <ProjectsEditor data={data} set={set} /> {/* ✅ Added Projects Editor */}
           <EducationEditor data={data} set={set} />
           <AchievementsEditor data={data} set={set} />
           <SkillsEditor data={data} set={set} />
         </div>
 
-        {/* Right side: preview */}
+        {/* Right side: live preview */}
         <div
           ref={printRef}
           className="rounded-2xl border border-gray-200 bg-white shadow-sm print:border-none print:shadow-none"
@@ -92,6 +95,7 @@ export default function App() {
         </div>
       </div>
 
+      {/* Footer */}
       <footer className="mt-6 text-center text-xs text-gray-400 print:hidden">
         Developed by <span className="font-semibold text-gray-500">Ferx Technologies</span>.
       </footer>

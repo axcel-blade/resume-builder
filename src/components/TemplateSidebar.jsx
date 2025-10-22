@@ -4,6 +4,7 @@ import {
   ExperienceBlock,
   EducationBlock,
   AchievementsBlock,
+  ProjectsBlock,
 } from "./TemplateSharedParts";
 
 export default function TemplateSidebar({ data }) {
@@ -12,7 +13,6 @@ export default function TemplateSidebar({ data }) {
 
   return (
     <div className="print-page mx-auto flex text-[13px]">
-      {/* Sidebar */}
       <aside
         className="w-[30%] bg-gray-50 p-6 border-r border-gray-200"
         style={{ color: "#333" }}
@@ -59,7 +59,6 @@ export default function TemplateSidebar({ data }) {
         )}
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-8 leading-5">
         {profile.summary && (
           <div className="mb-4">
@@ -79,6 +78,14 @@ export default function TemplateSidebar({ data }) {
           <Section title="Experience" accent={accent}>
             {data.experience.map((e) => (
               <ExperienceBlock key={e.id} e={e} />
+            ))}
+          </Section>
+        )}
+
+        {data.projects?.length > 0 && (
+          <Section title="Projects" accent={accent}>
+            {data.projects.map((p) => (
+              <ProjectsBlock key={p.id} p={p} />
             ))}
           </Section>
         )}

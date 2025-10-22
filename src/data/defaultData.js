@@ -143,4 +143,42 @@ export const defaultData = {
         ],
         },
     ],
+    projects: [
+        {
+            id: "proj1",
+            title: "SmartBudget – Personal Finance Tracker",
+            organization: "Personal Project",
+            start: "2023-06",
+            end: "2024-02",
+            bullets: [
+            "Developed a full-stack web app to manage budgets, expenses, and savings goals.",
+            "Built RESTful APIs with Node.js and Express for secure transaction management.",
+            "Used React and Chart.js to visualize spending patterns in real-time.",
+            ],
+        },
+        {
+            id: "proj2",
+            title: "EduLearn LMS",
+            organization: "Freelance / Open Source",
+            start: "2022-08",
+            end: "2023-03",
+            bullets: [
+            "Created an online learning platform enabling course creation and student tracking.",
+            "Implemented authentication and role-based access using JWT and Prisma ORM.",
+            "Deployed on Vercel and PostgreSQL with CI/CD via GitHub Actions.",
+            ],
+        },
+        {
+            id: "proj3",
+            title: "AI Trading Bot",
+            organization: "Ferx Technologies",
+            start: "2024-04",
+            end: "Present",
+            bullets: [
+            "Designed an intelligent Binance trading bot using Python and TensorFlow.",
+            "Integrated machine learning models to predict market trends and automate trades.",
+            "Implemented stop-loss and take-profit algorithms with live backtesting support.",
+            ],
+        },
+    ],
 };

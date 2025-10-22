@@ -4,6 +4,7 @@ import {
   ExperienceBlock,
   EducationBlock,
   AchievementsBlock,
+  ProjectsBlock,
 } from "./TemplateSharedParts";
 
 export default function TemplateBasic({ data }) {
@@ -12,7 +13,6 @@ export default function TemplateBasic({ data }) {
 
   return (
     <div className="print-page mx-auto text-[14px] leading-6 font-serif p-8">
-      {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold" style={{ color: accent }}>
           {profile.fullName}
@@ -56,6 +56,14 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
+      {data.projects?.length > 0 && (
+        <Section title="Projects" accent={accent}>
+          {data.projects.map((p) => (
+            <ProjectsBlock key={p.id} p={p} />
+          ))}
+        </Section>
+      )}
+
       {data.education?.length > 0 && (
         <Section title="Education" accent={accent}>
           {data.education.map((e) => (
@@ -74,9 +82,7 @@ export default function TemplateBasic({ data }) {
 
       {data.skills?.length > 0 && (
         <Section title="Skills" accent={accent}>
-          <p className="text-[13px] text-gray-700">
-            {data.skills.join(", ")}
-          </p>
+          <p className="text-[13px] text-gray-700">{data.skills.join(", ")}</p>
         </Section>
       )}
     </div>

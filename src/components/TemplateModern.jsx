@@ -1,10 +1,10 @@
 import React from "react";
 import {
-  Header,
   Section,
   ExperienceBlock,
   EducationBlock,
   AchievementsBlock,
+  ProjectsBlock,
 } from "./TemplateSharedParts";
 
 export default function TemplateModern({ data }) {
@@ -13,14 +13,12 @@ export default function TemplateModern({ data }) {
 
   return (
     <div className="p-8 text-[14px] leading-5">
-      {/* 👤 Header with Links merged into Profile */}
       <div className="mb-4">
         <h1 className="text-3xl font-bold leading-tight" style={{ color: accent }}>
           {profile.fullName}
         </h1>
         <div className="text-sm text-gray-600">{profile.title}</div>
 
-        {/* Contact Info */}
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
           {profile.email && <span>{profile.email}</span>}
           {profile.phone && <span>{profile.phone}</span>}
@@ -28,7 +26,6 @@ export default function TemplateModern({ data }) {
           {profile.website && <span>{profile.website}</span>}
         </div>
 
-        {/* Inline Links */}
         {data.links?.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
             {data.links.map((l) => (
@@ -46,7 +43,6 @@ export default function TemplateModern({ data }) {
         )}
       </div>
 
-      {/* Summary */}
       {profile.summary && (
         <Section title="Summary" accent={accent}>
           <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
@@ -55,7 +51,6 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* Experience */}
       {data.experience?.length > 0 && (
         <Section title="Experience" accent={accent}>
           {data.experience.map((e) => (
@@ -64,7 +59,14 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* Education */}
+      {data.projects?.length > 0 && (
+        <Section title="Projects" accent={accent}>
+          {data.projects.map((p) => (
+            <ProjectsBlock key={p.id} p={p} />
+          ))}
+        </Section>
+      )}
+
       {data.education?.length > 0 && (
         <Section title="Education" accent={accent}>
           {data.education.map((e) => (
@@ -73,7 +75,6 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* Achievements */}
       {data.achievements?.length > 0 && (
         <Section title="Achievements" accent={accent}>
           {data.achievements.map((a) => (
@@ -82,7 +83,6 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* Skills */}
       {data.skills?.length > 0 && (
         <Section title="Skills" accent={accent}>
           <div className="flex flex-wrap gap-2">
