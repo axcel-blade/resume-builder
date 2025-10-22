@@ -11,6 +11,13 @@ export default function TemplateBasic({ data }) {
   const accent = data.meta.accent;
   const profile = data.profile;
 
+  const renderSkillSection = (title, list) =>
+    list?.length > 0 && (
+      <Section title={title} accent={accent}>
+        <p className="text-[13px] text-gray-700">{list.join(", ")}</p>
+      </Section>
+    );
+
   return (
     <div className="print-page mx-auto text-[14px] leading-6 font-serif p-8">
       <div className="text-center mb-6">
@@ -21,23 +28,6 @@ export default function TemplateBasic({ data }) {
         <p className="text-xs text-gray-600 mt-1">
           {profile.email} • {profile.phone} • {profile.location}
         </p>
-        {data.links?.length > 0 && (
-          <p className="mt-1 text-xs text-gray-600">
-            {data.links.map((l, i) => (
-              <span key={l.id}>
-                <a
-                  href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sky-600 hover:underline print:no-underline"
-                >
-                  {l.label}
-                </a>
-                {i < data.links.length - 1 && " • "}
-              </span>
-            ))}
-          </p>
-        )}
       </div>
 
       {profile.summary && (
@@ -80,11 +70,11 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {data.skills?.length > 0 && (
-        <Section title="Skills" accent={accent}>
-          <p className="text-[13px] text-gray-700">{data.skills.join(", ")}</p>
-        </Section>
-      )}
+      {/* New categorized skills */}
+      {renderSkillSection("Hard Skills", data.skills?.hard)}
+      {renderSkillSection("Soft Skills", data.skills?.soft)}
+      {renderSkillSection("Transferable Skills", data.skills?.transferable)}
+      {renderSkillSection("Technical Skills", data.skills?.technical)}
     </div>
   );
 }

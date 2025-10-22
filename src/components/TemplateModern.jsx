@@ -11,6 +11,22 @@ export default function TemplateModern({ data }) {
   const accent = data.meta.accent;
   const profile = data.profile;
 
+  const renderSkillSection = (title, list) =>
+    list?.length > 0 && (
+      <Section title={title} accent={accent}>
+        <div className="flex flex-wrap gap-2 text-[13px] text-gray-700">
+          {list.map((s, i) => (
+            <span
+              key={i}
+              className="rounded-full border border-gray-300 px-3 py-1 text-xs"
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+      </Section>
+    );
+
   return (
     <div className="p-8 text-[14px] leading-5">
       <div className="mb-4">
@@ -25,22 +41,6 @@ export default function TemplateModern({ data }) {
           {profile.location && <span>{profile.location}</span>}
           {profile.website && <span>{profile.website}</span>}
         </div>
-
-        {data.links?.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
-            {data.links.map((l) => (
-              <a
-                key={l.id}
-                href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:underline text-sky-600 print:no-underline"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        )}
       </div>
 
       {profile.summary && (
@@ -83,20 +83,11 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {data.skills?.length > 0 && (
-        <Section title="Skills" accent={accent}>
-          <div className="flex flex-wrap gap-2">
-            {data.skills.map((s, i) => (
-              <span
-                key={i}
-                className="rounded-full border border-gray-300 px-3 py-1 text-xs"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
-        </Section>
-      )}
+      {/* New categorized skills */}
+      {renderSkillSection("Hard Skills", data.skills?.hard)}
+      {renderSkillSection("Soft Skills", data.skills?.soft)}
+      {renderSkillSection("Transferable Skills", data.skills?.transferable)}
+      {renderSkillSection("Technical Skills", data.skills?.technical)}
     </div>
   );
 }
