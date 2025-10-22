@@ -14,7 +14,11 @@ export default function TemplateBasic({ data }) {
   const renderSkillSection = (title, list) =>
     list?.length > 0 && (
       <Section title={title} accent={accent}>
-        <p className="text-[13px] text-gray-700">{list.join(", ")}</p>
+        <ul className="ml-5 list-disc text-[13px] text-gray-700 space-y-1">
+          {list.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ul>
       </Section>
     );
 
@@ -70,7 +74,7 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {/* New categorized skills */}
+      {/* Bullet-point categorized skills */}
       {renderSkillSection("Hard Skills", data.skills?.hard)}
       {renderSkillSection("Soft Skills", data.skills?.soft)}
       {renderSkillSection("Transferable Skills", data.skills?.transferable)}

@@ -37,7 +37,7 @@ export default function TemplateSidebar({ data }) {
           {profile.website && <p>{profile.website}</p>}
         </div>
 
-        {/* Categorized Skills */}
+        {/* Categorized Skills as bullet points */}
         {renderSkillList("Hard Skills", data.skills?.hard)}
         {renderSkillList("Soft Skills", data.skills?.soft)}
         {renderSkillList("Transferable Skills", data.skills?.transferable)}

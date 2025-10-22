@@ -14,16 +14,11 @@ export default function TemplateModern({ data }) {
   const renderSkillSection = (title, list) =>
     list?.length > 0 && (
       <Section title={title} accent={accent}>
-        <div className="flex flex-wrap gap-2 text-[13px] text-gray-700">
+        <ul className="ml-5 list-disc text-[13px] text-gray-700 space-y-1">
           {list.map((s, i) => (
-            <span
-              key={i}
-              className="rounded-full border border-gray-300 px-3 py-1 text-xs"
-            >
-              {s}
-            </span>
+            <li key={i}>{s}</li>
           ))}
-        </div>
+        </ul>
       </Section>
     );
 
