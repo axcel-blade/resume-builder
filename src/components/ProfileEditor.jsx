@@ -6,7 +6,7 @@ const uid = () => (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2))
 export default function ProfileEditor({ data, set }) {
     const p = data.profile;
 
-    // 🔗 --- link handlers ---
+    // link handlers
     const addLink = () =>
         set({
         links: [...data.links, { id: uid(), label: "", url: "" }],
@@ -29,7 +29,7 @@ export default function ProfileEditor({ data, set }) {
         }
     };
 
-    // --- render ---
+    // Render
     return (
         <SectionCard title="Profile">
         <div className="grid grid-cols-2 gap-3">
@@ -85,7 +85,7 @@ export default function ProfileEditor({ data, set }) {
             />
         </div>
 
-        {/* 🔗 Embedded link editor */}
+        {/* Embedded link editor */}
         <div className="mt-4">
             <div className="mb-2 flex items-center justify-between">
             <Label>Profile Links</Label>
