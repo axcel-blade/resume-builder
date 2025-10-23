@@ -8,23 +8,8 @@ export default function TemplateSidebar({ data }) {
   const dateRange = (start, end) =>
     `${monthYYYY(start)} – ${monthYYYY(end) || "Present"}`;
 
-  const renderSkillList = (title, list) =>
-    list?.length > 0 && (
-      <div className="mt-4">
-        <h3 className="text-sm font-semibold mb-1" style={{ color: accent }}>
-          {title}
-        </h3>
-        <ul className="ml-4 list-disc space-y-1 text-gray-700">
-          {list.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ul>
-      </div>
-    );
-
   return (
     <div className="print-page mx-auto flex text-[13px]">
-      {/* Sidebar */}
       <aside className="w-[30%] bg-gray-50 p-6 border-r border-gray-200">
         <h1 className="text-2xl font-bold mb-1" style={{ color: accent }}>
           {profile.fullName}
@@ -38,7 +23,6 @@ export default function TemplateSidebar({ data }) {
           {profile.website && <p>{profile.website}</p>}
         </div>
 
-        {/* Profile Links */}
         {data.links?.length > 0 && (
           <div className="mt-3 text-xs space-y-1">
             {data.links.map((l) => (
@@ -55,14 +39,28 @@ export default function TemplateSidebar({ data }) {
           </div>
         )}
 
-        {/* Categorized Skills */}
-        {renderSkillList("Hard Skills", data.skills?.hard)}
-        {renderSkillList("Soft Skills", data.skills?.soft)}
-        {renderSkillList("Transferable Skills", data.skills?.transferable)}
-        {renderSkillList("Technical Skills", data.skills?.technical)}
+        {/* Skill Groups */}
+        {data.skillGroups?.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold mb-1" style={{ color: accent }}>
+              Skills
+            </h3>
+            {data.skillGroups.map((g) => (
+              <div key={g.id} className="mt-2">
+                <p className="font-semibold text-[13px] text-gray-800">{g.title}</p>
+                {g.bullets?.length > 0 && (
+                  <ul className="ml-4 list-disc text-gray-700">
+                    {g.bullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-8 leading-5">
         {profile.summary && (
           <Section title="Summary" accent={accent}>
@@ -92,13 +90,11 @@ export default function TemplateSidebar({ data }) {
                       </>
                     ) : null}
                   </div>
-
                   {(item.start || item.end || item.year) && (
                     <div className="text-xs text-gray-500 mt-0.5">
                       {dateRange(item.start || item.year, item.end)}
                     </div>
                   )}
-
                   {item.bullets?.length > 0 && (
                     <ul className="ml-5 list-disc mt-1 text-gray-700">
                       {item.bullets.map((b, i) => (

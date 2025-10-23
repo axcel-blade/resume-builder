@@ -11,17 +11,6 @@ export default function TemplateBasic({ data }) {
   const accent = data.meta.accent;
   const profile = data.profile;
 
-  const renderSkillSection = (title, list) =>
-    list?.length > 0 && (
-      <Section title={title} accent={accent}>
-        <ul className="ml-5 list-disc text-[13px] text-gray-700 space-y-1">
-          {list.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ul>
-      </Section>
-    );
-
   return (
     <div className="print-page mx-auto text-[14px] leading-6 font-serif p-8">
       {/* Header */}
@@ -34,7 +23,6 @@ export default function TemplateBasic({ data }) {
           {profile.email} • {profile.phone} • {profile.location}
         </p>
 
-        {/* Profile Links */}
         {data.links?.length > 0 && (
           <p className="mt-1 text-xs text-gray-600">
             {data.links.map((l, i) => (
@@ -54,7 +42,7 @@ export default function TemplateBasic({ data }) {
         )}
       </div>
 
-      {/* Summary */}
+      {/* Sections */}
       {profile.summary && (
         <Section title="Summary" accent={accent}>
           <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
@@ -63,7 +51,6 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {/* Experience */}
       {data.experience?.length > 0 && (
         <Section title="Experience" accent={accent}>
           {data.experience.map((e) => (
@@ -72,7 +59,6 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {/* Projects */}
       {data.projects?.length > 0 && (
         <Section title="Projects" accent={accent}>
           {data.projects.map((p) => (
@@ -81,7 +67,6 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {/* Education */}
       {data.education?.length > 0 && (
         <Section title="Education" accent={accent}>
           {data.education.map((e) => (
@@ -90,7 +75,6 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {/* Achievements */}
       {data.achievements?.length > 0 && (
         <Section title="Achievements" accent={accent}>
           {data.achievements.map((a) => (
@@ -99,11 +83,23 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
-      {/* Categorized Skills */}
-      {renderSkillSection("Hard Skills", data.skills?.hard)}
-      {renderSkillSection("Soft Skills", data.skills?.soft)}
-      {renderSkillSection("Transferable Skills", data.skills?.transferable)}
-      {renderSkillSection("Technical Skills", data.skills?.technical)}
+      {/* Skill Groups */}
+      {data.skillGroups?.length > 0 && (
+        <Section title="Skills" accent={accent}>
+          {data.skillGroups.map((g) => (
+            <div key={g.id}>
+              <h4 className="font-semibold text-[13px] text-gray-800">{g.title}</h4>
+              {g.bullets?.length > 0 && (
+                <ul className="ml-5 list-disc text-[13px] text-gray-700">
+                  {g.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </Section>
+      )}
     </div>
   );
 }

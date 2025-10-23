@@ -1,70 +1,77 @@
-import React, { useState } from "react";
-import { SectionCard, IconButton, Chip } from "./SharedInputs";
+import React from "react";
+import { SectionCard, IconButton, Text } from "./SharedInputs";
+import BulletsEditor from "./BulletsEditor";
 
-function SkillCategoryEditor({ label, skills, onChange }) {
-  const [val, setVal] = useState("");
-
-  const add = () => {
-    if (!val.trim()) return;
-    onChange([...skills, val.trim()]);
-    setVal("");
-  };
-
-  const remove = (i) => onChange(skills.filter((_, idx) => idx !== i));
-
-  return (
-    <div className="mb-4">
-      <h4 className="text-sm font-semibold mb-2">{label}</h4>
-      <div className="flex gap-2">
-        <input
-          className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-400"
-          value={val}
-          onChange={(e) => setVal(e.target.value)}
-          placeholder={`Add a ${label.toLowerCase()} skill`}
-        />
-        <IconButton onClick={add}>+ Add</IconButton>
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {skills.map((s, i) => (
-          <Chip key={i} onRemove={() => remove(i)}>
-            {s}
-          </Chip>
-        ))}
-      </div>
-    </div>
-  );
-}
+const swap = (arr, i, j) => {
+  const a = arr.slice();
+  [a[i], a[j]] = [a[j], a[i]];
+  return a;
+};
+const uid = () =>
+  crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
 
 export default function SkillsEditor({ data, set }) {
-  const update = (category, newList) =>
+  const add = () =>
     set({
-      skills: { ...data.skills, [category]: newList },
+      skillGroups: [
+        ...(data.skillGroups || []),
+        { id: uid(), title: "", bullets: [] },
+      ],
     });
 
-  const { hard = [], soft = [], transferable = [], technical = [] } = data.skills || {};
+  const upd = (i, patch) =>
+    set({
+      skillGroups: data.skillGroups.map((g, idx) =>
+        idx === i ? { ...g, ...patch } : g
+      ),
+    });
+
+  const del = (i) =>
+    set({
+      skillGroups: data.skillGroups.filter((_, idx) => idx !== i),
+    });
+
+  const up = (i) =>
+    i > 0 && set({ skillGroups: swap(data.skillGroups, i, i - 1) });
+
+  const dn = (i) =>
+    i < data.skillGroups.length - 1 &&
+    set({ skillGroups: swap(data.skillGroups, i, i + 1) });
 
   return (
-    <SectionCard title="Skills">
-      <SkillCategoryEditor
-        label="Hard Skills"
-        skills={hard}
-        onChange={(list) => update("hard", list)}
-      />
-      <SkillCategoryEditor
-        label="Soft Skills"
-        skills={soft}
-        onChange={(list) => update("soft", list)}
-      />
-      <SkillCategoryEditor
-        label="Transferable Skills"
-        skills={transferable}
-        onChange={(list) => update("transferable", list)}
-      />
-      <SkillCategoryEditor
-        label="Technical Skills"
-        skills={technical}
-        onChange={(list) => update("technical", list)}
-      />
+    <SectionCard
+      title="Skills"
+      action={<IconButton onClick={add}>+ Add Group</IconButton>}
+    >
+      <div className="space-y-4">
+        {(data.skillGroups || []).map((g, i) => (
+          <div key={g.id} className="rounded-xl border border-gray-200 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-xs text-gray-500">
+                Skill Group {i + 1}
+              </div>
+              <div className="space-x-1">
+                <IconButton onClick={() => up(i)}>↑</IconButton>
+                <IconButton onClick={() => dn(i)}>↓</IconButton>
+                <IconButton onClick={() => del(i)}>Remove</IconButton>
+              </div>
+            </div>
+
+            <Text
+              value={g.title}
+              onChange={(v) => upd(i, { title: v })}
+              placeholder="Group Title (e.g., Programming Languages)"
+            />
+
+            <div className="mt-2">
+              <BulletsEditor
+                items={g.bullets}
+                onChange={(bullets) => upd(i, { bullets })}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </SectionCard>
   );
 }

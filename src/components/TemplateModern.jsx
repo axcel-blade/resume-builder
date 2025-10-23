@@ -11,17 +11,6 @@ export default function TemplateModern({ data }) {
   const accent = data.meta.accent;
   const profile = data.profile;
 
-  const renderSkillSection = (title, list) =>
-    list?.length > 0 && (
-      <Section title={title} accent={accent}>
-        <ul className="ml-5 list-disc text-[13px] text-gray-700 space-y-1">
-          {list.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ul>
-      </Section>
-    );
-
   return (
     <div className="p-8 text-[14px] leading-5">
       {/* Header */}
@@ -30,7 +19,6 @@ export default function TemplateModern({ data }) {
           {profile.fullName}
         </h1>
         <div className="text-sm text-gray-600">{profile.title}</div>
-
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
           {profile.email && <span>{profile.email}</span>}
           {profile.phone && <span>{profile.phone}</span>}
@@ -38,7 +26,7 @@ export default function TemplateModern({ data }) {
           {profile.website && <span>{profile.website}</span>}
         </div>
 
-        {/* Profile Links */}
+        {/* Links */}
         {data.links?.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
             {data.links.map((l) => (
@@ -101,11 +89,23 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* Categorized Skills */}
-      {renderSkillSection("Hard Skills", data.skills?.hard)}
-      {renderSkillSection("Soft Skills", data.skills?.soft)}
-      {renderSkillSection("Transferable Skills", data.skills?.transferable)}
-      {renderSkillSection("Technical Skills", data.skills?.technical)}
+      {/* Skill Groups */}
+      {data.skillGroups?.length > 0 && (
+        <Section title="Skills" accent={accent}>
+          {data.skillGroups.map((g) => (
+            <div key={g.id}>
+              <h4 className="font-semibold text-[13px] text-gray-800">{g.title}</h4>
+              {g.bullets?.length > 0 && (
+                <ul className="ml-5 list-disc text-[13px] text-gray-700">
+                  {g.bullets.map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </Section>
+      )}
     </div>
   );
 }
