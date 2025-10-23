@@ -5,51 +5,65 @@ export default function TemplateSidebar({ data }) {
   const accent = data.meta.accent;
   const profile = data.profile;
 
-  const dateRange = (start, end) =>
-    `${monthYYYY(start)} – ${monthYYYY(end) || "Present"}`;
-
   return (
-    <div className="print-page mx-auto flex text-[13px]">
-      <aside className="w-[30%] bg-gray-50 p-6 border-r border-gray-200">
-        <h1 className="text-2xl font-bold mb-1" style={{ color: accent }}>
-          {profile.fullName}
-        </h1>
-        <p className="text-sm text-gray-700 mb-2">{profile.title}</p>
-
-        <div className="text-xs text-gray-600 space-y-1">
-          {profile.email && <p>{profile.email}</p>}
-          {profile.phone && <p>{profile.phone}</p>}
-          {profile.location && <p>{profile.location}</p>}
-          {profile.website && <p>{profile.website}</p>}
+    <div className="print-page template-sidebar mx-auto flex text-[12.5px] leading-[1.4] font-sans">
+      {/* ==== SIDEBAR ==== */}
+      <aside className="w-[30%] bg-gray-50 border-r border-gray-200 px-4 py-5">
+        {/* Name & Title */}
+        <div className="mb-2">
+          <h1 className="text-xl font-bold leading-tight" style={{ color: accent }}>
+            {profile.fullName}
+          </h1>
+          <p className="text-[12px] text-gray-700">{profile.title}</p>
         </div>
 
+        {/* Personal Details */}
+        <div className="mb-2">
+          <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
+            PERSONAL DETAILS
+          </h3>
+          <ul className="text-[11.5px] text-gray-700 leading-[1.3] space-y-[1px]">
+            {profile.phone && <li>{profile.phone}</li>}
+            {profile.email && <li>{profile.email}</li>}
+            {profile.location && <li>{profile.location}</li>}
+            {profile.website && <li>{profile.website}</li>}
+          </ul>
+        </div>
+
+        {/* Websites & Social Links */}
         {data.links?.length > 0 && (
-          <div className="mt-3 text-xs space-y-1">
-            {data.links.map((l) => (
-              <a
-                key={l.id}
-                href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
-                target="_blank"
-                rel="noreferrer"
-                className="block text-sky-600 hover:underline print:no-underline"
-              >
-                {l.label}
-              </a>
-            ))}
+          <div className="mb-2">
+            <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
+              WEBSITES & SOCIAL LINKS
+            </h3>
+            <ul className="text-[11.5px] text-gray-700 leading-[1.3] space-y-[1px]">
+              {data.links.map((l) => (
+                <li key={l.id}>
+                  <a
+                    href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sky-600 hover:underline print:no-underline"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
-        {/* Skill Groups */}
+        {/* Skills */}
         {data.skillGroups?.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-sm font-semibold mb-1" style={{ color: accent }}>
-              Skills
+          <div>
+            <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
+              SKILLS
             </h3>
             {data.skillGroups.map((g) => (
-              <div key={g.id} className="mt-2">
-                <p className="font-semibold text-[13px] text-gray-800">{g.title}</p>
+              <div key={g.id} className="mb-[4px]">
+                <p className="font-semibold text-[12px] text-gray-800">{g.title}</p>
                 {g.bullets?.length > 0 && (
-                  <ul className="ml-4 list-disc text-gray-700">
+                  <ul className="ml-4 list-disc text-[11.5px] text-gray-700 leading-[1.3]">
                     {g.bullets.map((b, i) => (
                       <li key={i}>{b}</li>
                     ))}
@@ -61,51 +75,115 @@ export default function TemplateSidebar({ data }) {
         )}
       </aside>
 
-      <main className="flex-1 p-8 leading-5">
+      {/* ==== MAIN CONTENT ==== */}
+      <main className="flex-1 px-6 py-5">
+        {/* Summary */}
         {profile.summary && (
-          <Section title="Summary" accent={accent}>
-            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
+          <Section title="SUMMARY" accent={accent}>
+            <p className="text-[12.5px] text-gray-800 whitespace-pre-wrap break-words leading-[1.4]">
               {profile.summary}
             </p>
           </Section>
         )}
 
-        {["experience", "projects", "education", "achievements"].map((key) =>
-          data[key]?.length > 0 ? (
-            <Section
-              key={key}
-              title={key.charAt(0).toUpperCase() + key.slice(1)}
-              accent={accent}
-            >
-              {data[key].map((item) => (
-                <div key={item.id}>
-                  <div className="text-[13px] font-medium">
-                    <span>{item.role || item.title || item.degree}</span>
-                    {item.company || item.organization || item.school ? (
-                      <>
-                        <span className="mx-2 text-gray-400">•</span>
-                        <span className="text-gray-600">
-                          {item.company || item.organization || item.school}
-                        </span>
-                      </>
-                    ) : null}
-                  </div>
-                  {(item.start || item.end || item.year) && (
-                    <div className="text-xs text-gray-500 mt-0.5">
-                      {dateRange(item.start || item.year, item.end)}
-                    </div>
-                  )}
-                  {item.bullets?.length > 0 && (
-                    <ul className="ml-5 list-disc mt-1 text-gray-700">
-                      {item.bullets.map((b, i) => (
-                        <li key={i}>{b}</li>
-                      ))}
-                    </ul>
+        {/* Employment */}
+        {data.experience?.length > 0 && (
+          <Section title="EMPLOYMENT HISTORY" accent={accent}>
+            {data.experience.map((e) => (
+              <div key={e.id} className="mb-[6px]">
+                <div className="font-semibold text-[12.5px]">
+                  {e.role}
+                  {e.company && (
+                    <span className="text-gray-600 font-normal"> • {e.company}</span>
                   )}
                 </div>
-              ))}
-            </Section>
-          ) : null
+                <div className="text-[11px] text-gray-500 mb-[2px]">
+                  {monthYYYY(e.start)} – {monthYYYY(e.end) || "Present"}{" "}
+                  {e.location && `| ${e.location}`}
+                </div>
+                {e.bullets?.length > 0 && (
+                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                    {e.bullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Education */}
+        {data.education?.length > 0 && (
+          <Section title="EDUCATION" accent={accent}>
+            {data.education.map((e) => (
+              <div key={e.id} className="mb-[6px]">
+                <div className="font-semibold text-[12.5px]">
+                  {e.degree}
+                  {e.school && (
+                    <span className="text-gray-600 font-normal"> • {e.school}</span>
+                  )}
+                </div>
+                <div className="text-[11px] text-gray-500 mb-[2px]">
+                  {monthYYYY(e.start)} – {monthYYYY(e.end)} {e.location && `| ${e.location}`}
+                </div>
+                {e.bullets?.length > 0 && (
+                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                    {e.bullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Projects */}
+        {data.projects?.length > 0 && (
+          <Section title="PROJECTS" accent={accent}>
+            {data.projects.map((p) => (
+              <div key={p.id} className="mb-[6px]">
+                <div className="font-semibold text-[12.5px]">{p.title}</div>
+                <div className="text-[11px] text-gray-500 mb-[2px]">
+                  {p.organization} | {monthYYYY(p.start)} – {monthYYYY(p.end)}
+                </div>
+                {p.bullets?.length > 0 && (
+                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                    {p.bullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Achievements */}
+        {data.achievements?.length > 0 && (
+          <Section title="ACHIEVEMENTS" accent={accent}>
+            {data.achievements.map((a) => (
+              <div key={a.id} className="mb-[6px]">
+                <div className="font-semibold text-[12.5px]">
+                  {a.title}
+                  {a.organization && (
+                    <span className="text-gray-600 font-normal"> • {a.organization}</span>
+                  )}
+                </div>
+                <div className="text-[11px] text-gray-500 mb-[2px]">
+                  {a.year && `${a.year}`}
+                </div>
+                {a.bullets?.length > 0 && (
+                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                    {a.bullets.map((b, i) => (
+                      <li key={i}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </Section>
         )}
       </main>
     </div>
