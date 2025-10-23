@@ -7,7 +7,7 @@ export default function TemplateSidebar({ data }) {
 
   return (
     <div className="print-page template-sidebar mx-auto flex text-[12.5px] leading-[1.4] font-sans">
-      {/* ==== SIDEBAR ==== */}
+      {/* SIDEBAR */}
       <aside className="w-[30%] bg-gray-50 border-r border-gray-200 px-4 py-5">
         {/* Name & Title */}
         <div className="mb-2">
@@ -75,7 +75,7 @@ export default function TemplateSidebar({ data }) {
         )}
       </aside>
 
-      {/* ==== MAIN CONTENT ==== */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 px-6 py-5">
         {/* Summary */}
         {profile.summary && (
