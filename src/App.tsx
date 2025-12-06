@@ -46,12 +46,15 @@ export default function App() {
       {/* ✅ Print-specific styling */}
       <style>{`
         /* Default margins for all templates */
-        @page { size: A4; margin: 18mm; }
+        @page { 
+          size: A4; 
+          margin: 0.3in 0.5in;
+          }
 
         /* Minimal margin for TemplateSidebar only */
         @page TemplateSidebar {
           size: A4;
-          margin: 8mm;
+          margin: 0.3in 0.5in;
         }
 
         @media print {
