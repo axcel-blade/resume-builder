@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconButton } from "./SharedInputs";
+import { IconButton } from "../SharedInputs";
 
 export default function BulletsEditor({ items = [], onChange }) {
   const [val, setVal] = useState("");

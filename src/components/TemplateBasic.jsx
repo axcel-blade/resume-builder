@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Section,
-  ExperienceBlock,
-  EducationBlock,
-  AchievementsBlock,
-  ProjectsBlock,
-} from "./TemplateSharedParts";
+import { Section, ExperienceBlock, EducationBlock, AchievementsBlock, ProjectsBlock, SkillsBlock } from "./TemplateSharedParts";
 
 export default function TemplateBasic({ data }) {
   const accent = data.meta.accent;
@@ -87,16 +81,7 @@ export default function TemplateBasic({ data }) {
       {data.skillGroups?.length > 0 && (
         <Section title="Skills" accent={accent}>
           {data.skillGroups.map((g) => (
-            <div key={g.id}>
-              <h4 className="font-semibold text-[13px] text-gray-800">{g.title}</h4>
-              {g.bullets?.length > 0 && (
-                <ul className="ml-5 list-disc text-[13px] text-gray-700">
-                  {g.bullets.map((b, i) => (
-                    <li key={i}>{b}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <SkillsBlock key={g.id} group={g} />
           ))}
         </Section>
       )}

@@ -35,7 +35,7 @@ export function Dot() {
   return <span className="mx-2 text-gray-400">•</span>;
 }
 
-/* 🗓️ Consistent Month-Year formatter */
+/* 📅 Consistent Month-Year formatter */
 export function monthYYYY(s) {
   if (!s) return "";
   if (s.toLowerCase() === "present") return "Present";
@@ -172,6 +172,22 @@ export function ProjectsBlock({ p }) {
       {p.bullets?.length > 0 && (
         <ul className="ml-5 list-disc text-[13px] text-gray-700">
           {p.bullets.map((b, i) => (
+            <li key={i}>{b}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/* SKILLS */
+export function SkillsBlock({ group }) {
+  return (
+    <div>
+      <h4 className="font-semibold text-[13px] text-gray-800">{group.title}</h4>
+      {group.bullets?.length > 0 && (
+        <ul className="ml-5 list-disc text-[13px] text-gray-700">
+          {group.bullets.map((b, i) => (
             <li key={i}>{b}</li>
           ))}
         </ul>

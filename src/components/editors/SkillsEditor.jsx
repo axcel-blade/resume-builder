@@ -1,22 +1,18 @@
 import React from "react";
-import { SectionCard, IconButton, Text } from "./SharedInputs";
+import { SectionCard, IconButton, Text } from "../SharedInputs";
 import BulletsEditor from "./BulletsEditor";
 
+const uid = () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
 const swap = (arr, i, j) => {
   const a = arr.slice();
   [a[i], a[j]] = [a[j], a[i]];
   return a;
 };
-const uid = () =>
-  crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
 
 export default function SkillsEditor({ data, set }) {
   const add = () =>
     set({
-      skillGroups: [
-        ...(data.skillGroups || []),
-        { id: uid(), title: "", bullets: [] },
-      ],
+      skillGroups: [...(data.skillGroups || []), { id: uid(), title: "", bullets: [] }],
     });
 
   const upd = (i, patch) =>
@@ -47,9 +43,7 @@ export default function SkillsEditor({ data, set }) {
         {(data.skillGroups || []).map((g, i) => (
           <div key={g.id} className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 flex items-center justify-between">
-              <div className="text-xs text-gray-500">
-                Skill Group {i + 1}
-              </div>
+              <div className="text-xs text-gray-500">Skill Group {i + 1}</div>
               <div className="space-x-1">
                 <IconButton onClick={() => up(i)}>↑</IconButton>
                 <IconButton onClick={() => dn(i)}>↓</IconButton>
@@ -60,7 +54,7 @@ export default function SkillsEditor({ data, set }) {
             <Text
               value={g.title}
               onChange={(v) => upd(i, { title: v })}
-              placeholder="Group Title (e.g., Programming Languages)"
+              placeholder="Group Title"
             />
 
             <div className="mt-2">

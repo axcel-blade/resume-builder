@@ -1,9 +1,13 @@
 import React from "react";
-import { SectionCard, IconButton, Text } from "./SharedInputs";
+import { SectionCard, IconButton, Text } from "../SharedInputs";
 import BulletsEditor from "./BulletsEditor";
 
-const swap = (arr, i, j) => { const a = arr.slice(); [a[i], a[j]] = [a[j], a[i]]; return a; };
-const uid = () => (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2));
+const uid = () => crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
+const swap = (arr, i, j) => {
+  const a = arr.slice();
+  [a[i], a[j]] = [a[j], a[i]];
+  return a;
+};
 
 export default function ProjectsEditor({ data, set }) {
   const add = () =>
@@ -19,13 +23,11 @@ export default function ProjectsEditor({ data, set }) {
       projects: data.projects.map((p, idx) => (idx === i ? { ...p, ...patch } : p)),
     });
 
-  const del = (i) =>
-    set({
-      projects: data.projects.filter((_, idx) => idx !== i),
-    });
+  const del = (i) => set({ projects: data.projects.filter((_, idx) => idx !== i) });
 
   const up = (i) => i > 0 && set({ projects: swap(data.projects, i, i - 1) });
-  const dn = (i) => i < data.projects.length - 1 && set({ projects: swap(data.projects, i, i + 1) });
+  const dn = (i) =>
+    i < data.projects.length - 1 && set({ projects: swap(data.projects, i, i + 1) });
 
   return (
     <SectionCard title="Projects" action={<IconButton onClick={add}>+ Add</IconButton>}>
@@ -41,15 +43,34 @@ export default function ProjectsEditor({ data, set }) {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Text value={p.title} onChange={(v) => upd(i, { title: v })} placeholder="Project Title" />
-              <Text value={p.organization} onChange={(v) => upd(i, { organization: v })} placeholder="Organization / Team" />
+              <Text
+                value={p.title}
+                onChange={(v) => upd(i, { title: v })}
+                placeholder="Title"
+              />
+              <Text
+                value={p.organization}
+                onChange={(v) => upd(i, { organization: v })}
+                placeholder="Organization"
+              />
               <div className="grid grid-cols-2 gap-2">
-                <Text value={p.start} onChange={(v) => upd(i, { start: v })} placeholder="Start (YYYY-MM)" />
-                <Text value={p.end} onChange={(v) => upd(i, { end: v })} placeholder="End (YYYY-MM or Present)" />
+                <Text
+                  value={p.start}
+                  onChange={(v) => upd(i, { start: v })}
+                  placeholder="Start (YYYY-MM)"
+                />
+                <Text
+                  value={p.end}
+                  onChange={(v) => upd(i, { end: v })}
+                  placeholder="End (YYYY-MM)"
+                />
               </div>
             </div>
             <div className="mt-2">
-              <BulletsEditor items={p.bullets} onChange={(bullets) => upd(i, { bullets })} />
+              <BulletsEditor
+                items={p.bullets}
+                onChange={(bullets) => upd(i, { bullets })}
+              />
             </div>
           </div>
         ))}

@@ -31,20 +31,8 @@ export default function Toolbar({ data, set, onPrint }) {
 
   return (
     <div className="sticky top-0 z-10 mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm print:hidden">
-      {/* Template & Accent */}
       <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-gray-700">Template</span>
-        <select
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm"
-          value={data.meta.template}
-          onChange={(e) => set({ meta: { ...data.meta, template: e.target.value } })}
-        >
-          <option value="modern">Modern</option>
-          <option value="basic">Basic</option>
-          <option value="sidebar">Sidebar</option>
-        </select>
-
-        <span className="ml-3 text-sm font-semibold text-gray-700">Accent</span>
+        <span className="text-sm font-semibold text-gray-700">Accent</span>
         <input
           type="color"
           className="h-9 w-9 cursor-pointer rounded-xl border border-gray-300 p-1"
@@ -53,7 +41,6 @@ export default function Toolbar({ data, set, onPrint }) {
         />
       </div>
 
-      {/* Export/Import/Print */}
       <div className="flex items-center gap-2">
         <button
           className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"

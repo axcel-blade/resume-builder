@@ -1,5 +1,5 @@
 import React from "react";
-import { SectionCard, IconButton, Text } from "./SharedInputs";
+import { SectionCard, IconButton, Text } from "../SharedInputs";
 
 const uid = () => (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2));
 

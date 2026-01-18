@@ -1,5 +1,4 @@
 import React from "react";
-import { Section, monthYYYY } from "./TemplateSharedParts";
 
 export default function TemplateSidebar({ data }) {
   const accent = data.meta.accent;
@@ -79,111 +78,148 @@ export default function TemplateSidebar({ data }) {
       <main className="flex-1 px-6 py-5">
         {/* Summary */}
         {profile.summary && (
-          <Section title="SUMMARY" accent={accent}>
-            <p className="text-[12.5px] text-gray-800 whitespace-pre-wrap break-words leading-[1.4]">
-              {profile.summary}
-            </p>
-          </Section>
+          <div className="mt-4">
+            <h3
+              className="mb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: accent }}
+            >
+              SUMMARY
+            </h3>
+            <div className="space-y-2 text-sm text-gray-800">
+              <p className="text-[12.5px] text-gray-800 whitespace-pre-wrap break-words leading-[1.4]">
+                {profile.summary}
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Employment */}
         {data.experience?.length > 0 && (
-          <Section title="EMPLOYMENT HISTORY" accent={accent}>
-            {data.experience.map((e) => (
-              <div key={e.id} className="mb-[6px]">
-                <div className="font-semibold text-[12.5px]">
-                  {e.role}
-                  {e.company && (
-                    <span className="text-gray-600 font-normal"> • {e.company}</span>
+          <div className="mt-4">
+            <h3
+              className="mb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: accent }}
+            >
+              EMPLOYMENT HISTORY
+            </h3>
+            <div className="space-y-2 text-sm text-gray-800">
+              {data.experience.map((e) => (
+                <div key={e.id} className="mb-[6px]">
+                  <div className="font-semibold text-[12.5px]">
+                    {e.role}
+                    {e.company && (
+                      <span className="text-gray-600 font-normal"> • {e.company}</span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-gray-500 mb-[2px]">
+                    {e.start} – {e.end || "Present"} {e.location && `| ${e.location}`}
+                  </div>
+                  {e.bullets?.length > 0 && (
+                    <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                      {e.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
                   )}
                 </div>
-                <div className="text-[11px] text-gray-500 mb-[2px]">
-                  {monthYYYY(e.start)} – {monthYYYY(e.end) || "Present"}{" "}
-                  {e.location && `| ${e.location}`}
-                </div>
-                {e.bullets?.length > 0 && (
-                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
-                    {e.bullets.map((b, i) => (
-                      <li key={i}>{b}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </Section>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Education */}
         {data.education?.length > 0 && (
-          <Section title="EDUCATION" accent={accent}>
-            {data.education.map((e) => (
-              <div key={e.id} className="mb-[6px]">
-                <div className="font-semibold text-[12.5px]">
-                  {e.degree}
-                  {e.school && (
-                    <span className="text-gray-600 font-normal"> • {e.school}</span>
+          <div className="mt-4">
+            <h3
+              className="mb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: accent }}
+            >
+              EDUCATION
+            </h3>
+            <div className="space-y-2 text-sm text-gray-800">
+              {data.education.map((e) => (
+                <div key={e.id} className="mb-[6px]">
+                  <div className="font-semibold text-[12.5px]">
+                    {e.degree}
+                    {e.school && (
+                      <span className="text-gray-600 font-normal"> • {e.school}</span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-gray-500 mb-[2px]">
+                    {e.start} – {e.end} {e.location && `| ${e.location}`}
+                  </div>
+                  {e.bullets?.length > 0 && (
+                    <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                      {e.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
                   )}
                 </div>
-                <div className="text-[11px] text-gray-500 mb-[2px]">
-                  {monthYYYY(e.start)} – {monthYYYY(e.end)} {e.location && `| ${e.location}`}
-                </div>
-                {e.bullets?.length > 0 && (
-                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
-                    {e.bullets.map((b, i) => (
-                      <li key={i}>{b}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </Section>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Projects */}
         {data.projects?.length > 0 && (
-          <Section title="PROJECTS" accent={accent}>
-            {data.projects.map((p) => (
-              <div key={p.id} className="mb-[6px]">
-                <div className="font-semibold text-[12.5px]">{p.title}</div>
-                <div className="text-[11px] text-gray-500 mb-[2px]">
-                  {p.organization} | {monthYYYY(p.start)} – {monthYYYY(p.end)}
+          <div className="mt-4">
+            <h3
+              className="mb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: accent }}
+            >
+              PROJECTS
+            </h3>
+            <div className="space-y-2 text-sm text-gray-800">
+              {data.projects.map((p) => (
+                <div key={p.id} className="mb-[6px]">
+                  <div className="font-semibold text-[12.5px]">{p.title}</div>
+                  <div className="text-[11px] text-gray-500 mb-[2px]">
+                    {p.organization} | {p.start} – {p.end}
+                  </div>
+                  {p.bullets?.length > 0 && (
+                    <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                      {p.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                {p.bullets?.length > 0 && (
-                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
-                    {p.bullets.map((b, i) => (
-                      <li key={i}>{b}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </Section>
+              ))}
+            </div>
+          </div>
         )}
 
         {/* Achievements */}
         {data.achievements?.length > 0 && (
-          <Section title="ACHIEVEMENTS" accent={accent}>
-            {data.achievements.map((a) => (
-              <div key={a.id} className="mb-[6px]">
-                <div className="font-semibold text-[12.5px]">
-                  {a.title}
-                  {a.organization && (
-                    <span className="text-gray-600 font-normal"> • {a.organization}</span>
+          <div className="mt-4">
+            <h3
+              className="mb-1 text-xs font-semibold uppercase tracking-wider"
+              style={{ color: accent }}
+            >
+              ACHIEVEMENTS
+            </h3>
+            <div className="space-y-2 text-sm text-gray-800">
+              {data.achievements.map((a) => (
+                <div key={a.id} className="mb-[6px]">
+                  <div className="font-semibold text-[12.5px]">
+                    {a.title}
+                    {a.organization && (
+                      <span className="text-gray-600 font-normal"> • {a.organization}</span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-gray-500 mb-[2px]">{a.year && `${a.year}`}</div>
+                  {a.bullets?.length > 0 && (
+                    <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
+                      {a.bullets.map((b, i) => (
+                        <li key={i}>{b}</li>
+                      ))}
+                    </ul>
                   )}
                 </div>
-                <div className="text-[11px] text-gray-500 mb-[2px]">
-                  {a.year && `${a.year}`}
-                </div>
-                {a.bullets?.length > 0 && (
-                  <ul className="ml-5 list-disc text-[12px] text-gray-700 leading-[1.4]">
-                    {a.bullets.map((b, i) => (
-                      <li key={i}>{b}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </Section>
+              ))}
+            </div>
+          </div>
         )}
       </main>
     </div>
