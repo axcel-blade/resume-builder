@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Toolbar from "./components/Toolbar";
 import TabNavigation from "./components/TabNavigation";
 import ResumeEditor from "./components/editors/ResumeEditor";
 import CoverLetterEditor from "./components/editors/CoverLetterEditor";
+import A4PaginatedPreview from "./components/preview/A4PaginatedPreview";
 import TemplateModern from "./components/TemplateModern";
 import TemplateBasic from "./components/TemplateBasic";
 import TemplateSidebar from "./components/TemplateSidebar";
@@ -14,6 +15,26 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("resume");
 
   const set = (patch) => setData((prev) => ({ ...prev, ...patch }));
+
+  // Determine which template component to use
+  const getTemplateComponent = () => {
+    if (activeTab === "coverLetter") {
+      return CoverLetterTemplate;
+    }
+    
+    const template = data.meta?.template || "modern";
+    
+    switch (template) {
+      case "modern":
+        return TemplateModern;
+      case "basic":
+        return TemplateBasic;
+      case "sidebar":
+        return TemplateSidebar;
+      default:
+        return TemplateModern;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -38,23 +59,16 @@ export default function App() {
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm h-full">
             <div className="sticky top-0 border-b border-gray-200 bg-gray-50 px-4 py-2 print:hidden z-10">
               <p className="text-sm font-semibold text-gray-700">
-                {activeTab === "resume" ? "Resume Preview" : "Cover Letter Preview"}
+                {activeTab === "resume" ? "Resume Preview (A4 Pages)" : "Cover Letter Preview"}
               </p>
             </div>
-            <div 
-              id="print-content"
-              className="max-h-[calc(100vh-100px)] overflow-y-auto bg-white"
-            >
+            <div className="max-h-[calc(100vh-100px)] overflow-y-auto bg-gray-100 p-4">
               {activeTab === "resume" ? (
-                data.meta.template === "modern" ? (
-                  <TemplateModern data={data} />
-                ) : data.meta.template === "basic" ? (
-                  <TemplateBasic data={data} />
-                ) : (
-                  <TemplateSidebar data={data} />
-                )
+                <A4PaginatedPreview data={data} templateComponent={getTemplateComponent()} />
               ) : (
-                <CoverLetterTemplate data={data} />
+                <div className="bg-white rounded-lg shadow-sm p-8 mx-auto" style={{ maxWidth: "794px" }}>
+                  <CoverLetterTemplate data={data} />
+                </div>
               )}
             </div>
           </div>

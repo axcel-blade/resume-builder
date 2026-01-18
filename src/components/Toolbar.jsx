@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-export default function Toolbar({ data, set, onPrint, printContent }) {
+export default function Toolbar({ data, set }) {
   const fileInputRef = useRef(null);
 
   const exportJson = () => {
@@ -32,28 +32,46 @@ export default function Toolbar({ data, set, onPrint, printContent }) {
   };
 
   const savePDF = async (event) => {
-    const element = document.getElementById("print-content");
-    if (!element) {
-      alert("Content not found. Please try again.");
-      return;
-    }
+    const btn = event.target;
+    const originalText = btn.textContent;
 
     try {
-      // Show loading message
-      const btn = event.target;
-      const originalText = btn.textContent;
       btn.textContent = "Generating PDF...";
       btn.disabled = true;
 
-      // Create a temporary container to measure content
+      // Create a temporary container with A4 dimensions and margins
       const tempDiv = document.createElement("div");
       tempDiv.style.position = "absolute";
       tempDiv.style.left = "-9999px";
       tempDiv.style.width = "210mm"; // A4 width
-      tempDiv.innerHTML = element.innerHTML;
+      tempDiv.style.padding = "15mm"; // 15mm margins
+      tempDiv.style.boxSizing = "border-box";
+      tempDiv.style.backgroundColor = "#ffffff";
+
+      // Get all templates and render the active one
+      const templateDiv = document.querySelector('[id$="template"]');
+      if (!templateDiv) {
+        // Fallback: create a minimal resume from data
+        tempDiv.innerHTML = `
+          <div style="font-family: sans-serif; font-size: 14px; line-height: 1.5;">
+            <h1 style="margin: 0 0 10px 0; font-size: 24px;">${data.profile.fullName}</h1>
+            <p style="margin: 0 0 15px 0; color: #666;">${data.profile.email} • ${data.profile.phone} • ${data.profile.location}</p>
+            <p style="margin: 0 0 15px 0; line-height: 1.6;">${data.profile.summary}</p>
+          </div>
+        `;
+      } else {
+        tempDiv.innerHTML = templateDiv.innerHTML;
+      }
+
       document.body.appendChild(tempDiv);
 
-      // Convert HTML to canvas with proper dimensions
+      // Convert to canvas
+      const dpi = 96;
+      const pixelsPerMM = dpi / 25.4;
+      const pageWidthMM = 210;
+      const pageHeightMM = 297;
+      const marginMM = 15;
+
       const canvas = await html2canvas(tempDiv, {
         allowTaint: true,
         useCORS: true,
@@ -61,18 +79,10 @@ export default function Toolbar({ data, set, onPrint, printContent }) {
         logging: false,
         backgroundColor: "#ffffff",
         windowHeight: tempDiv.scrollHeight,
-        windowWidth: 794, // A4 width in pixels at 96 DPI
+        windowWidth: pageWidthMM * pixelsPerMM * 2,
       });
 
-      // Remove temp div
       document.body.removeChild(tempDiv);
-
-      // Get image data
-      const imgData = canvas.toDataURL("image/png");
-      const pageWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
       // Create PDF
       const pdf = new jsPDF({
@@ -82,34 +92,62 @@ export default function Toolbar({ data, set, onPrint, printContent }) {
         compress: true,
       });
 
-      let heightLeft = imgHeight;
-      let position = 0;
+      // Calculate dimensions
+      const contentHeightPx = (pageHeightMM - marginMM * 2) * pixelsPerMM * 2;
+      const contentWidthPx = (pageWidthMM - marginMM * 2) * pixelsPerMM * 2;
+      const totalPages = Math.ceil(canvas.height / contentHeightPx);
 
-      // Add first page
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Add pages
+      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+        if (pageNum > 0) {
+          pdf.addPage();
+        }
 
-      // Add remaining pages
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        // Calculate the slice of canvas for this page
+        const sourceY = pageNum * contentHeightPx;
+        const sliceHeight = Math.min(contentHeightPx, canvas.height - sourceY);
+
+        // Create a canvas for this page slice
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = contentWidthPx;
+        pageCanvas.height = sliceHeight;
+
+        const ctx = pageCanvas.getContext("2d");
+        ctx.drawImage(
+          canvas,
+          0, sourceY,
+          contentWidthPx, sliceHeight,
+          0, 0,
+          contentWidthPx, sliceHeight
+        );
+
+        // Convert to image
+        const imgData = pageCanvas.toDataURL("image/png");
+
+        // Calculate display height
+        const displayHeight = (sliceHeight / pixelsPerMM) / 2;
+
+        // Add to PDF with margins
+        pdf.addImage(
+          imgData,
+          "PNG",
+          marginMM,
+          marginMM,
+          pageWidthMM - marginMM * 2,
+          displayHeight
+        );
       }
 
       // Download PDF
       const fileName = `${(data.profile.fullName || "resume").replace(/\s+/g, "_")}.pdf`;
       pdf.save(fileName);
 
-      // Reset button
       btn.textContent = originalText;
       btn.disabled = false;
     } catch (error) {
       console.error("PDF generation failed:", error);
       alert("Failed to generate PDF. Please try again.");
-      // Reset button on error
-      const btn = event.target;
-      btn.textContent = "Save as PDF";
+      btn.textContent = originalText;
       btn.disabled = false;
     }
   };
