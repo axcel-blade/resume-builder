@@ -31,7 +31,7 @@ export default function Toolbar({ data, set, onPrint, printContent }) {
     if (confirm("Reset to starter content?")) window.location.reload();
   };
 
-  const savePDF = async () => {
+  const savePDF = async (event) => {
     const element = document.getElementById("print-content");
     if (!element) {
       alert("Content not found. Please try again.");
@@ -45,39 +45,56 @@ export default function Toolbar({ data, set, onPrint, printContent }) {
       btn.textContent = "Generating PDF...";
       btn.disabled = true;
 
-      // Convert HTML to canvas
-      const canvas = await html2canvas(element, {
+      // Create a temporary container to measure content
+      const tempDiv = document.createElement("div");
+      tempDiv.style.position = "absolute";
+      tempDiv.style.left = "-9999px";
+      tempDiv.style.width = "210mm"; // A4 width
+      tempDiv.innerHTML = element.innerHTML;
+      document.body.appendChild(tempDiv);
+
+      // Convert HTML to canvas with proper dimensions
+      const canvas = await html2canvas(tempDiv, {
         allowTaint: true,
         useCORS: true,
         scale: 2,
         logging: false,
         backgroundColor: "#ffffff",
+        windowHeight: tempDiv.scrollHeight,
+        windowWidth: 794, // A4 width in pixels at 96 DPI
       });
 
-      // Get canvas dimensions
+      // Remove temp div
+      document.body.removeChild(tempDiv);
+
+      // Get image data
       const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
       // Create PDF
       const pdf = new jsPDF({
-        orientation: imgHeight > imgWidth ? "portrait" : "portrait",
+        orientation: "portrait",
         unit: "mm",
         format: "a4",
+        compress: true,
       });
 
       let heightLeft = imgHeight;
       let position = 0;
 
-      // Add image to PDF (handle multi-page)
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= 297; // A4 height
+      // Add first page
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-      while (heightLeft >= 0) {
+      // Add remaining pages
+      while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= 297;
+        heightLeft -= pageHeight;
       }
 
       // Download PDF
@@ -90,6 +107,10 @@ export default function Toolbar({ data, set, onPrint, printContent }) {
     } catch (error) {
       console.error("PDF generation failed:", error);
       alert("Failed to generate PDF. Please try again.");
+      // Reset button on error
+      const btn = event.target;
+      btn.textContent = "Save as PDF";
+      btn.disabled = false;
     }
   };
 
