@@ -1,94 +1,180 @@
-# 📄 Resume Builder
-A React-based resume builder that allows users to create, customize, and export professional resumes with live preview and PDF download. Built with React, Tailwind CSS, and react-to-print, this project provides clean and modern templates for a personalized and print-ready resume creation experience.
+# 📄 Resume & Cover Letter Builder
 
-## 🚀 Features
-* 🧩 Dynamic Resume Editor – Instantly edit profile details, experience, education, achievements, and skills.
-* 🎨 Multiple Templates – Choose between Modern, Basic, and Sidebar resume designs.
-* 💾 PDF Export – Download clean, print-ready resumes using react-to-print (no headers or footers).
-* ⚡ Live Preview – Real-time updates as you type.
-* 🎯 Fully Responsive – Works seamlessly across desktop and mobile browsers.
-* 💡 Minimal & Fast – Lightweight UI built with Tailwind CSS for smooth performance.
+A modern, full-featured React application for creating professional resumes and cover letters with real-time preview, multiple customizable templates, and seamless PDF export capabilities.
+
+## ✨ Key Features
+
+- **📝 Dual Document Support** - Create and manage both resumes and cover letters in one platform
+- **🎨 Multiple Templates** - Choose from Modern, Basic, and Sidebar designs with one-click switching
+- **👁️ Live Preview** - See changes instantly as you edit your content
+- **💾 Smart Data Management** - Export/import resumes as JSON to save your work locally
+- **📊 Comprehensive Sections** - Profile, experience, education, projects, achievements, and skills
+- **🎯 Customizable Styling** - Pick your accent color to personalize your resume
+- **📱 Responsive Design** - Works seamlessly on desktop, tablet, and mobile
+- **⚡ Fast & Lightweight** - Built with modern tooling (Vite) for optimal performance
+- **🖨️ Print-Ready PDF Export** - Download professional PDFs without headers/footers
 
 ## 🛠️ Tech Stack
-* Frontend: React (Vite)
-* Styling: Tailwind CSS
-* PDF Export: react-to-print
-* Language: JavaScript (ES6+)
 
-## 🧰 Installation & Setup
-### 1. Clone the repository
-```
-git clone https://github.com/<your-username>/resume-builder.git
-cd resume-builder
-```
+| Technology | Purpose |
+|-----------|---------|
+| **React 18** | UI Framework |
+| **Vite** | Build tool & dev server |
+| **Tailwind CSS** | Utility-first styling |
+| **react-to-print** | PDF generation |
+| **JavaScript ES6+** | Core language |
 
-### 2. Install dependencies
-```
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 14+ 
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/resume-cover-letter-builder.git
+cd resume-cover-letter-builder
+
+# Install dependencies
 npm install
-```
 
-### 3. Start the development server
-```
+# Start development server
 npm run dev
 ```
-### 4. Open your browser and visit:
+
+The app will be available at `http://localhost:5173`
+
+### Build for Production
+
+```bash
+npm run build
+npm run preview
 ```
-http://localhost:5173
+
+## 📖 Usage Guide
+
+1. **Start Editing** - Fill in your profile information (name, email, phone, location)
+2. **Add Sections** - Add work experience, education, projects, achievements, and skills
+3. **Choose Template** - Select from Modern, Basic, or Sidebar designs in the Resume Template section
+4. **Customize** - Pick an accent color that matches your style
+5. **Preview** - See live updates in the right panel
+6. **Export** - Save as PDF or export data as JSON
+
+### Tab Navigation
+
+- **📄 Resume Tab** - Edit and preview your resume with template selection
+- **📝 Cover Letter Tab** - Create a customized cover letter for specific job applications
+
+## 📁 Project Structure
+
 ```
-
-## 🧾 Usage
-1. Enter your personal and professional details in the sidebar editor.
-2. Choose a template from the toolbar (Modern, Basic, or Sidebar).
-
-3. Preview your resume in real time as you edit.
-
-4. Click “Save as PDF” to download a clean, print-ready version of your resume.
-
-## 🧑‍💻 Folder Structure
-```
-resume-builder/
-│
-├── src/
-│   ├── components/
-│   │   ├── Toolbar.jsx
-│   │   ├── TemplateModern.jsx
-│   │   ├── TemplateBasic.jsx
-│   │   ├── TemplateSidebar.jsx
-│   │   ├── TemplateSharedParts.jsx
+src/
+├── components/
+│   ├── editors/              # Form editors for each resume section
 │   │   ├── ProfileEditor.jsx
 │   │   ├── ExperienceEditor.jsx
 │   │   ├── EducationEditor.jsx
+│   │   ├── ProjectsEditor.jsx
 │   │   ├── AchievementsEditor.jsx
-│   │   └── SkillsEditor.jsx
-│   ├── data/
-│   │   └── defaultData.js
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-│
-├── public/
-│   └── favicon.ico
-│
-├── package.json
-├── tailwind.config.js
-└── README.md
+│   │   ├── SkillsEditor.jsx
+│   │   ├── BulletsEditor.jsx
+│   │   ├── ResumeEditor.jsx
+│   │   └── CoverLetterEditor.jsx
+│   ├── templates/            # Resume & cover letter templates
+│   │   ├── ResumeTemplate.jsx
+│   │   └── CoverLetterTemplate.jsx
+│   ├── TemplateModern.jsx    # Modern resume design
+│   ├── TemplateBasic.jsx     # Basic resume design
+│   ├── TemplateSidebar.jsx   # Sidebar resume design
+│   ├── TemplateSharedParts.jsx  # Reusable template components
+│   ├── Toolbar.jsx           # Export/Import/PDF controls
+│   ├── TabNavigation.jsx     # Resume/Cover Letter switcher
+│   └── SharedInputs.jsx      # Reusable UI components
+├── data/
+│   └── defaultData.js        # Sample resume & cover letter data
+├── App.jsx                   # Main application component
+├── main.jsx                  # React entry point
+└── index.css                 # Tailwind directives
 ```
 
+## 🎨 Template Designs
+
+### Modern Template ✨
+Clean, contemporary design with bold typography and ample white space. Perfect for tech and creative professionals.
+
+### Basic Template 📋
+Traditional centered layout with classic serif typography. Ideal for conservative industries.
+
+### Sidebar Template 📑
+Professional two-column design with sidebar for skills and contact info. Great for organizing information clearly.
+
+## 🔧 Customization
+
+### Change Accent Color
+Use the color picker in the toolbar to customize the accent color throughout your resume.
+
+### Add Custom Sections
+Easily extend the app by adding new editor components and integrating them into ResumeEditor.jsx.
+
+### Modify Templates
+Edit template files in `src/components/` to adjust spacing, fonts, colors, and layout.
+
 ## 📦 Dependencies
-```
-"dependencies": {
-  "react": "^18.x",
-  "react-dom": "^18.x",
-  "react-to-print": "^3.x",
-  "tailwindcss": "^3.x"
+
+```json
+{
+  "react": "^18.2.0",
+  "react-dom": "^18.2.0",
+  "react-to-print": "^3.0.0",
+  "tailwindcss": "^3.3.0",
+  "vite": "^5.0.0"
 }
 ```
 
-## 📸 Preview
+## 💡 Tips & Tricks
 
-## 🧑‍🎨 Author
-Developed by **Ferx Technologies**<br>
-Maintained by Joseph Fernando
+- **Quick Bullets** - Press Enter to add multiple bullet points without clicking "Add"
+- **Reorder Sections** - Use ↑/↓ buttons to move items up and down
+- **Save Your Work** - Export JSON regularly to backup your resume data
+- **Print Optimization** - The PDF export automatically hides the UI for clean printing
+- **Mobile Editing** - Edit on the go with the responsive mobile-friendly interface
 
-## 📜 License
-This project is licensed under the MIT License – you’re free to use, modify, and distribute it.
+## 🐛 Known Limitations
+
+- Cover letter templates are limited to one professional design
+- No built-in spell checker (use browser extensions)
+- Images cannot be embedded in resumes
+
+## 🚀 Future Enhancements
+
+- [ ] Dark mode support
+- [ ] More template designs
+- [ ] Resume ATS optimization checker
+- [ ] Spell checking integration
+- [ ] Template preview gallery
+- [ ] Cloud sync and backup
+- [ ] Share resume link feature
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs and request features via GitHub Issues
+- Submit pull requests for improvements
+- Share template designs
+- Improve documentation
+
+## 👨‍💻 Author
+
+**Your Name** - [GitHub](https://github.com/yourusername) | [Portfolio](https://yourportfolio.com)
+
+---
+
+**Ready to build your resume?** [Try it now](#getting-started) or [View Demo](#)
+
+Made with ❤️ using React & Tailwind CSS
