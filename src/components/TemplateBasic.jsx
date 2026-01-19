@@ -17,22 +17,24 @@ export default function TemplateBasic({ data }) {
           {profile.email} • {profile.phone} • {profile.location}
         </p>
 
+        {/* Profile Links */}
         {data.links?.length > 0 && (
-          <p className="mt-1 text-xs text-gray-600">
-            {data.links.map((l, i) => (
-              <span key={l.id}>
+          <div className="mt-2 text-xs text-gray-600 space-y-0.5">
+            {data.links.map((l) => (
+              <div key={l.id}>
+                <span className="font-medium">{l.label}</span>
+                {" • "}
                 <a
                   href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-sky-600 hover:underline print:no-underline"
                 >
-                  {l.label}
+                  {l.url}
                 </a>
-                {i < data.links.length - 1 && " • "}
-              </span>
+              </div>
             ))}
-          </p>
+          </div>
         )}
       </div>
 

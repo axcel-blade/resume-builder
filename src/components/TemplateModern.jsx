@@ -20,19 +20,22 @@ export default function TemplateModern({ data }) {
           {profile.website && <span>{profile.website}</span>}
         </div>
 
-        {/* Links */}
+        {/* Profile Links */}
         {data.links?.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
+          <div className="mt-2 text-xs text-gray-600 space-y-0.5">
             {data.links.map((l) => (
-              <a
-                key={l.id}
-                href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:underline text-sky-600 print:no-underline"
-              >
-                {l.label}
-              </a>
+              <div key={l.id} className="flex items-center gap-2">
+                <span className="font-medium">{l.label}</span>
+                <span className="text-gray-400">•</span>
+                <a
+                  href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sky-600 hover:underline print:no-underline break-all"
+                >
+                  {l.url}
+                </a>
+              </div>
             ))}
           </div>
         )}

@@ -29,22 +29,23 @@ export default function TemplateSidebar({ data }) {
           </ul>
         </div>
 
-        {/* Websites & Social Links */}
+        {/* Profile Links */}
         {data.links?.length > 0 && (
           <div className="mb-2" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
             <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
-              WEBSITES & SOCIAL LINKS
+              LINKS
             </h3>
-            <ul className="text-[11.5px] text-gray-700 leading-[1.3] space-y-[1px]">
+            <ul className="text-[11.5px] text-gray-700 leading-[1.3] space-y-[2px]">
               {data.links.map((l) => (
-                <li key={l.id}>
+                <li key={l.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+                  <div className="font-medium">{l.label}</div>
                   <a
                     href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sky-600 hover:underline print:no-underline"
+                    className="text-sky-600 hover:underline print:no-underline break-all text-[11px]"
                   >
-                    {l.label}
+                    {l.url}
                   </a>
                 </li>
               ))}
