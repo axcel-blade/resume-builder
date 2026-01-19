@@ -1,6 +1,9 @@
 import React, { useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import TemplateModern from "./TemplateModern";
+import TemplateBasic from "./TemplateBasic";
+import TemplateSidebar from "./TemplateSidebar";
 
 export default function Toolbar({ data, set }) {
   const fileInputRef = useRef(null);
@@ -39,50 +42,72 @@ export default function Toolbar({ data, set }) {
       btn.textContent = "Generating PDF...";
       btn.disabled = true;
 
-      // Create a temporary container with A4 dimensions and margins
-      const tempDiv = document.createElement("div");
-      tempDiv.style.position = "absolute";
-      tempDiv.style.left = "-9999px";
-      tempDiv.style.width = "210mm"; // A4 width
-      tempDiv.style.padding = "15mm"; // 15mm margins
-      tempDiv.style.boxSizing = "border-box";
-      tempDiv.style.backgroundColor = "#ffffff";
-
-      // Get all templates and render the active one
-      const templateDiv = document.querySelector('[id$="template"]');
-      if (!templateDiv) {
-        // Fallback: create a minimal resume from data
-        tempDiv.innerHTML = `
-          <div style="font-family: sans-serif; font-size: 14px; line-height: 1.5;">
-            <h1 style="margin: 0 0 10px 0; font-size: 24px;">${data.profile.fullName}</h1>
-            <p style="margin: 0 0 15px 0; color: #666;">${data.profile.email} • ${data.profile.phone} • ${data.profile.location}</p>
-            <p style="margin: 0 0 15px 0; line-height: 1.6;">${data.profile.summary}</p>
-          </div>
-        `;
+      // Get the appropriate template component
+      let TemplateComponent;
+      const template = data.meta?.template || "modern";
+      
+      if (template === "modern") {
+        TemplateComponent = TemplateModern;
+      } else if (template === "basic") {
+        TemplateComponent = TemplateBasic;
+      } else if (template === "sidebar") {
+        TemplateComponent = TemplateSidebar;
       } else {
-        tempDiv.innerHTML = templateDiv.innerHTML;
+        TemplateComponent = TemplateModern;
       }
 
-      document.body.appendChild(tempDiv);
-
-      // Convert to canvas
-      const dpi = 96;
-      const pixelsPerMM = dpi / 25.4;
+      // PDF Constants
       const pageWidthMM = 210;
       const pageHeightMM = 297;
       const marginMM = 15;
+      const dpi = 96;
+      const pixelsPerMM = dpi / 25.4;
 
-      const canvas = await html2canvas(tempDiv, {
+      // Create a temporary container with A4 dimensions
+      const tempDiv = document.createElement("div");
+      tempDiv.style.position = "absolute";
+      tempDiv.style.left = "-9999px";
+      tempDiv.style.width = pageWidthMM + "mm";
+      tempDiv.style.padding = marginMM + "mm";
+      tempDiv.style.boxSizing = "border-box";
+      tempDiv.style.backgroundColor = "#ffffff";
+      tempDiv.style.fontFamily = "sans-serif";
+
+      // Render the template component as HTML string
+      // We'll use ReactDOMServer or just clone the DOM
+      const templateElement = React.createElement(TemplateComponent, { data });
+      const { createRoot } = await import("react-dom/client");
+      const root = createRoot(tempDiv);
+      root.render(templateElement);
+
+      document.body.appendChild(tempDiv);
+
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      // Get actual rendered content
+      const contentToCapture = tempDiv.querySelector("div");
+      
+      if (!contentToCapture) {
+        throw new Error("Template failed to render");
+      }
+
+      // Convert to canvas
+      const canvas = await html2canvas(contentToCapture || tempDiv, {
         allowTaint: true,
         useCORS: true,
         scale: 2,
         logging: false,
         backgroundColor: "#ffffff",
-        windowHeight: tempDiv.scrollHeight,
+        windowHeight: contentToCapture?.scrollHeight || tempDiv.scrollHeight,
         windowWidth: pageWidthMM * pixelsPerMM * 2,
       });
 
-      document.body.removeChild(tempDiv);
+      // Unmount and cleanup
+      root.unmount();
+      if (tempDiv.parentNode) {
+        document.body.removeChild(tempDiv);
+      }
 
       // Create PDF
       const pdf = new jsPDF({
@@ -92,22 +117,27 @@ export default function Toolbar({ data, set }) {
         compress: true,
       });
 
-      // Calculate dimensions
-      const contentHeightPx = (pageHeightMM - marginMM * 2) * pixelsPerMM * 2;
+      // Calculate page dimensions
+      const contentAreaHeight = pageHeightMM - marginMM * 2;
+      const contentHeightPx = contentAreaHeight * pixelsPerMM * 2;
       const contentWidthPx = (pageWidthMM - marginMM * 2) * pixelsPerMM * 2;
+
+      // Calculate total pages
       const totalPages = Math.ceil(canvas.height / contentHeightPx);
 
-      // Add pages
+      console.log(`PDF: ${totalPages} pages from ${canvas.height}px canvas`);
+
+      // Add each page
       for (let pageNum = 0; pageNum < totalPages; pageNum++) {
         if (pageNum > 0) {
           pdf.addPage();
         }
 
-        // Calculate the slice of canvas for this page
         const sourceY = pageNum * contentHeightPx;
-        const sliceHeight = Math.min(contentHeightPx, canvas.height - sourceY);
+        const remainingHeight = canvas.height - sourceY;
+        const sliceHeight = Math.min(contentHeightPx, remainingHeight);
 
-        // Create a canvas for this page slice
+        // Create page canvas
         const pageCanvas = document.createElement("canvas");
         pageCanvas.width = contentWidthPx;
         pageCanvas.height = sliceHeight;
@@ -121,20 +151,16 @@ export default function Toolbar({ data, set }) {
           contentWidthPx, sliceHeight
         );
 
-        // Convert to image
-        const imgData = pageCanvas.toDataURL("image/png");
+        const pageImgData = pageCanvas.toDataURL("image/png");
+        const displayHeightMM = (sliceHeight / pixelsPerMM) / 2;
 
-        // Calculate display height
-        const displayHeight = (sliceHeight / pixelsPerMM) / 2;
-
-        // Add to PDF with margins
         pdf.addImage(
-          imgData,
+          pageImgData,
           "PNG",
           marginMM,
           marginMM,
           pageWidthMM - marginMM * 2,
-          displayHeight
+          displayHeightMM
         );
       }
 
@@ -144,9 +170,10 @@ export default function Toolbar({ data, set }) {
 
       btn.textContent = originalText;
       btn.disabled = false;
+      alert(`✓ PDF saved!\n${totalPages} page(s) generated`);
     } catch (error) {
-      console.error("PDF generation failed:", error);
-      alert("Failed to generate PDF. Please try again.");
+      console.error("PDF error:", error);
+      alert(`Failed to generate PDF:\n${error.message}`);
       btn.textContent = originalText;
       btn.disabled = false;
     }

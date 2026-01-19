@@ -8,7 +8,7 @@ export default function TemplateBasic({ data }) {
   return (
     <div className="print-page mx-auto text-[14px] leading-6 font-serif p-8">
       {/* Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
         <h1 className="text-3xl font-bold" style={{ color: accent }}>
           {profile.fullName}
         </h1>
@@ -38,17 +38,21 @@ export default function TemplateBasic({ data }) {
 
       {/* Sections */}
       {profile.summary && (
-        <Section title="Summary" accent={accent}>
-          <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
-            {profile.summary}
-          </p>
-        </Section>
+        <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+          <Section title="Summary" accent={accent}>
+            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
+              {profile.summary}
+            </p>
+          </Section>
+        </div>
       )}
 
       {data.experience?.length > 0 && (
         <Section title="Experience" accent={accent}>
           {data.experience.map((e) => (
-            <ExperienceBlock key={e.id} e={e} />
+            <div key={e.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <ExperienceBlock e={e} />
+            </div>
           ))}
         </Section>
       )}
@@ -56,7 +60,9 @@ export default function TemplateBasic({ data }) {
       {data.projects?.length > 0 && (
         <Section title="Projects" accent={accent}>
           {data.projects.map((p) => (
-            <ProjectsBlock key={p.id} p={p} />
+            <div key={p.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <ProjectsBlock p={p} />
+            </div>
           ))}
         </Section>
       )}
@@ -64,7 +70,9 @@ export default function TemplateBasic({ data }) {
       {data.education?.length > 0 && (
         <Section title="Education" accent={accent}>
           {data.education.map((e) => (
-            <EducationBlock key={e.id} e={e} />
+            <div key={e.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <EducationBlock e={e} />
+            </div>
           ))}
         </Section>
       )}
@@ -72,7 +80,9 @@ export default function TemplateBasic({ data }) {
       {data.achievements?.length > 0 && (
         <Section title="Achievements" accent={accent}>
           {data.achievements.map((a) => (
-            <AchievementsBlock key={a.id} a={a} />
+            <div key={a.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <AchievementsBlock a={a} />
+            </div>
           ))}
         </Section>
       )}
@@ -81,7 +91,9 @@ export default function TemplateBasic({ data }) {
       {data.skillGroups?.length > 0 && (
         <Section title="Skills" accent={accent}>
           {data.skillGroups.map((g) => (
-            <SkillsBlock key={g.id} group={g} />
+            <div key={g.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <SkillsBlock group={g} />
+            </div>
           ))}
         </Section>
       )}

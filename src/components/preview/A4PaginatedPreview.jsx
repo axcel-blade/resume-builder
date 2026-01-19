@@ -20,10 +20,11 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
       }
 
       const totalHeight = contentRef.current.scrollHeight;
-      const numPages = Math.ceil(totalHeight / CONTENT_HEIGHT);
+      // Add small buffer to prevent cutting off content
+      const numPages = Math.ceil((totalHeight + 10) / CONTENT_HEIGHT);
       setTotalPages(Math.max(1, numPages));
       setCurrentPage(0); // Reset to first page
-    }, 100);
+    }, 150);
 
     return () => clearTimeout(timer);
   }, [data, CONTENT_HEIGHT]);

@@ -9,7 +9,7 @@ export default function TemplateSidebar({ data }) {
       {/* SIDEBAR */}
       <aside className="w-[30%] bg-gray-50 border-r border-gray-200 px-4 py-5">
         {/* Name & Title */}
-        <div className="mb-2">
+        <div className="mb-2" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h1 className="text-xl font-bold leading-tight" style={{ color: accent }}>
             {profile.fullName}
           </h1>
@@ -17,7 +17,7 @@ export default function TemplateSidebar({ data }) {
         </div>
 
         {/* Personal Details */}
-        <div className="mb-2">
+        <div className="mb-2" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
             PERSONAL DETAILS
           </h3>
@@ -31,7 +31,7 @@ export default function TemplateSidebar({ data }) {
 
         {/* Websites & Social Links */}
         {data.links?.length > 0 && (
-          <div className="mb-2">
+          <div className="mb-2" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
             <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
               WEBSITES & SOCIAL LINKS
             </h3>
@@ -54,12 +54,12 @@ export default function TemplateSidebar({ data }) {
 
         {/* Skills */}
         {data.skillGroups?.length > 0 && (
-          <div>
+          <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
             <h3 className="text-[12px] font-semibold mb-[2px]" style={{ color: accent }}>
               SKILLS
             </h3>
             {data.skillGroups.map((g) => (
-              <div key={g.id} className="mb-[4px]">
+              <div key={g.id} className="mb-[4px]" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
                 <p className="font-semibold text-[12px] text-gray-800">{g.title}</p>
                 {g.bullets?.length > 0 && (
                   <ul className="ml-4 list-disc text-[11.5px] text-gray-700 leading-[1.3]">
@@ -78,7 +78,7 @@ export default function TemplateSidebar({ data }) {
       <main className="flex-1 px-6 py-5">
         {/* Summary */}
         {profile.summary && (
-          <div className="mt-4">
+          <div className="mt-4" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
             <h3
               className="mb-1 text-xs font-semibold uppercase tracking-wider"
               style={{ color: accent }}
@@ -104,7 +104,7 @@ export default function TemplateSidebar({ data }) {
             </h3>
             <div className="space-y-2 text-sm text-gray-800">
               {data.experience.map((e) => (
-                <div key={e.id} className="mb-[6px]">
+                <div key={e.id} className="mb-[6px]" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
                   <div className="font-semibold text-[12.5px]">
                     {e.role}
                     {e.company && (
@@ -138,7 +138,7 @@ export default function TemplateSidebar({ data }) {
             </h3>
             <div className="space-y-2 text-sm text-gray-800">
               {data.education.map((e) => (
-                <div key={e.id} className="mb-[6px]">
+                <div key={e.id} className="mb-[6px]" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
                   <div className="font-semibold text-[12.5px]">
                     {e.degree}
                     {e.school && (
@@ -172,7 +172,7 @@ export default function TemplateSidebar({ data }) {
             </h3>
             <div className="space-y-2 text-sm text-gray-800">
               {data.projects.map((p) => (
-                <div key={p.id} className="mb-[6px]">
+                <div key={p.id} className="mb-[6px]" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
                   <div className="font-semibold text-[12.5px]">{p.title}</div>
                   <div className="text-[11px] text-gray-500 mb-[2px]">
                     {p.organization} | {p.start} – {p.end}
@@ -201,7 +201,7 @@ export default function TemplateSidebar({ data }) {
             </h3>
             <div className="space-y-2 text-sm text-gray-800">
               {data.achievements.map((a) => (
-                <div key={a.id} className="mb-[6px]">
+                <div key={a.id} className="mb-[6px]" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
                   <div className="font-semibold text-[12.5px]">
                     {a.title}
                     {a.organization && (

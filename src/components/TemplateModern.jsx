@@ -8,7 +8,7 @@ export default function TemplateModern({ data }) {
   return (
     <div className="p-8 text-[14px] leading-5">
       {/* Header */}
-      <div className="mb-4">
+      <div className="mb-4" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
         <h1 className="text-3xl font-bold leading-tight" style={{ color: accent }}>
           {profile.fullName}
         </h1>
@@ -40,18 +40,22 @@ export default function TemplateModern({ data }) {
 
       {/* Summary */}
       {profile.summary && (
-        <Section title="Summary" accent={accent}>
-          <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
-            {profile.summary}
-          </p>
-        </Section>
+        <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+          <Section title="Summary" accent={accent}>
+            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
+              {profile.summary}
+            </p>
+          </Section>
+        </div>
       )}
 
       {/* Experience */}
       {data.experience?.length > 0 && (
         <Section title="Experience" accent={accent}>
           {data.experience.map((e) => (
-            <ExperienceBlock key={e.id} e={e} />
+            <div key={e.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <ExperienceBlock e={e} />
+            </div>
           ))}
         </Section>
       )}
@@ -60,7 +64,9 @@ export default function TemplateModern({ data }) {
       {data.projects?.length > 0 && (
         <Section title="Projects" accent={accent}>
           {data.projects.map((p) => (
-            <ProjectsBlock key={p.id} p={p} />
+            <div key={p.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <ProjectsBlock p={p} />
+            </div>
           ))}
         </Section>
       )}
@@ -69,7 +75,9 @@ export default function TemplateModern({ data }) {
       {data.education?.length > 0 && (
         <Section title="Education" accent={accent}>
           {data.education.map((e) => (
-            <EducationBlock key={e.id} e={e} />
+            <div key={e.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <EducationBlock e={e} />
+            </div>
           ))}
         </Section>
       )}
@@ -78,7 +86,9 @@ export default function TemplateModern({ data }) {
       {data.achievements?.length > 0 && (
         <Section title="Achievements" accent={accent}>
           {data.achievements.map((a) => (
-            <AchievementsBlock key={a.id} a={a} />
+            <div key={a.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <AchievementsBlock a={a} />
+            </div>
           ))}
         </Section>
       )}
@@ -87,7 +97,9 @@ export default function TemplateModern({ data }) {
       {data.skillGroups?.length > 0 && (
         <Section title="Skills" accent={accent}>
           {data.skillGroups.map((g) => (
-            <SkillsBlock key={g.id} group={g} />
+            <div key={g.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+              <SkillsBlock group={g} />
+            </div>
           ))}
         </Section>
       )}
