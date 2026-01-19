@@ -59,7 +59,8 @@ export default function Toolbar({ data, set }) {
       // PDF Constants
       const pageWidthMM = 210;
       const pageHeightMM = 297;
-      const marginMM = 15;
+      const isSidebar = (data.meta?.template || "modern") === "sidebar";
+      const marginMM = isSidebar ? 0 : 15; // No margin for sidebar
       const dpi = 96;
       const pixelsPerMM = dpi / 25.4;
 
@@ -68,7 +69,7 @@ export default function Toolbar({ data, set }) {
       tempDiv.style.position = "absolute";
       tempDiv.style.left = "-9999px";
       tempDiv.style.width = pageWidthMM + "mm";
-      tempDiv.style.padding = marginMM + "mm";
+      tempDiv.style.padding = marginMM > 0 ? marginMM + "mm" : "0";
       tempDiv.style.boxSizing = "border-box";
       tempDiv.style.backgroundColor = "#ffffff";
       tempDiv.style.fontFamily = "sans-serif";
