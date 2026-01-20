@@ -6,29 +6,44 @@ export default function TemplateBasic({ data }) {
   const profile = data.profile;
 
   return (
-    <div className="print-page mx-auto text-[14px] leading-6 font-serif p-8">
-      {/* Header */}
-      <div className="text-center mb-6" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
-        <h1 className="text-3xl font-bold" style={{ color: accent }}>
+    <div 
+      className="text-[14px] leading-6 font-serif"
+      style={{ 
+        backgroundColor: "#ffffff",
+        margin: 0,
+        padding: "60px 60px 60px 60px",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Header - Keep on first page */}
+      <div 
+        className="text-center mb-6" 
+        style={{ 
+          pageBreakInside: "avoid",
+          pageBreakAfter: "avoid"
+        }}
+      >
+        <h1 className="text-3xl font-bold m-0" style={{ color: accent }}>
           {profile.fullName}
         </h1>
-        <p className="text-gray-700 text-sm">{profile.title}</p>
-        <p className="text-xs text-gray-600 mt-1">
-          {profile.email} • {profile.phone} • {profile.location}
+        <p className="text-gray-700 text-sm m-0 mt-1">{profile.title}</p>
+        <p className="text-xs text-gray-600 mt-1 m-0">
+          {profile.email} | {profile.phone} | {profile.location}
         </p>
 
         {/* Profile Links */}
         {data.links?.length > 0 && (
-          <div className="mt-2 text-xs text-gray-600 space-y-0.5">
+          <div className="mt-2 text-xs text-gray-600">
             {data.links.map((l) => (
-              <div key={l.id}>
+              <div key={l.id} style={{ margin: 0, marginBottom: "2px" }}>
                 <span className="font-medium">{l.label}</span>
-                {" • "}
+                {" | "}
                 <a
                   href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sky-600 hover:underline print:no-underline"
+                  className="text-sky-600"
                 >
                   {l.url}
                 </a>
@@ -38,11 +53,11 @@ export default function TemplateBasic({ data }) {
         )}
       </div>
 
-      {/* Sections */}
+      {/* Sections - Each section can move to next page */}
       {profile.summary && (
-        <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
+        <div style={{ marginBottom: "12px" }}>
           <Section title="Summary" accent={accent}>
-            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words">
+            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words leading-[1.5]">
               {profile.summary}
             </p>
           </Section>
@@ -50,54 +65,94 @@ export default function TemplateBasic({ data }) {
       )}
 
       {data.experience?.length > 0 && (
-        <Section title="Experience" accent={accent}>
-          {data.experience.map((e) => (
-            <div key={e.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
-              <ExperienceBlock e={e} />
-            </div>
-          ))}
-        </Section>
+        <div style={{ marginBottom: "12px" }}>
+          <Section title="Experience" accent={accent}>
+            {data.experience.map((e, idx) => (
+              <div 
+                key={e.id} 
+                style={{ 
+                  pageBreakInside: "avoid",
+                  marginBottom: idx < data.experience.length - 1 ? "12px" : "0",
+                }}
+              >
+                <ExperienceBlock e={e} />
+              </div>
+            ))}
+          </Section>
+        </div>
       )}
 
       {data.projects?.length > 0 && (
-        <Section title="Projects" accent={accent}>
-          {data.projects.map((p) => (
-            <div key={p.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
-              <ProjectsBlock p={p} />
-            </div>
-          ))}
-        </Section>
+        <div style={{ marginBottom: "12px" }}>
+          <Section title="Projects" accent={accent}>
+            {data.projects.map((p, idx) => (
+              <div 
+                key={p.id} 
+                style={{ 
+                  pageBreakInside: "avoid",
+                  marginBottom: idx < data.projects.length - 1 ? "12px" : "0",
+                }}
+              >
+                <ProjectsBlock p={p} />
+              </div>
+            ))}
+          </Section>
+        </div>
       )}
 
       {data.education?.length > 0 && (
-        <Section title="Education" accent={accent}>
-          {data.education.map((e) => (
-            <div key={e.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
-              <EducationBlock e={e} />
-            </div>
-          ))}
-        </Section>
+        <div style={{ marginBottom: "12px" }}>
+          <Section title="Education" accent={accent}>
+            {data.education.map((e, idx) => (
+              <div 
+                key={e.id} 
+                style={{ 
+                  pageBreakInside: "avoid",
+                  marginBottom: idx < data.education.length - 1 ? "12px" : "0",
+                }}
+              >
+                <EducationBlock e={e} />
+              </div>
+            ))}
+          </Section>
+        </div>
       )}
 
       {data.achievements?.length > 0 && (
-        <Section title="Achievements" accent={accent}>
-          {data.achievements.map((a) => (
-            <div key={a.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
-              <AchievementsBlock a={a} />
-            </div>
-          ))}
-        </Section>
+        <div style={{ marginBottom: "12px" }}>
+          <Section title="Achievements" accent={accent}>
+            {data.achievements.map((a, idx) => (
+              <div 
+                key={a.id} 
+                style={{ 
+                  pageBreakInside: "avoid",
+                  marginBottom: idx < data.achievements.length - 1 ? "12px" : "0",
+                }}
+              >
+                <AchievementsBlock a={a} />
+              </div>
+            ))}
+          </Section>
+        </div>
       )}
 
       {/* Skill Groups */}
       {data.skillGroups?.length > 0 && (
-        <Section title="Skills" accent={accent}>
-          {data.skillGroups.map((g) => (
-            <div key={g.id} style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
-              <SkillsBlock group={g} />
-            </div>
-          ))}
-        </Section>
+        <div>
+          <Section title="Skills" accent={accent}>
+            {data.skillGroups.map((g, idx) => (
+              <div 
+                key={g.id} 
+                style={{ 
+                  pageBreakInside: "avoid",
+                  marginBottom: idx < data.skillGroups.length - 1 ? "12px" : "0",
+                }}
+              >
+                <SkillsBlock group={g} />
+              </div>
+            ))}
+          </Section>
+        </div>
       )}
     </div>
   );

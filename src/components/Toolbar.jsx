@@ -60,7 +60,7 @@ export default function Toolbar({ data, set }) {
       const pageWidthMM = 210;
       const pageHeightMM = 297;
       const isSidebar = (data.meta?.template || "modern") === "sidebar";
-      const marginMM = isSidebar ? 0 : 15; // No margin for sidebar
+      const marginMM = isSidebar ? 0 : 15;
       const dpi = 96;
       const pixelsPerMM = dpi / 25.4;
 
@@ -72,53 +72,64 @@ export default function Toolbar({ data, set }) {
       tempDiv.style.padding = marginMM > 0 ? marginMM + "mm" : "0";
       tempDiv.style.boxSizing = "border-box";
       tempDiv.style.backgroundColor = "#ffffff";
-      tempDiv.style.fontFamily = "sans-serif";
+      tempDiv.style.fontFamily = "system-ui, -apple-system, sans-serif";
+      tempDiv.style.lineHeight = "1.5";
+      tempDiv.style.color = "#000000";
 
-      // Render the template component as HTML string
-      // We'll use ReactDOMServer or just clone the DOM
-      const templateElement = React.createElement(TemplateComponent, { data });
+      // Import React DOM for server rendering
       const { createRoot } = await import("react-dom/client");
       const root = createRoot(tempDiv);
-      root.render(templateElement);
-
+      
+      // Render template
+      root.render(React.createElement(TemplateComponent, { data }));
       document.body.appendChild(tempDiv);
 
-      // Wait for rendering
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // Wait for rendering and DOM settlement
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          // Force a reflow to ensure all content is rendered
+          tempDiv.offsetHeight;
+          resolve();
+        }, 800);
+      });
 
-      // Get actual rendered content
-      const contentToCapture = tempDiv.querySelector("div");
-      
-      if (!contentToCapture) {
+      const contentElement = tempDiv.querySelector("div");
+      if (!contentElement) {
         throw new Error("Template failed to render");
       }
 
-      // Convert to canvas
-      const canvas = await html2canvas(contentToCapture || tempDiv, {
+      // Convert to canvas with better settings
+      const canvas = await html2canvas(contentElement || tempDiv, {
         allowTaint: true,
         useCORS: true,
         scale: 2,
         logging: false,
         backgroundColor: "#ffffff",
-        windowHeight: contentToCapture?.scrollHeight || tempDiv.scrollHeight,
+        windowHeight: tempDiv.scrollHeight,
         windowWidth: pageWidthMM * pixelsPerMM * 2,
+        ignoreElements: (element) => {
+          // Ignore hidden or non-rendering elements
+          return element.style.display === "none" || 
+                 element.style.visibility === "hidden";
+        },
       });
 
-      // Unmount and cleanup
+      // Cleanup
       root.unmount();
       if (tempDiv.parentNode) {
         document.body.removeChild(tempDiv);
       }
 
-      // Create PDF
+      // Create PDF with proper settings
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
         compress: true,
+        precision: 16,
       });
 
-      // Calculate page dimensions
+      // Calculate dimensions
       const contentAreaHeight = pageHeightMM - marginMM * 2;
       const contentHeightPx = contentAreaHeight * pixelsPerMM * 2;
       const contentWidthPx = (pageWidthMM - marginMM * 2) * pixelsPerMM * 2;
@@ -126,9 +137,9 @@ export default function Toolbar({ data, set }) {
       // Calculate total pages
       const totalPages = Math.ceil(canvas.height / contentHeightPx);
 
-      console.log(`PDF: ${totalPages} pages from ${canvas.height}px canvas`);
+      console.log(`Generating PDF: ${totalPages} pages from ${canvas.height}px canvas`);
 
-      // Add each page
+      // Add each page to PDF
       for (let pageNum = 0; pageNum < totalPages; pageNum++) {
         if (pageNum > 0) {
           pdf.addPage();
@@ -138,23 +149,34 @@ export default function Toolbar({ data, set }) {
         const remainingHeight = canvas.height - sourceY;
         const sliceHeight = Math.min(contentHeightPx, remainingHeight);
 
-        // Create page canvas
+        // Create a canvas for this page
         const pageCanvas = document.createElement("canvas");
         pageCanvas.width = contentWidthPx;
         pageCanvas.height = sliceHeight;
 
         const ctx = pageCanvas.getContext("2d");
+        if (!ctx) {
+          throw new Error("Failed to get canvas context");
+        }
+
+        // Draw the slice of the full canvas onto the page canvas
         ctx.drawImage(
           canvas,
-          0, sourceY,
-          contentWidthPx, sliceHeight,
-          0, 0,
-          contentWidthPx, sliceHeight
+          0,
+          sourceY,
+          contentWidthPx,
+          sliceHeight,
+          0,
+          0,
+          contentWidthPx,
+          sliceHeight
         );
 
+        // Convert page canvas to image
         const pageImgData = pageCanvas.toDataURL("image/png");
         const displayHeightMM = (sliceHeight / pixelsPerMM) / 2;
 
+        // Add image to PDF page
         pdf.addImage(
           pageImgData,
           "PNG",
@@ -165,15 +187,15 @@ export default function Toolbar({ data, set }) {
         );
       }
 
-      // Download PDF
+      // Save the PDF
       const fileName = `${(data.profile.fullName || "resume").replace(/\s+/g, "_")}.pdf`;
       pdf.save(fileName);
 
       btn.textContent = originalText;
       btn.disabled = false;
-      alert(`✓ PDF saved!\n${totalPages} page(s) generated`);
+      alert(`Success! PDF saved.\n${totalPages} page(s) generated`);
     } catch (error) {
-      console.error("PDF error:", error);
+      console.error("PDF generation error:", error);
       alert(`Failed to generate PDF:\n${error.message}`);
       btn.textContent = originalText;
       btn.disabled = false;
