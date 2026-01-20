@@ -4,6 +4,7 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const contentRef = useRef(null);
+  const [pages, setPages] = useState([]);
 
   // A4 Constants at 96 DPI
   const A4_WIDTH_PX = 794; // 210mm
@@ -11,20 +12,33 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
   const MARGIN_PX = 56; // 15mm
   const CONTENT_HEIGHT = A4_HEIGHT_PX - MARGIN_PX * 2;
 
-  // Calculate total pages when data changes
+  // Calculate pages when data changes
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!contentRef.current) {
-        setTotalPages(1);
+        setPages([]);
+        setTotalPages(0);
         return;
       }
 
-      const totalHeight = contentRef.current.scrollHeight;
-      // Add small buffer to prevent cutting off content
-      const numPages = Math.ceil((totalHeight + 10) / CONTENT_HEIGHT);
+      // Get the full content height
+      const fullHeight = contentRef.current.scrollHeight;
+      const numPages = Math.ceil(fullHeight / CONTENT_HEIGHT);
+      
+      // Create page segments
+      const pageArray = [];
+      for (let i = 0; i < numPages; i++) {
+        pageArray.push({
+          pageNum: i,
+          startY: i * CONTENT_HEIGHT,
+          endY: (i + 1) * CONTENT_HEIGHT,
+        });
+      }
+      
+      setPages(pageArray);
       setTotalPages(Math.max(1, numPages));
-      setCurrentPage(0); // Reset to first page
-    }, 150);
+      setCurrentPage(0);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [data, CONTENT_HEIGHT]);
@@ -53,9 +67,11 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
     setCurrentPage((prev) => Math.max(prev - 1, 0));
   };
 
-  if (!TemplateComponent) {
-    return <div className="text-center text-red-500 p-4">Template not found</div>;
+  if (!TemplateComponent || totalPages === 0) {
+    return <div className="text-center text-gray-400 p-8">Loading preview...</div>;
   }
+
+  const currentPageData = pages[currentPage];
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
@@ -67,44 +83,44 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
           TemplateComponent={TemplateComponent}
           contentRef={contentRef}
           CONTENT_HEIGHT={CONTENT_HEIGHT}
+          MARGIN_PX={MARGIN_PX}
+          A4_WIDTH_PX={A4_WIDTH_PX}
+          A4_HEIGHT_PX={A4_HEIGHT_PX}
         />
       </div>
 
       {/* Navigation Controls */}
       <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
-        {/* Previous Button */}
         <button
           onClick={goToPreviousPage}
           disabled={currentPage === 0}
-          className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition"
-          title="Previous page (← Arrow)"
+          className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          title="Previous page"
         >
           <span className="text-lg">←</span>
           <span className="text-sm font-medium">Previous</span>
         </button>
 
-        {/* Page Counter */}
         <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg">
           <span className="text-sm font-semibold text-gray-700">
-            Page <span className="text-sky-600">{currentPage + 1}</span> of <span className="text-sky-600">{totalPages}</span>
+            Page <span className="text-sky-600">{currentPage + 1}</span> of{" "}
+            <span className="text-sky-600">{totalPages}</span>
           </span>
         </div>
 
-        {/* Next Button */}
         <button
           onClick={goToNextPage}
           disabled={currentPage === totalPages - 1}
-          className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition"
-          title="Next page (→ Arrow)"
+          className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          title="Next page"
         >
           <span className="text-sm font-medium">Next</span>
           <span className="text-lg">→</span>
         </button>
       </div>
 
-      {/* Keyboard Hint */}
       <div className="text-xs text-gray-400 text-center">
-        Use arrow keys (← →) or buttons to navigate pages
+        Use arrow keys or buttons to navigate pages
       </div>
     </div>
   );
@@ -116,16 +132,10 @@ function A4Page({
   TemplateComponent,
   contentRef,
   CONTENT_HEIGHT,
+  MARGIN_PX,
+  A4_WIDTH_PX,
+  A4_HEIGHT_PX,
 }) {
-  // A4 Constants
-  const A4_WIDTH_PX = 794;
-  const A4_HEIGHT_PX = 1123;
-  const MARGIN_PX = 56;
-
-  if (!TemplateComponent) {
-    return null;
-  }
-
   return (
     <div
       className="shadow-lg bg-white rounded-lg overflow-hidden"
@@ -135,7 +145,7 @@ function A4Page({
         position: "relative",
       }}
     >
-      {/* A4 Page Container with Margins */}
+      {/* A4 Page Container with Margins and Page Break Prevention */}
       <div
         style={{
           width: "100%",
@@ -147,7 +157,7 @@ function A4Page({
         }}
       >
         {/* Page Number Badge */}
-        <div 
+        <div
           className="absolute text-xs text-gray-400 pointer-events-none bg-gray-50 rounded px-2 py-1"
           style={{
             bottom: "8px",
@@ -158,7 +168,7 @@ function A4Page({
           Page {pageNum + 1}
         </div>
 
-        {/* Content Area */}
+        {/* Content Area with Clipping */}
         <div
           style={{
             height: `${CONTENT_HEIGHT}px`,
@@ -171,8 +181,9 @@ function A4Page({
           <div
             style={{
               transform: `translateY(-${pageNum * CONTENT_HEIGHT}px)`,
-              transition: "none",
+              transition: "transform 0.2s ease-out",
               width: "100%",
+              willChange: "transform",
             }}
           >
             <div

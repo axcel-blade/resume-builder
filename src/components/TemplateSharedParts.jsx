@@ -2,7 +2,7 @@ import React from "react";
 
 export function Header({ profile, accent }) {
   return (
-    <div className="mb-4">
+    <div className="mb-4" style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
       <h1 className="text-3xl font-bold leading-tight" style={{ color: accent }}>
         {profile.fullName}
       </h1>
@@ -19,10 +19,10 @@ export function Header({ profile, accent }) {
 
 export function Section({ title, children, accent }) {
   return (
-    <div className="mt-4">
+    <div className="mt-4" style={{ pageBreakInside: "avoid", breakInside: "auto" }}>
       <h3
-        className="mb-1 text-xs font-semibold uppercase tracking-wider"
-        style={{ color: accent }}
+        className="mb-2 text-xs font-semibold uppercase tracking-wider"
+        style={{ color: accent, pageBreakAfter: "avoid" }}
       >
         {title}
       </h3>
@@ -32,10 +32,10 @@ export function Section({ title, children, accent }) {
 }
 
 export function Dot() {
-  return <span className="mx-2 text-gray-400">•</span>;
+  return <span className="mx-2 text-gray-400">|</span>;
 }
 
-/* 📅 Consistent Month-Year formatter */
+/* Month-Year formatter */
 export function monthYYYY(s) {
   if (!s) return "";
   if (s.toLowerCase() === "present") return "Present";
@@ -53,8 +53,8 @@ export const prefixHttp = (url) =>
 /* EXPERIENCE */
 export function ExperienceBlock({ e }) {
   return (
-    <div>
-      <div className="flex flex-wrap items-baseline text-[13px] font-medium">
+    <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
+      <div className="flex flex-wrap items-baseline text-[13px] font-medium gap-2">
         <span>{e.role}</span>
         {e.company && (
           <>
@@ -63,20 +63,22 @@ export function ExperienceBlock({ e }) {
           </>
         )}
         {(e.start || e.end) && (
-          <span className="ml-auto text-xs text-gray-500">
-            {monthYYYY(e.start)} – {monthYYYY(e.end) || "Present"}
+          <span className="ml-auto text-xs text-gray-500 whitespace-nowrap">
+            {monthYYYY(e.start)} - {monthYYYY(e.end) || "Present"}
           </span>
         )}
       </div>
       {(e.location || e.bullets?.length) && (
         <div className="mt-1 text-[13px] text-gray-700">
           {e.location && (
-            <div className="italic text-gray-500">{e.location}</div>
+            <div className="italic text-gray-500 text-[12px]">{e.location}</div>
           )}
           {e.bullets?.length > 0 && (
-            <ul className="ml-5 list-disc">
+            <ul className="ml-5 list-disc mt-1 space-y-0.5">
               {e.bullets.map((b, i) => (
-                <li key={i}>{b}</li>
+                <li key={i} className="text-[12.5px] text-gray-700 leading-[1.4]">
+                  {b}
+                </li>
               ))}
             </ul>
           )}
@@ -89,8 +91,8 @@ export function ExperienceBlock({ e }) {
 /* EDUCATION */
 export function EducationBlock({ e }) {
   return (
-    <div>
-      <div className="flex flex-wrap items-baseline text-[13px] font-medium">
+    <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
+      <div className="flex flex-wrap items-baseline text-[13px] font-medium gap-2">
         <span>{e.degree}</span>
         {e.school && (
           <>
@@ -99,20 +101,22 @@ export function EducationBlock({ e }) {
           </>
         )}
         {(e.start || e.end) && (
-          <span className="ml-auto text-xs text-gray-500">
-            {monthYYYY(e.start)} – {monthYYYY(e.end) || "Present"}
+          <span className="ml-auto text-xs text-gray-500 whitespace-nowrap">
+            {monthYYYY(e.start)} - {monthYYYY(e.end) || "Present"}
           </span>
         )}
       </div>
       {(e.location || e.bullets?.length) && (
         <div className="mt-1 text-[13px] text-gray-700">
           {e.location && (
-            <div className="italic text-gray-500">{e.location}</div>
+            <div className="italic text-gray-500 text-[12px]">{e.location}</div>
           )}
           {e.bullets?.length > 0 && (
-            <ul className="ml-5 list-disc">
+            <ul className="ml-5 list-disc mt-1 space-y-0.5">
               {e.bullets.map((b, i) => (
-                <li key={i}>{b}</li>
+                <li key={i} className="text-[12.5px] text-gray-700 leading-[1.4]">
+                  {b}
+                </li>
               ))}
             </ul>
           )}
@@ -125,8 +129,8 @@ export function EducationBlock({ e }) {
 /* ACHIEVEMENTS */
 export function AchievementsBlock({ a }) {
   return (
-    <div>
-      <div className="flex flex-wrap items-baseline text-[13px] font-medium">
+    <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
+      <div className="flex flex-wrap items-baseline text-[13px] font-medium gap-2">
         <span>{a.title}</span>
         {a.organization && (
           <>
@@ -135,15 +139,15 @@ export function AchievementsBlock({ a }) {
           </>
         )}
         {a.year && (
-          <span className="ml-auto text-xs text-gray-500">
+          <span className="ml-auto text-xs text-gray-500 whitespace-nowrap">
             {monthYYYY(a.year)}
           </span>
         )}
       </div>
       {a.bullets?.length > 0 && (
-        <ul className="ml-5 list-disc text-[13px] text-gray-700">
+        <ul className="ml-5 list-disc text-[12.5px] text-gray-700 mt-1 space-y-0.5">
           {a.bullets.map((b, i) => (
-            <li key={i}>{b}</li>
+            <li key={i} className="leading-[1.4]">{b}</li>
           ))}
         </ul>
       )}
@@ -154,8 +158,8 @@ export function AchievementsBlock({ a }) {
 /* PROJECTS */
 export function ProjectsBlock({ p }) {
   return (
-    <div>
-      <div className="flex flex-wrap items-baseline text-[13px] font-medium">
+    <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
+      <div className="flex flex-wrap items-baseline text-[13px] font-medium gap-2">
         <span>{p.title}</span>
         {p.organization && (
           <>
@@ -164,15 +168,15 @@ export function ProjectsBlock({ p }) {
           </>
         )}
         {(p.start || p.end) && (
-          <span className="ml-auto text-xs text-gray-500">
-            {monthYYYY(p.start)} – {monthYYYY(p.end) || "Present"}
+          <span className="ml-auto text-xs text-gray-500 whitespace-nowrap">
+            {monthYYYY(p.start)} - {monthYYYY(p.end) || "Present"}
           </span>
         )}
       </div>
       {p.bullets?.length > 0 && (
-        <ul className="ml-5 list-disc text-[13px] text-gray-700">
+        <ul className="ml-5 list-disc text-[12.5px] text-gray-700 mt-1 space-y-0.5">
           {p.bullets.map((b, i) => (
-            <li key={i}>{b}</li>
+            <li key={i} className="leading-[1.4]">{b}</li>
           ))}
         </ul>
       )}
@@ -183,12 +187,12 @@ export function ProjectsBlock({ p }) {
 /* SKILLS */
 export function SkillsBlock({ group }) {
   return (
-    <div>
+    <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
       <h4 className="font-semibold text-[13px] text-gray-800">{group.title}</h4>
       {group.bullets?.length > 0 && (
-        <ul className="ml-5 list-disc text-[13px] text-gray-700">
+        <ul className="ml-5 list-disc text-[12.5px] text-gray-700 mt-1 space-y-0.5">
           {group.bullets.map((b, i) => (
-            <li key={i}>{b}</li>
+            <li key={i} className="leading-[1.4]">{b}</li>
           ))}
         </ul>
       )}
