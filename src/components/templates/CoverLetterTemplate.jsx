@@ -37,7 +37,6 @@ export default function CoverLetterTemplate({ data }) {
 
       {/* Closing */}
       <div className="mt-8">
-        <p className="text-[14px]">Sincerely,</p>
         <div className="text-[14px]">
           <p className="font-semibold">{profile.fullName}</p>
           {profile.email && <p className="text-[13px] text-gray-600">{profile.email}</p>}
