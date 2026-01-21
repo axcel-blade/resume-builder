@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Toolbar from "./components/Toolbar";
+import ToolbarSidebar from "./components/ToolbarSidebar";
 import TabNavigation from "./components/TabNavigation";
 import ResumeEditor from "./components/editors/ResumeEditor";
 import CoverLetterEditor from "./components/editors/CoverLetterEditor";
@@ -36,12 +37,19 @@ export default function App() {
     }
   };
 
+  // Determine which toolbar to render
+  const isSidebarTemplate = data.meta?.template === "sidebar";
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto flex flex-col lg:flex-row gap-4 p-4">
         {/* EDITOR PANEL */}
         <div className="w-full lg:w-1/2 flex flex-col gap-4">
-          <Toolbar data={data} set={set} />
+          {isSidebarTemplate ? (
+            <ToolbarSidebar data={data} set={set} />
+          ) : (
+            <Toolbar data={data} set={set} />
+          )}
           <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {/* EDITOR CONTENT */}
