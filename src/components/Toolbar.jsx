@@ -44,48 +44,59 @@ export default function Toolbar({ data, set }) {
       const template = data.meta?.template || "modern";
       const TemplateComponent = template === "basic" ? TemplateBasic : TemplateModern;
 
+      // A4 dimensions in mm
       const pageWidthMM = 210;
       const pageHeightMM = 297;
-      const marginMM = 15;
-      const dpi = 96;
-      const pixelsPerMM = dpi / 25.4;
+      const marginTopMM = 15;
+      const marginBottomMM = 15;
+      const marginLeftMM = 15;
+      const marginRightMM = 15;
 
+      // Create container
       const tempDiv = document.createElement("div");
       tempDiv.style.position = "absolute";
       tempDiv.style.left = "-9999px";
-      tempDiv.style.width = pageWidthMM + "mm";
-      tempDiv.style.padding = marginMM + "mm";
+      tempDiv.style.width = (pageWidthMM - marginLeftMM - marginRightMM) + "mm";
+      tempDiv.style.padding = "0";
+      tempDiv.style.margin = "0";
       tempDiv.style.boxSizing = "border-box";
       tempDiv.style.backgroundColor = "#ffffff";
-      tempDiv.style.fontFamily = "system-ui, -apple-system, sans-serif";
-      tempDiv.style.lineHeight = "1.5";
+      tempDiv.style.fontFamily = "Arial, sans-serif";
+      tempDiv.style.lineHeight = "1.4";
       tempDiv.style.color = "#000000";
+      tempDiv.style.fontSize = "10pt";
+      tempDiv.style.overflow = "visible";
+      tempDiv.style.pageBreakInside = "avoid";
 
       const { createRoot } = await import("react-dom/client");
       const root = createRoot(tempDiv);
       root.render(React.createElement(TemplateComponent, { data }));
       document.body.appendChild(tempDiv);
 
+      // Wait for rendering
       await new Promise((resolve) => {
         setTimeout(() => {
           tempDiv.offsetHeight;
           resolve();
-        }, 800);
+        }, 1000);
       });
 
-      const contentElement = tempDiv.querySelector("div");
-      if (!contentElement) {
-        throw new Error("Template failed to render");
-      }
-
-      const canvas = await html2canvas(contentElement || tempDiv, {
-        allowTaint: true,
+      // Get actual content height
+      const contentHeight = tempDiv.scrollHeight;
+      
+      // Convert to canvas with high DPI
+      const dpi = 300;
+      const scale = dpi / 96;
+      
+      const canvas = await html2canvas(tempDiv, {
+        scale: scale,
         useCORS: true,
-        scale: 2,
-        logging: false,
+        allowTaint: true,
         backgroundColor: "#ffffff",
-        windowHeight: tempDiv.scrollHeight,
-        windowWidth: pageWidthMM * pixelsPerMM * 2,
+        logging: false,
+        letterRendering: true,
+        windowHeight: contentHeight,
+        windowWidth: tempDiv.offsetWidth,
       });
 
       root.unmount();
@@ -93,63 +104,88 @@ export default function Toolbar({ data, set }) {
         document.body.removeChild(tempDiv);
       }
 
+      // Create PDF
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
-        compress: true,
-        precision: 16,
+        compress: false,
       });
 
-      const contentAreaHeight = pageHeightMM - marginMM * 2;
-      const contentHeightPx = contentAreaHeight * pixelsPerMM * 2;
-      const contentWidthPx = (pageWidthMM - marginMM * 2) * pixelsPerMM * 2;
+      const pageContentWidth = pageWidthMM - marginLeftMM - marginRightMM;
+      const pageContentHeight = pageHeightMM - marginTopMM - marginBottomMM;
 
-      const totalPages = Math.ceil(canvas.height / contentHeightPx);
+      // Canvas dimensions
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
 
+      // Calculate pixels per mm at the scale we used
+      const pixelsPerMM = (dpi / 25.4);
+      
+      // Height of content area in pixels
+      const contentHeightPixels = pageContentHeight * pixelsPerMM;
+      
+      // Calculate number of pages needed
+      const totalPages = Math.ceil(canvasHeight / contentHeightPixels);
+
+      console.log(`PDF Info:
+        Canvas size: ${canvasWidth}x${canvasHeight}px
+        Page content area: ${pageContentWidth}x${pageContentHeight}mm
+        Content height pixels: ${contentHeightPixels}px
+        Total pages: ${totalPages}`);
+
+      // Add each page to PDF
       for (let pageNum = 0; pageNum < totalPages; pageNum++) {
         if (pageNum > 0) {
           pdf.addPage();
         }
 
-        const sourceY = pageNum * contentHeightPx;
-        const remainingHeight = canvas.height - sourceY;
-        const sliceHeight = Math.min(contentHeightPx, remainingHeight);
+        // Calculate what portion of the canvas to use for this page
+        const sourceYPixels = pageNum * contentHeightPixels;
+        const remainingHeightPixels = canvasHeight - sourceYPixels;
+        const pageHeightPixels = Math.min(contentHeightPixels, remainingHeightPixels);
 
+        // Create image for this page section
         const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = contentWidthPx;
-        pageCanvas.height = sliceHeight;
+        pageCanvas.width = canvasWidth;
+        pageCanvas.height = pageHeightPixels;
 
         const ctx = pageCanvas.getContext("2d");
         if (!ctx) {
           throw new Error("Failed to get canvas context");
         }
 
+        // Draw the slice
         ctx.drawImage(
           canvas,
           0,
-          sourceY,
-          contentWidthPx,
-          sliceHeight,
+          sourceYPixels,
+          canvasWidth,
+          pageHeightPixels,
           0,
           0,
-          contentWidthPx,
-          sliceHeight
+          canvasWidth,
+          pageHeightPixels
         );
 
-        const pageImgData = pageCanvas.toDataURL("image/png");
-        const displayHeightMM = (sliceHeight / pixelsPerMM) / 2;
+        // Convert to image data
+        const imgData = pageCanvas.toDataURL("image/png");
+
+        // Add to PDF with proper sizing
+        const imgWidthMM = pageContentWidth;
+        const imgHeightMM = (pageHeightPixels / pixelsPerMM);
 
         pdf.addImage(
-          pageImgData,
+          imgData,
           "PNG",
-          marginMM,
-          marginMM,
-          pageWidthMM - marginMM * 2,
-          displayHeightMM
+          marginLeftMM,
+          marginTopMM,
+          imgWidthMM,
+          imgHeightMM
         );
       }
 
+      // Save PDF
       const fileName = `${(data.profile.fullName || "resume").replace(/\s+/g, "_")}.pdf`;
       pdf.save(fileName);
 

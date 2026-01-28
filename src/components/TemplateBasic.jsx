@@ -11,9 +11,12 @@ export default function TemplateBasic({ data }) {
       style={{ 
         backgroundColor: "#ffffff",
         margin: 0,
-        padding: "60px 60px 60px 60px",
+        padding: "40px 40px 40px 40px",
         width: "100%",
         boxSizing: "border-box",
+        wordWrap: "break-word",
+        overflowWrap: "break-word",
+        whiteSpace: "normal",
       }}
     >
       {/* Header - Keep on first page */}
@@ -21,22 +24,59 @@ export default function TemplateBasic({ data }) {
         className="text-center mb-6" 
         style={{ 
           pageBreakInside: "avoid",
-          pageBreakAfter: "avoid"
+          pageBreakAfter: "avoid",
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
         }}
       >
-        <h1 className="text-3xl font-bold m-0" style={{ color: accent }}>
+        <h1 
+          className="text-3xl font-bold m-0" 
+          style={{ 
+            color: accent,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
+        >
           {profile.fullName}
         </h1>
-        <p className="text-gray-700 text-sm m-0 mt-1">{profile.title}</p>
-        <p className="text-xs text-gray-600 mt-1 m-0">
+        <p 
+          className="text-gray-700 text-sm m-0 mt-1"
+          style={{
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
+        >
+          {profile.title}
+        </p>
+        <p 
+          className="text-xs text-gray-600 mt-1 m-0"
+          style={{
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
+        >
           {profile.email} | {profile.phone} | {profile.location}
         </p>
 
         {/* Profile Links */}
         {data.links?.length > 0 && (
-          <div className="mt-2 text-xs text-gray-600">
+          <div 
+            className="mt-2 text-xs text-gray-600"
+            style={{
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
             {data.links.map((l) => (
-              <div key={l.id} style={{ margin: 0, marginBottom: "2px" }}>
+              <div 
+                key={l.id} 
+                style={{ 
+                  margin: 0, 
+                  marginBottom: "2px",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                }}
+              >
                 <span className="font-medium">{l.label}</span>
                 {" | "}
                 <a
@@ -44,6 +84,10 @@ export default function TemplateBasic({ data }) {
                   target="_blank"
                   rel="noreferrer"
                   className="text-sky-600"
+                  style={{
+                    wordWrap: "break-word",
+                    overflowWrap: "break-word",
+                  }}
                 >
                   {l.url}
                 </a>
@@ -57,7 +101,14 @@ export default function TemplateBasic({ data }) {
       {profile.summary && (
         <div style={{ marginBottom: "12px" }}>
           <Section title="Summary" accent={accent}>
-            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words leading-[1.5]">
+            <p 
+              className="text-[13px] text-gray-700 whitespace-normal break-words leading-[1.5]"
+              style={{
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                whiteSpace: "normal",
+              }}
+            >
               {profile.summary}
             </p>
           </Section>
@@ -73,6 +124,8 @@ export default function TemplateBasic({ data }) {
                 style={{ 
                   pageBreakInside: "avoid",
                   marginBottom: idx < data.experience.length - 1 ? "12px" : "0",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
                 <ExperienceBlock e={e} />
@@ -91,6 +144,8 @@ export default function TemplateBasic({ data }) {
                 style={{ 
                   pageBreakInside: "avoid",
                   marginBottom: idx < data.projects.length - 1 ? "12px" : "0",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
                 <ProjectsBlock p={p} />
@@ -109,6 +164,8 @@ export default function TemplateBasic({ data }) {
                 style={{ 
                   pageBreakInside: "avoid",
                   marginBottom: idx < data.education.length - 1 ? "12px" : "0",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
                 <EducationBlock e={e} />
@@ -127,6 +184,8 @@ export default function TemplateBasic({ data }) {
                 style={{ 
                   pageBreakInside: "avoid",
                   marginBottom: idx < data.achievements.length - 1 ? "12px" : "0",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
                 <AchievementsBlock a={a} />
@@ -146,6 +205,8 @@ export default function TemplateBasic({ data }) {
                 style={{ 
                   pageBreakInside: "avoid",
                   marginBottom: idx < data.skillGroups.length - 1 ? "12px" : "0",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
                 }}
               >
                 <SkillsBlock group={g} />

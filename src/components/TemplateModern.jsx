@@ -6,14 +6,56 @@ export default function TemplateModern({ data }) {
   const profile = data.profile;
 
   return (
-    <div className="p-8 text-[14px] leading-5" style={{ pageBreakAfter: "avoid" }}>
+    <div 
+      className="p-8 text-[14px] leading-5"
+      style={{ 
+        pageBreakAfter: "avoid",
+        wordWrap: "break-word",
+        overflowWrap: "break-word",
+        whiteSpace: "normal",
+        backgroundColor: "#ffffff",
+        margin: 0,
+        padding: "40px",
+        boxSizing: "border-box",
+      }}
+    >
       {/* Header - Keep together */}
-      <div className="mb-4" style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
-        <h1 className="text-3xl font-bold leading-tight" style={{ color: accent }}>
+      <div 
+        className="mb-4" 
+        style={{ 
+          pageBreakInside: "avoid", 
+          breakInside: "avoid",
+          wordWrap: "break-word",
+          overflowWrap: "break-word",
+        }}
+      >
+        <h1 
+          className="text-3xl font-bold leading-tight"
+          style={{ 
+            color: accent,
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+            margin: 0,
+          }}
+        >
           {profile.fullName}
         </h1>
-        <div className="text-sm text-gray-600">{profile.title}</div>
-        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
+        <div 
+          className="text-sm text-gray-600"
+          style={{
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
+        >
+          {profile.title}
+        </div>
+        <div 
+          className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600"
+          style={{
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
+        >
           {profile.email && <span>{profile.email}</span>}
           {profile.phone && <span>{profile.phone}</span>}
           {profile.location && <span>{profile.location}</span>}
@@ -22,9 +64,22 @@ export default function TemplateModern({ data }) {
 
         {/* Profile Links */}
         {data.links?.length > 0 && (
-          <div className="mt-2 text-xs text-gray-600 space-y-0.5">
+          <div 
+            className="mt-2 text-xs text-gray-600 space-y-0.5"
+            style={{
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
             {data.links.map((l) => (
-              <div key={l.id} className="flex items-center gap-2">
+              <div 
+                key={l.id} 
+                className="flex items-center gap-2"
+                style={{
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                }}
+              >
                 <span className="font-medium">{l.label}</span>
                 <span className="text-gray-400">|</span>
                 <a
@@ -32,6 +87,10 @@ export default function TemplateModern({ data }) {
                   target="_blank"
                   rel="noreferrer"
                   className="text-sky-600 hover:underline print:no-underline break-all"
+                  style={{
+                    wordWrap: "break-word",
+                    overflowWrap: "break-word",
+                  }}
                 >
                   {l.url}
                 </a>
@@ -45,7 +104,14 @@ export default function TemplateModern({ data }) {
       {profile.summary && (
         <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
           <Section title="Summary" accent={accent}>
-            <p className="text-[13px] text-gray-700 whitespace-pre-wrap break-words leading-[1.5]">
+            <p 
+              className="text-[13px] text-gray-700 whitespace-normal break-words leading-[1.5]"
+              style={{
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                whiteSpace: "normal",
+              }}
+            >
               {profile.summary}
             </p>
           </Section>
@@ -62,6 +128,8 @@ export default function TemplateModern({ data }) {
                 pageBreakInside: "avoid", 
                 breakInside: "avoid",
                 marginBottom: idx < data.experience.length - 1 ? "12px" : "0",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               <ExperienceBlock e={e} />
@@ -80,6 +148,8 @@ export default function TemplateModern({ data }) {
                 pageBreakInside: "avoid", 
                 breakInside: "avoid",
                 marginBottom: idx < data.projects.length - 1 ? "12px" : "0",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               <ProjectsBlock p={p} />
@@ -98,6 +168,8 @@ export default function TemplateModern({ data }) {
                 pageBreakInside: "avoid", 
                 breakInside: "avoid",
                 marginBottom: idx < data.education.length - 1 ? "12px" : "0",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               <EducationBlock e={e} />
@@ -116,6 +188,8 @@ export default function TemplateModern({ data }) {
                 pageBreakInside: "avoid", 
                 breakInside: "avoid",
                 marginBottom: idx < data.achievements.length - 1 ? "12px" : "0",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               <AchievementsBlock a={a} />
@@ -134,6 +208,8 @@ export default function TemplateModern({ data }) {
                 pageBreakInside: "avoid", 
                 breakInside: "avoid",
                 marginBottom: idx < data.skillGroups.length - 1 ? "12px" : "0",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               <SkillsBlock group={g} />
