@@ -202,11 +202,4 @@ export const defaultData = {
       bullets: ["Microservices", "Event-Driven Architecture", "System Design", "Domain-Driven Design"],
     },
   ],
-  coverLetter: {
-    companyName: "",
-    jobTitle: "",
-    recipientName: "",
-    recipientTitle: "",
-    content: "Dear Hiring Manager,\n\nI am writing to express my strong interest in the [Job Title] position at [Company Name]. With 8+ years of experience architecting and deploying scalable cloud-native systems, combined with a proven track record of leading high-performing engineering teams, I am confident I can deliver significant value to your organization.\n\nThroughout my career, I have successfully designed microservices architectures supporting millions of daily active users, implemented DevOps practices that reduced deployment time by 75%, and mentored teams that have driven measurable improvements in productivity and code quality. My expertise in cloud technologies, distributed systems, and full-stack development aligns perfectly with your needs.\n\nWhat particularly excites me about this opportunity is your commitment to innovation. I am eager to bring my technical expertise, collaborative approach, and passion for engineering excellence to contribute to your team's success.\n\nThank you for considering my application. I would welcome the opportunity to discuss how my experience and vision can help drive innovation.\n\nSincerely,\nSarah Mitchell",
-  },
 };

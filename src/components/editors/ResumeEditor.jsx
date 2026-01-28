@@ -13,7 +13,6 @@ export default function ResumeEditor({ data, set }) {
   const templates = [
     { id: "modern", name: "Modern", icon: "✨" },
     { id: "basic", name: "Basic", icon: "📋" },
-    { id: "sidebar", name: "Sidebar", icon: "📑" },
   ];
 
   const selectTemplate = (templateId) => {
@@ -40,7 +39,7 @@ export default function ResumeEditor({ data, set }) {
         </div>
 
         {showTemplateSelector && (
-          <div className="mt-4 grid grid-cols-3 gap-3">
+          <div className="mt-4 grid grid-cols-2 gap-3">
             {templates.map((template) => (
               <button
                 key={template.id}
