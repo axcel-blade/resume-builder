@@ -1,3 +1,5 @@
+/* src/components/TemplateSharedParts.jsx */
+
 import React from "react";
 
 // Section header component used by all templates

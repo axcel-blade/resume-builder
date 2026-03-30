@@ -1,3 +1,5 @@
+/* src/App.jsx */
+
 import React, { useState } from "react";
 import Toolbar from "./components/Toolbar";
 import ResumeEditor from "./components/editors/ResumeEditor";

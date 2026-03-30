@@ -1,3 +1,5 @@
+/* src/components/preview/A4PaginatedPreview.jsx */
+
 import React, { useState, useRef, useEffect } from "react";
 
 export default function A4PaginatedPreview({ data, templateComponent: TemplateComponent }) {

@@ -1,3 +1,5 @@
+/* src/components/templates/TemplateModern.jsx */
+
 import React from "react";
 import { Section, ExperienceBlock, EducationBlock, AchievementsBlock, ProjectsBlock, SkillsBlock } from "./TemplateSharedParts";
 

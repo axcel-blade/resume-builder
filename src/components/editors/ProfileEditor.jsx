@@ -1,3 +1,5 @@
+/* src/components/editors/ProfileEditor.jsx */
+
 import React from "react";
 import { SectionCard, Label, Text, TextArea, IconButton } from "../SharedInputs";
 

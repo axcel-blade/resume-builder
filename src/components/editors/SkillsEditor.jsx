@@ -1,3 +1,5 @@
+/* src/components/editors/SkillsEditor.jsx */
+
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";
 import BulletsEditor from "./BulletsEditor";

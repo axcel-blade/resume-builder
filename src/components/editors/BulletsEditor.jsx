@@ -1,3 +1,5 @@
+/* src/components/editors/BulletsEditor.jsx */
+
 import React, { useState } from "react";
 import { IconButton } from "../SharedInputs";
 

@@ -1,3 +1,5 @@
+/* src/components/editors/LinksEditor.jsx */
+
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";
 

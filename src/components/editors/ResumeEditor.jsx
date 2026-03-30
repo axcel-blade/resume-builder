@@ -1,3 +1,5 @@
+/* src/components/editors/ResumeEditor.jsx */
+
 import React, { useState } from "react";
 import ProfileEditor from "./ProfileEditor";
 import ExperienceEditor from "./ExperienceEditor";
