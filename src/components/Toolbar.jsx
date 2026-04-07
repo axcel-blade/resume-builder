@@ -4,26 +4,26 @@ import React, { useRef } from "react";
 import jsPDF from "jspdf";
 
 // ─── Layout constants (all in mm) ───────────────────────────────────────────
-const PAGE_W  = 210;
-const PAGE_H  = 297;
-const ML      = 15;
-const MR      = 15;
-const MT      = 16;
-const MB      = 16;
+const PAGE_W    = 210;
+const PAGE_H    = 297;
+const ML        = 15;
+const MR        = 15;
+const MT        = 16;
+const MB        = 16;
 const CONTENT_W = PAGE_W - ML - MR;
 const BULLET_INDENT = 6;
 const BULLET_HANG   = 4;
 
 // ─── Font sizes (pt) ────────────────────────────────────────────────────────
 const FS = {
-  name:       22,
-  title:      11,
-  contact:     9,
-  sectionHead: 8.5,
-  entryTitle: 10,
-  entryMeta:   8.5,
-  bullet:      9.5,
-  summary:     9.5,
+  name:        22,
+  title:       11,
+  contact:      9,
+  sectionHead:  8.5,
+  entryTitle:  10,
+  entryMeta:    8.5,
+  bullet:       9.5,
+  summary:      9.5,
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -85,13 +85,70 @@ function drawBullets(pdf, bullets, y) {
   return y;
 }
 
-// ─── Header renderers (the only difference between Modern and Basic) ─────────
+/**
+ * Draw "Label  |  url" with the URL in accent colour + a clickable PDF link.
+ * x      — left edge of the label
+ * y      — baseline of the text
+ * align  — "left" or "center" (for Basic)
+ * Returns the URL's x position and width (used for centering hotspot).
+ */
+function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
+  const [ar, ag, ab] = accentRgb;
+  const sep    = "  |  ";
+  const href   = url.startsWith("http") ? url : `https://${url}`;
+  const lineH  = 4.2;
+  const capH   = lineH; // approximate text cap height in mm
+
+  if (align === "center") {
+    // For centered text we can't easily split colours, so draw whole line gray
+    // then add the link hotspot over the URL portion
+    const fullLine  = `${label}${sep}${url}`;
+    const fullW     = pdf.getTextWidth(fullLine);
+    const labelSepW = pdf.getTextWidth(`${label}${sep}`);
+    const urlW      = pdf.getTextWidth(url);
+    const lineStartX = (PAGE_W - fullW) / 2; // actual left edge of the full string
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(80, 80, 80);
+    pdf.text(fullLine, PAGE_W / 2, y, { align: "center" });
+
+    // Recolour URL portion — overdraw in accent
+    pdf.setTextColor(ar, ag, ab);
+    pdf.text(url, lineStartX + labelSepW, y);
+
+    // Clickable hotspot
+    pdf.link(lineStartX + labelSepW, y - capH + 1, urlW, capH, { url: href });
+  } else {
+    // Left-aligned
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(80, 80, 80);
+    pdf.text(label, x, y);
+    const labelW = pdf.getTextWidth(label);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(80, 80, 80);
+    pdf.text(sep, x + labelW, y);
+    const sepW = pdf.getTextWidth(sep);
+
+    pdf.setTextColor(ar, ag, ab);
+    pdf.text(url, x + labelW + sepW, y);
+    const urlW = pdf.getTextWidth(url);
+
+    // Clickable hotspot over URL
+    pdf.link(x + labelW + sepW, y - capH + 1, urlW, capH, { url: href });
+  }
+
+  return y + lineH;
+}
+
+// ─── Header: Modern (left-aligned) ───────────────────────────────────────────
 
 function drawHeaderModern(pdf, data, y, accent) {
   const [ar, ag, ab] = hexToRgb(accent);
+  const accentRgb = [ar, ag, ab];
   const p = data.profile;
 
-  // Name — left-aligned
+  // Name
   pdf.setFontSize(FS.name);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(ar, ag, ab);
@@ -107,36 +164,32 @@ function drawHeaderModern(pdf, data, y, accent) {
     y += 5.5;
   }
 
-  // Contact
+  // Contact line
   pdf.setFontSize(FS.contact);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(80, 80, 80);
   const contact = [p.email, p.phone, p.location, p.website].filter(Boolean).join("   ");
   if (contact) { pdf.text(contact, ML, y); y += 4.5; }
 
-  // Links
+  // Links — each row clickable
   if (data.links?.length) {
     pdf.setFontSize(FS.contact);
     data.links.forEach((l) => {
       y = ensureSpace(pdf, y, 4.5);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(80, 80, 80);
-      pdf.text(l.label, ML, y);
-      const lw = pdf.getTextWidth(l.label);
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(ar, ag, ab);
-      pdf.text(`  |  ${l.url}`, ML + lw, y);
-      y += 4.2;
+      y = drawLinkRow(pdf, l.label, l.url, ML, y, accentRgb, "left");
     });
   }
 
   return y + 3;
 }
 
+// ─── Header: Basic (centered) ────────────────────────────────────────────────
+
 function drawHeaderBasic(pdf, data, y, accent) {
   const [ar, ag, ab] = hexToRgb(accent);
+  const accentRgb = [ar, ag, ab];
   const p = data.profile;
-  const cx = PAGE_W / 2; // center x
+  const cx = PAGE_W / 2;
 
   // Name — centered
   pdf.setFontSize(FS.name);
@@ -154,31 +207,26 @@ function drawHeaderBasic(pdf, data, y, accent) {
     y += 5.5;
   }
 
-  // Contact — centered
+  // Contact — centered with | separators
   pdf.setFontSize(FS.contact);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(80, 80, 80);
   const contact = [p.email, p.phone, p.location, p.website].filter(Boolean).join("   |   ");
   if (contact) { pdf.text(contact, cx, y, { align: "center" }); y += 4.5; }
 
-  // Links — centered
+  // Links — centered, clickable
   if (data.links?.length) {
     pdf.setFontSize(FS.contact);
     data.links.forEach((l) => {
       y = ensureSpace(pdf, y, 4.5);
-      const linkLine = `${l.label}  |  ${l.url}`;
-      // label part in gray bold, url in accent — draw centered as one line
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(80, 80, 80);
-      pdf.text(linkLine, cx, y, { align: "center" });
-      y += 4.2;
+      y = drawLinkRow(pdf, l.label, l.url, ML, y, accentRgb, "center");
     });
   }
 
   return y + 3;
 }
 
-// ─── Shared body sections ────────────────────────────────────────────────────
+// ─── Shared body ─────────────────────────────────────────────────────────────
 
 function drawBody(pdf, data, y, accent) {
 
@@ -337,22 +385,16 @@ function drawBody(pdf, data, y, accent) {
 // ─── Main builder ─────────────────────────────────────────────────────────────
 
 function buildPDF(data) {
-  const pdf    = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-  const accent = data.meta?.accent || "#0ea5e9";
+  const pdf      = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const accent   = data.meta?.accent || "#0ea5e9";
   const template = data.meta?.template || "modern";
 
   let y = MT;
+  y = template === "basic"
+    ? drawHeaderBasic(pdf, data, y, accent)
+    : drawHeaderModern(pdf, data, y, accent);
 
-  // Draw template-specific header
-  if (template === "basic") {
-    y = drawHeaderBasic(pdf, data, y, accent);
-  } else {
-    y = drawHeaderModern(pdf, data, y, accent);
-  }
-
-  // Draw shared body
   drawBody(pdf, data, y, accent);
-
   return pdf;
 }
 
@@ -375,7 +417,7 @@ export default function Toolbar({ data, set }) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try { set(JSON.parse(e.target.result)); }
-      catch (error) { alert("Invalid JSON file: " + error.message); }
+      catch (err) { alert("Invalid JSON file: " + err.message); }
     };
     reader.readAsText(file);
   };
@@ -386,7 +428,7 @@ export default function Toolbar({ data, set }) {
 
   const savePDF = (event) => {
     const btn = event.target;
-    const originalText = btn.textContent;
+    const orig = btn.textContent;
     btn.textContent = "Generating PDF...";
     btn.disabled = true;
     try {
@@ -397,7 +439,7 @@ export default function Toolbar({ data, set }) {
       console.error("PDF error:", err);
       alert("Failed to generate PDF:\n" + err.message);
     } finally {
-      btn.textContent = originalText;
+      btn.textContent = orig;
       btn.disabled = false;
     }
   };
