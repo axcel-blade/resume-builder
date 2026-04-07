@@ -34,7 +34,7 @@ A React application for creating professional resumes with real-time A4 preview,
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/resume-builder.git
+git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
 
 # Install dependencies
