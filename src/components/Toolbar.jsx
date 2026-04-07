@@ -6,11 +6,13 @@ import jsPDF from "jspdf";
 // ─── Layout constants (all in mm) ───────────────────────────────────────────
 const PAGE_W = 210;
 const PAGE_H = 297;
-const ML = 15; // margin left
-const MR = 15; // margin right
-const MT = 16; // margin top
-const MB = 16; // margin bottom
+const ML = 15;
+const MR = 15;
+const MT = 16;
+const MB = 16;
 const CONTENT_W = PAGE_W - ML - MR;
+const BULLET_INDENT = 6;   // indent from left margin
+const BULLET_HANG = 4;     // extra indent for wrapped lines (after the bullet)
 
 // ─── Font sizes (pt) ────────────────────────────────────────────────────────
 const FS = {
@@ -26,7 +28,6 @@ const FS = {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-/** Convert hex colour to [r, g, b] 0-255 */
 function hexToRgb(hex) {
   const h = hex.replace("#", "");
   return [
@@ -36,31 +37,6 @@ function hexToRgb(hex) {
   ];
 }
 
-/**
- * Wrap text to fit within maxWidth mm.
- * Returns an array of line strings.
- */
-function wrapText(pdf, text, maxWidth) {
-  return pdf.splitTextToSize(text, maxWidth);
-}
-
-/**
- * Draw wrapped text and return new Y position.
- * lineHeight in mm.
- */
-function drawText(pdf, text, x, y, maxWidth, lineHeightMM) {
-  const lines = wrapText(pdf, text, maxWidth);
-  lines.forEach((line) => {
-    pdf.text(line, x, y);
-    y += lineHeightMM;
-  });
-  return y;
-}
-
-/**
- * Draw a section heading with an underline rule.
- * Returns new Y.
- */
 function drawSectionHead(pdf, label, y, accent) {
   const [r, g, b] = hexToRgb(accent);
   pdf.setFontSize(FS.sectionHead);
@@ -76,26 +52,43 @@ function drawSectionHead(pdf, label, y, accent) {
   return y;
 }
 
-/**
- * Add a new page and reset Y to top margin.
- */
-function newPage(pdf) {
-  pdf.addPage();
-  return MT;
-}
-
-/**
- * Check if adding `neededMM` from current y would overflow the page.
- * If so, add a new page.
- */
 function ensureSpace(pdf, y, neededMM) {
   if (y + neededMM > PAGE_H - MB) {
-    return newPage(pdf);
+    pdf.addPage();
+    return MT;
   }
   return y;
 }
 
-// ─── Main export function ────────────────────────────────────────────────────
+/**
+ * Draw a bullet item with hanging indent.
+ * First line: "•  text..."  at ML + BULLET_INDENT
+ * Wrapped lines: indented by BULLET_HANG more (aligns text under first line)
+ */
+function drawBullet(pdf, text, y) {
+  const bulletChar = "\u2022"; // •
+  const bulletX = ML + BULLET_INDENT;
+  const textX = bulletX + BULLET_HANG;
+  const wrapWidth = CONTENT_W - BULLET_INDENT - BULLET_HANG;
+  const lineH = 4.2;
+
+  const lines = pdf.splitTextToSize(text, wrapWidth);
+  y = ensureSpace(pdf, y, lines.length * lineH + 1);
+
+  lines.forEach((line, i) => {
+    if (i === 0) {
+      pdf.text(bulletChar, bulletX, y);
+      pdf.text(line, textX, y);
+    } else {
+      pdf.text(line, textX, y);
+    }
+    y += lineH;
+  });
+
+  return y;
+}
+
+// ─── Main PDF builder ────────────────────────────────────────────────────────
 
 function buildPDF(data) {
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -121,16 +114,11 @@ function buildPDF(data) {
     y += 5.5;
   }
 
-  // ── CONTACT LINE ─────────────────────────────────────────────────────────
+  // ── CONTACT ───────────────────────────────────────────────────────────────
   pdf.setFontSize(FS.contact);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(80, 80, 80);
-  const contactParts = [
-    profile.email,
-    profile.phone,
-    profile.location,
-    profile.website,
-  ].filter(Boolean);
+  const contactParts = [profile.email, profile.phone, profile.location, profile.website].filter(Boolean);
   if (contactParts.length) {
     pdf.text(contactParts.join("   "), ML, y);
     y += 4.5;
@@ -139,21 +127,20 @@ function buildPDF(data) {
   // ── LINKS ─────────────────────────────────────────────────────────────────
   if (data.links?.length) {
     pdf.setFontSize(FS.contact);
-    pdf.setFont("helvetica", "normal");
     data.links.forEach((l) => {
       y = ensureSpace(pdf, y, 4.5);
-      pdf.setTextColor(80, 80, 80);
       pdf.setFont("helvetica", "bold");
-      pdf.text(`${l.label}`, ML, y);
-      const labelW = pdf.getTextWidth(`${l.label}  `);
+      pdf.setTextColor(80, 80, 80);
+      pdf.text(l.label, ML, y);
+      const labelW = pdf.getTextWidth(l.label);
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(ar, ag, ab);
-      pdf.text(l.url, ML + labelW + 2, y);
+      pdf.text(`  |  ${l.url}`, ML + labelW, y);
       y += 4.2;
     });
   }
 
-  y += 3; // gap before first section
+  y += 3;
 
   // ── SUMMARY ───────────────────────────────────────────────────────────────
   if (profile.summary) {
@@ -162,8 +149,13 @@ function buildPDF(data) {
     pdf.setFontSize(FS.summary);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(50, 50, 50);
-    y = drawText(pdf, profile.summary, ML, y, CONTENT_W, 4.5);
-    y += 4;
+    const lines = pdf.splitTextToSize(profile.summary, CONTENT_W);
+    lines.forEach((line) => {
+      y = ensureSpace(pdf, y, 5);
+      pdf.text(line, ML, y);
+      y += 4.5;
+    });
+    y += 3;
   }
 
   // ── EXPERIENCE ────────────────────────────────────────────────────────────
@@ -178,13 +170,12 @@ function buildPDF(data) {
       pdf.setFontSize(FS.entryTitle);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(30, 30, 30);
-      const roleText = e.company ? `${e.role}` : e.role;
-      pdf.text(roleText, ML, y);
+      pdf.text(e.role || "", ML, y);
       if (e.company) {
-        const roleW = pdf.getTextWidth(roleText);
+        const rw = pdf.getTextWidth(e.role || "");
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(90, 90, 90);
-        pdf.text(` | ${e.company}`, ML + roleW, y);
+        pdf.text(` | ${e.company}`, ML + rw, y);
       }
       y += 4.5;
 
@@ -192,10 +183,7 @@ function buildPDF(data) {
       pdf.setFontSize(FS.entryMeta);
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(120, 120, 120);
-      const meta = [
-        `${e.start} – ${e.end || "Present"}`,
-        e.location,
-      ].filter(Boolean).join("   |   ");
+      const meta = [`${e.start} – ${e.end || "Present"}`, e.location].filter(Boolean).join("   |   ");
       pdf.text(meta, ML, y);
       y += 4;
 
@@ -204,14 +192,7 @@ function buildPDF(data) {
         pdf.setFontSize(FS.bullet);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(50, 50, 50);
-        e.bullets.forEach((b) => {
-          const lines = wrapText(pdf, b, CONTENT_W - 6);
-          y = ensureSpace(pdf, y, lines.length * 4 + 1);
-          lines.forEach((line, li) => {
-            pdf.text(line, ML + 6, y);
-            y += 4;
-          });
-        });
+        e.bullets.forEach((b) => { y = drawBullet(pdf, b, y); });
       }
       y += 3;
     });
@@ -244,14 +225,7 @@ function buildPDF(data) {
         pdf.setFontSize(FS.bullet);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(50, 50, 50);
-        p.bullets.forEach((b) => {
-          const lines = wrapText(pdf, b, CONTENT_W - 6);
-          y = ensureSpace(pdf, y, lines.length * 4 + 1);
-          lines.forEach((line) => {
-            pdf.text(line, ML + 6, y);
-            y += 4;
-          });
-        });
+        p.bullets.forEach((b) => { y = drawBullet(pdf, b, y); });
       }
       y += 3;
     });
@@ -290,14 +264,7 @@ function buildPDF(data) {
         pdf.setFontSize(FS.bullet);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(50, 50, 50);
-        e.bullets.forEach((b) => {
-          const lines = wrapText(pdf, b, CONTENT_W - 6);
-          y = ensureSpace(pdf, y, lines.length * 4 + 1);
-          lines.forEach((line) => {
-            pdf.text(line, ML + 6, y);
-            y += 4;
-          });
-        });
+        e.bullets.forEach((b) => { y = drawBullet(pdf, b, y); });
       }
       y += 3;
     });
@@ -335,14 +302,7 @@ function buildPDF(data) {
         pdf.setFontSize(FS.bullet);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(50, 50, 50);
-        a.bullets.forEach((b) => {
-          const lines = wrapText(pdf, b, CONTENT_W - 6);
-          y = ensureSpace(pdf, y, lines.length * 4 + 1);
-          lines.forEach((line) => {
-            pdf.text(line, ML + 6, y);
-            y += 4;
-          });
-        });
+        a.bullets.forEach((b) => { y = drawBullet(pdf, b, y); });
       }
       y += 3;
     });
@@ -366,11 +326,7 @@ function buildPDF(data) {
         pdf.setFontSize(FS.bullet);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(50, 50, 50);
-        g.bullets.forEach((b) => {
-          y = ensureSpace(pdf, y, 4);
-          pdf.text(b, ML + 6, y);
-          y += 4;
-        });
+        g.bullets.forEach((b) => { y = drawBullet(pdf, b, y); });
       }
       y += 3;
     });
@@ -415,7 +371,6 @@ export default function Toolbar({ data, set }) {
     const originalText = btn.textContent;
     btn.textContent = "Generating PDF...";
     btn.disabled = true;
-
     try {
       const pdf = buildPDF(data);
       const fileName = `${(data.profile.fullName || "resume").replace(/\s+/g, "_")}.pdf`;
