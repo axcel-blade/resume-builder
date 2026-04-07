@@ -175,14 +175,7 @@ function drawHeaderBasic(pdf, data, y, accent) {
     });
   }
 
-  // Divider under header
-  y += 2;
-  pdf.setDrawColor(...hexToRgb(accent));
-  pdf.setLineWidth(0.3);
-  pdf.line(ML, y, ML + CONTENT_W, y);
-  y += 3;
-
-  return y;
+  return y + 3;
 }
 
 // ─── Shared body sections ────────────────────────────────────────────────────

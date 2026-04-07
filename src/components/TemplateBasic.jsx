@@ -78,8 +78,7 @@ export default function TemplateBasic({ data }) {
           </div>
         )}
 
-        {/* Divider — matches jsPDF drawHeaderBasic rule */}
-        <div style={{ height: "0.75px", backgroundColor: accent, marginTop: "6px" }} />
+        {/* Divider removed */}
       </div>
 
       {/* ── SUMMARY ── */}
