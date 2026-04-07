@@ -1,95 +1,75 @@
-/* src/components/templates/TemplateBasic.jsx */
+/* src/components/TemplateBasic.jsx */
+
+// TemplateBasic uses the same layout as TemplateModern for PDF-preview parity.
+// The only visual difference: the name is centered.
 
 import React from "react";
-import { Section, ExperienceBlock, EducationBlock, AchievementsBlock, ProjectsBlock, SkillsBlock } from "./TemplateSharedParts";
+import {
+  Section,
+  ExperienceBlock,
+  EducationBlock,
+  AchievementsBlock,
+  ProjectsBlock,
+  SkillsBlock,
+} from "./TemplateSharedParts";
+
+const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
 export default function TemplateBasic({ data }) {
-  const accent = data.meta.accent;
-  const profile = data.profile;
+  const accent = data.meta?.accent || "#0ea5e9";
+  const p = data.profile;
 
   return (
-    <div 
-      className="text-[14px] leading-6 font-serif"
-      style={{ 
+    <div
+      style={{
+        fontFamily: FONT,
+        fontSize: "12px",
+        lineHeight: 1.45,
+        color: "#1a1a1a",
         backgroundColor: "#ffffff",
-        margin: 0,
-        padding: "40px 40px 40px 40px",
+        padding: "0",
         width: "100%",
         boxSizing: "border-box",
         wordWrap: "break-word",
         overflowWrap: "break-word",
-        whiteSpace: "normal",
       }}
     >
-      {/* Header - Keep on first page */}
-      <div 
-        className="text-center mb-6" 
-        style={{ 
-          pageBreakInside: "avoid",
-          pageBreakAfter: "avoid",
-          wordWrap: "break-word",
-          overflowWrap: "break-word",
-        }}
-      >
-        <h1 
-          className="text-3xl font-bold m-0" 
-          style={{ 
+      {/* ── NAME (centered) ── */}
+      <div style={{ textAlign: "center", marginBottom: "10px" }}>
+        <div
+          style={{
+            fontSize: "29px",
+            fontWeight: "700",
             color: accent,
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
+            lineHeight: 1.1,
+            marginBottom: "4px",
+            fontFamily: FONT,
           }}
         >
-          {profile.fullName}
-        </h1>
-        <p 
-          className="text-gray-700 text-sm m-0 mt-1"
-          style={{
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-          }}
-        >
-          {profile.title}
-        </p>
-        <p 
-          className="text-xs text-gray-600 mt-1 m-0"
-          style={{
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-          }}
-        >
-          {profile.email} | {profile.phone} | {profile.location}
-        </p>
+          {p.fullName}
+        </div>
 
-        {/* Profile Links */}
+        {p.title && (
+          <div style={{ fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginBottom: "4px" }}>
+            {p.title}
+          </div>
+        )}
+
+        <div style={{ fontSize: "12px", color: "#505050", marginBottom: "4px" }}>
+          {[p.email, p.phone, p.location, p.website].filter(Boolean).join("   ")}
+        </div>
+
         {data.links?.length > 0 && (
-          <div 
-            className="mt-2 text-xs text-gray-600"
-            style={{
-              wordWrap: "break-word",
-              overflowWrap: "break-word",
-            }}
-          >
+          <div style={{ marginBottom: "4px" }}>
             {data.links.map((l) => (
-              <div 
-                key={l.id} 
-                style={{ 
-                  margin: 0, 
-                  marginBottom: "2px",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                }}
-              >
-                <span className="font-medium">{l.label}</span>
-                {" | "}
+              <div key={l.id} style={{ fontSize: "12px", lineHeight: 1.6 }}>
+                <span style={{ fontWeight: "700", color: "#505050" }}>{l.label}</span>
+                <span style={{ color: "#505050" }}>  |  </span>
                 <a
                   href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-sky-600"
-                  style={{
-                    wordWrap: "break-word",
-                    overflowWrap: "break-word",
-                  }}
+                  style={{ color: accent, textDecoration: "none" }}
                 >
                   {l.url}
                 </a>
@@ -99,123 +79,43 @@ export default function TemplateBasic({ data }) {
         )}
       </div>
 
-      {/* Sections - Each section can move to next page */}
-      {profile.summary && (
-        <div style={{ marginBottom: "12px" }}>
-          <Section title="Summary" accent={accent}>
-            <p 
-              className="text-[13px] text-gray-700 whitespace-normal break-words leading-[1.5]"
-              style={{
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-                whiteSpace: "normal",
-              }}
-            >
-              {profile.summary}
-            </p>
-          </Section>
-        </div>
+      {/* ── SUMMARY ── */}
+      {p.summary && (
+        <Section title="Summary" accent={accent}>
+          <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, wordBreak: "break-word" }}>
+            {p.summary}
+          </div>
+        </Section>
       )}
 
       {data.experience?.length > 0 && (
-        <div style={{ marginBottom: "12px" }}>
-          <Section title="Experience" accent={accent}>
-            {data.experience.map((e, idx) => (
-              <div 
-                key={e.id} 
-                style={{ 
-                  pageBreakInside: "avoid",
-                  marginBottom: idx < data.experience.length - 1 ? "12px" : "0",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                }}
-              >
-                <ExperienceBlock e={e} />
-              </div>
-            ))}
-          </Section>
-        </div>
+        <Section title="Experience" accent={accent}>
+          {data.experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
+        </Section>
       )}
 
       {data.projects?.length > 0 && (
-        <div style={{ marginBottom: "12px" }}>
-          <Section title="Projects" accent={accent}>
-            {data.projects.map((p, idx) => (
-              <div 
-                key={p.id} 
-                style={{ 
-                  pageBreakInside: "avoid",
-                  marginBottom: idx < data.projects.length - 1 ? "12px" : "0",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                }}
-              >
-                <ProjectsBlock p={p} />
-              </div>
-            ))}
-          </Section>
-        </div>
+        <Section title="Projects" accent={accent}>
+          {data.projects.map((p) => <ProjectsBlock key={p.id} p={p} />)}
+        </Section>
       )}
 
       {data.education?.length > 0 && (
-        <div style={{ marginBottom: "12px" }}>
-          <Section title="Education" accent={accent}>
-            {data.education.map((e, idx) => (
-              <div 
-                key={e.id} 
-                style={{ 
-                  pageBreakInside: "avoid",
-                  marginBottom: idx < data.education.length - 1 ? "12px" : "0",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                }}
-              >
-                <EducationBlock e={e} />
-              </div>
-            ))}
-          </Section>
-        </div>
+        <Section title="Education" accent={accent}>
+          {data.education.map((e) => <EducationBlock key={e.id} e={e} />)}
+        </Section>
       )}
 
       {data.achievements?.length > 0 && (
-        <div style={{ marginBottom: "12px" }}>
-          <Section title="Achievements" accent={accent}>
-            {data.achievements.map((a, idx) => (
-              <div 
-                key={a.id} 
-                style={{ 
-                  pageBreakInside: "avoid",
-                  marginBottom: idx < data.achievements.length - 1 ? "12px" : "0",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                }}
-              >
-                <AchievementsBlock a={a} />
-              </div>
-            ))}
-          </Section>
-        </div>
+        <Section title="Achievements" accent={accent}>
+          {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
+        </Section>
       )}
 
-      {/* Skill Groups */}
       {data.skillGroups?.length > 0 && (
-        <div>
-          <Section title="Skills" accent={accent}>
-            {data.skillGroups.map((g, idx) => (
-              <div 
-                key={g.id} 
-                style={{ 
-                  pageBreakInside: "avoid",
-                  marginBottom: idx < data.skillGroups.length - 1 ? "12px" : "0",
-                  wordWrap: "break-word",
-                  overflowWrap: "break-word",
-                }}
-              >
-                <SkillsBlock group={g} />
-              </div>
-            ))}
-          </Section>
-        </div>
+        <Section title="Skills" accent={accent}>
+          {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
+        </Section>
       )}
     </div>
   );

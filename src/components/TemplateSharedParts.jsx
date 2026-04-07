@@ -2,124 +2,125 @@
 
 import React from "react";
 
-// Section header component used by all templates
+// ─── Matches jsPDF layout constants ──────────────────────────────────────────
+// PDF: ML=15mm, MR=15mm, MT=16mm — we replicate via padding in the wrapper.
+// Font sizes are matched pt→px (1pt ≈ 1.333px at 96dpi).
+
+const C = {
+  accent: "inherit",          // overridden per-template via style prop
+  name:   { fontSize: "29px",  fontWeight: "700", lineHeight: 1.1 },
+  title:  { fontSize: "14.5px",fontWeight: "400", color: "#3c3c3c", marginTop: "4px" },
+  contact:{ fontSize: "12px",  color: "#505050",  marginTop: "5px" },
+  linkRow:{ fontSize: "12px",  marginTop: "3px" },
+  secHead:{ fontSize: "11px",  fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase" },
+  rule:   { height: "0.75px",  marginTop: "2px", marginBottom: "5px" },
+  eTitle: { fontSize: "13px",  fontWeight: "700", color: "#1e1e1e" },
+  eComp:  { fontSize: "13px",  fontWeight: "400", color: "#5a5a5a" },
+  eMeta:  { fontSize: "11px",  color: "#787878",  marginTop: "1px", marginBottom: "3px" },
+  bullet: { fontSize: "12px",  color: "#323232",  lineHeight: 1.55 },
+  summary:{ fontSize: "12px",  color: "#323232",  lineHeight: 1.6  },
+};
+
+// ─── Section heading — matches jsPDF drawSectionHead() ───────────────────────
 export function Section({ title, accent, children }) {
   return (
-    <div style={{ marginBottom: "16px" }}>
-      <h3
-        className="mb-2 text-xs font-semibold uppercase tracking-wider m-0"
-        style={{ color: accent, pageBreakAfter: "avoid" }}
-      >
-        {title}
-      </h3>
+    <div style={{ marginBottom: "14px" }}>
+      <div style={{ ...C.secHead, color: accent }}>{title}</div>
+      <div style={{ ...C.rule, backgroundColor: accent }} />
       <div>{children}</div>
     </div>
   );
 }
 
-// Shared item list renderer — no bullets, just indented lines
-function ItemList({ items }) {
-  if (!items || items.length === 0) return null;
+// ─── Bullet list — matches jsPDF drawBullet() ────────────────────────────────
+// • char at bulletX, text at bulletX + hang, wrapped lines also at hang indent
+function BulletList({ items }) {
+  if (!items?.length) return null;
   return (
-    <div style={{ marginTop: "4px", paddingLeft: "12px" }}>
+    <div style={{ marginTop: "3px" }}>
       {items.map((b, i) => (
         <div
           key={i}
           style={{
-            fontSize: "11.5px",
-            lineHeight: "1.5",
-            color: "#374151",
-            marginBottom: "2px",
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "5px",
+            marginBottom: "1.5px",
+            paddingLeft: "6px",
           }}
         >
-          {b}
+          <span style={{ ...C.bullet, flexShrink: 0, marginTop: "0px" }}>•</span>
+          <span style={{ ...C.bullet, flex: 1, wordBreak: "break-word" }}>{b}</span>
         </div>
       ))}
     </div>
   );
 }
 
-// Experience entry component
+// ─── Entry blocks ─────────────────────────────────────────────────────────────
+
 export function ExperienceBlock({ e }) {
   return (
-    <div>
-      <div className="font-semibold text-[12.5px] m-0">
-        {e.role}
-        {e.company && (
-          <span className="text-gray-600 font-normal"> | {e.company}</span>
-        )}
+    <div style={{ marginBottom: "10px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0" }}>
+        <span style={C.eTitle}>{e.role}</span>
+        {e.company && <span style={C.eComp}>&nbsp;| {e.company}</span>}
       </div>
-      <div className="text-[11px] text-gray-500 mb-1 m-0">
-        {e.start} - {e.end || "Present"} {e.location && `| ${e.location}`}
+      <div style={C.eMeta}>
+        {e.start} – {e.end || "Present"}{e.location ? `   |   ${e.location}` : ""}
       </div>
-      <ItemList items={e.bullets} />
+      <BulletList items={e.bullets} />
     </div>
   );
 }
 
-// Education entry component
 export function EducationBlock({ e }) {
   return (
-    <div>
-      <div className="font-semibold text-[12.5px] m-0">
-        {e.degree}
-        {e.school && (
-          <span className="text-gray-600 font-normal"> | {e.school}</span>
-        )}
+    <div style={{ marginBottom: "10px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
+        <span style={C.eTitle}>{e.degree}</span>
+        {e.school && <span style={C.eComp}>&nbsp;| {e.school}</span>}
       </div>
-      <div className="text-[11px] text-gray-500 mb-1 m-0">
-        {e.start} - {e.end} {e.location && `| ${e.location}`}
+      <div style={C.eMeta}>
+        {e.start} – {e.end}{e.location ? `   |   ${e.location}` : ""}
       </div>
-      <ItemList items={e.bullets} />
+      <BulletList items={e.bullets} />
     </div>
   );
 }
 
-// Projects entry component
 export function ProjectsBlock({ p }) {
   return (
-    <div>
-      <div className="font-semibold text-[12.5px] m-0">
-        {p.title}
-      </div>
-      <div className="text-[11px] text-gray-500 mb-1 m-0">
-        {p.organization} | {p.start} - {p.end}
-      </div>
-      <ItemList items={p.bullets} />
-    </div>
-  );
-}
-
-// Achievements entry component
-export function AchievementsBlock({ a }) {
-  return (
-    <div>
-      <div className="font-semibold text-[12.5px] m-0">
-        {a.title}
-        {a.organization && (
-          <span className="text-gray-600 font-normal"> | {a.organization}</span>
-        )}
-      </div>
-      {a.year && (
-        <div className="text-[11px] text-gray-500 mb-1 m-0">
-          {a.year}
+    <div style={{ marginBottom: "10px" }}>
+      <div style={C.eTitle}>{p.title}</div>
+      {(p.organization || p.start) && (
+        <div style={C.eMeta}>
+          {[p.organization, `${p.start} – ${p.end}`].filter(Boolean).join("   |   ")}
         </div>
       )}
-      <ItemList items={a.bullets} />
+      <BulletList items={p.bullets} />
     </div>
   );
 }
 
-// Skills group component
+export function AchievementsBlock({ a }) {
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
+        <span style={C.eTitle}>{a.title}</span>
+        {a.organization && <span style={C.eComp}>&nbsp;| {a.organization}</span>}
+      </div>
+      {a.year && <div style={C.eMeta}>{a.year}</div>}
+      <BulletList items={a.bullets} />
+    </div>
+  );
+}
+
 export function SkillsBlock({ group }) {
   return (
-    <div>
-      <p className="font-semibold text-[12px] text-gray-800 m-0">
-        {group.title}
-      </p>
-      <ItemList items={group.bullets} />
+    <div style={{ marginBottom: "10px" }}>
+      <div style={{ ...C.eTitle, marginBottom: "1px" }}>{group.title}</div>
+      <BulletList items={group.bullets} />
     </div>
   );
 }
