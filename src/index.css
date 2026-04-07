@@ -1,8 +1,6 @@
 /* src/index.css */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 body {
   font-family: system-ui, sans-serif;
