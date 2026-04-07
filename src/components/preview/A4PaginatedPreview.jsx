@@ -1,18 +1,24 @@
 /* src/components/preview/A4PaginatedPreview.jsx */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 
-export default function A4PaginatedPreview({ data, templateComponent: TemplateComponent }) {
+const A4PaginatedPreview = forwardRef(function A4PaginatedPreview(
+  { data, templateComponent: TemplateComponent },
+  ref
+) {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const contentRef = useRef(null);
   const [pages, setPages] = useState([]);
 
   // A4 Constants at 96 DPI
-  const A4_WIDTH_PX = 794; // 210mm
+  const A4_WIDTH_PX = 794;   // 210mm
   const A4_HEIGHT_PX = 1123; // 297mm
-  const MARGIN_PX = 56; // 15mm
+  const MARGIN_PX = 56;      // ~15mm
   const CONTENT_HEIGHT = A4_HEIGHT_PX - MARGIN_PX * 2;
+
+  // Expose the content node upward so Toolbar can screenshot it
+  useImperativeHandle(ref, () => contentRef.current, []);
 
   // Calculate pages when data changes
   useEffect(() => {
@@ -23,11 +29,9 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
         return;
       }
 
-      // Get the full content height
       const fullHeight = contentRef.current.scrollHeight;
       const numPages = Math.ceil(fullHeight / CONTENT_HEIGHT);
-      
-      // Create page segments
+
       const pageArray = [];
       for (let i = 0; i < numPages; i++) {
         pageArray.push({
@@ -36,7 +40,7 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
           endY: (i + 1) * CONTENT_HEIGHT,
         });
       }
-      
+
       setPages(pageArray);
       setTotalPages(Math.max(1, numPages));
       setCurrentPage(0);
@@ -45,7 +49,7 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
     return () => clearTimeout(timer);
   }, [data, CONTENT_HEIGHT]);
 
-  // Handle keyboard navigation
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === "ArrowRight" || e.key === "ArrowDown") {
@@ -56,28 +60,20 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
         setCurrentPage((prev) => Math.max(prev - 1, 0));
       }
     };
-
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [totalPages]);
 
-  const goToNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
-  };
-
-  const goToPreviousPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 0));
-  };
+  const goToNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+  const goToPreviousPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
 
   if (!TemplateComponent || totalPages === 0) {
     return <div className="text-center text-gray-400 p-8">Loading preview...</div>;
   }
 
-  const currentPageData = pages[currentPage];
-
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      {/* Page Display */}
+      {/* A4 Page Display */}
       <div className="w-full flex justify-center">
         <A4Page
           pageNum={currentPage}
@@ -91,13 +87,14 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
         />
       </div>
 
-      {/* Navigation Controls */}
+      {/* Navigation */}
       <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
         <button
           onClick={goToPreviousPage}
           disabled={currentPage === 0}
           className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
           title="Previous page"
+          data-pdf-ignore="true"
         >
           <span className="text-lg">←</span>
           <span className="text-sm font-medium">Previous</span>
@@ -115,6 +112,7 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
           disabled={currentPage === totalPages - 1}
           className="flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
           title="Next page"
+          data-pdf-ignore="true"
         >
           <span className="text-sm font-medium">Next</span>
           <span className="text-lg">→</span>
@@ -126,7 +124,9 @@ export default function A4PaginatedPreview({ data, templateComponent: TemplateCo
       </div>
     </div>
   );
-}
+});
+
+export default A4PaginatedPreview;
 
 function A4Page({
   pageNum,
@@ -147,7 +147,6 @@ function A4Page({
         position: "relative",
       }}
     >
-      {/* A4 Page Container with Margins and Page Break Prevention */}
       <div
         style={{
           width: "100%",
@@ -158,19 +157,16 @@ function A4Page({
           position: "relative",
         }}
       >
-        {/* Page Number Badge */}
+        {/* Page number badge — excluded from PDF capture */}
         <div
           className="absolute text-xs text-gray-400 pointer-events-none bg-gray-50 rounded px-2 py-1"
-          style={{
-            bottom: "8px",
-            right: "8px",
-            fontSize: "11px",
-          }}
+          data-pdf-ignore="true"
+          style={{ bottom: "8px", right: "8px", fontSize: "11px", zIndex: 10 }}
         >
           Page {pageNum + 1}
         </div>
 
-        {/* Content Area with Clipping */}
+        {/* Clipping window */}
         <div
           style={{
             height: `${CONTENT_HEIGHT}px`,
@@ -179,7 +175,7 @@ function A4Page({
             width: "100%",
           }}
         >
-          {/* Main Content Container - Translates to show correct page */}
+          {/* Translates to show the correct page slice */}
           <div
             style={{
               transform: `translateY(-${pageNum * CONTENT_HEIGHT}px)`,
@@ -188,12 +184,8 @@ function A4Page({
               willChange: "transform",
             }}
           >
-            <div
-              ref={contentRef}
-              style={{
-                width: "100%",
-              }}
-            >
+            {/* ← THIS is what gets captured for the PDF */}
+            <div ref={contentRef} style={{ width: "100%" }}>
               <TemplateComponent data={data} />
             </div>
           </div>

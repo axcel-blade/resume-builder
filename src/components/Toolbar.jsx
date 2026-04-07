@@ -3,10 +3,8 @@
 import React, { useRef } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import TemplateModern from "./TemplateModern";
-import TemplateBasic from "./TemplateBasic";
 
-export default function Toolbar({ data, set }) {
+export default function Toolbar({ data, set, previewRef }) {
   const fileInputRef = useRef(null);
 
   const exportJson = () => {
@@ -43,151 +41,86 @@ export default function Toolbar({ data, set }) {
       btn.textContent = "Generating PDF...";
       btn.disabled = true;
 
-      const template = data.meta?.template || "modern";
-      const TemplateComponent = template === "basic" ? TemplateBasic : TemplateModern;
-
-      // A4 dimensions in mm
+      // A4 dimensions
       const pageWidthMM = 210;
       const pageHeightMM = 297;
-      const marginTopMM = 15;
-      const marginBottomMM = 15;
-      const marginLeftMM = 15;
-      const marginRightMM = 15;
+      const marginMM = 15;
 
-      // Create container
-      const tempDiv = document.createElement("div");
-      tempDiv.style.position = "absolute";
-      tempDiv.style.left = "-9999px";
-      tempDiv.style.width = (pageWidthMM - marginLeftMM - marginRightMM) + "mm";
-      tempDiv.style.padding = "0";
-      tempDiv.style.margin = "0";
-      tempDiv.style.boxSizing = "border-box";
-      tempDiv.style.backgroundColor = "#ffffff";
-      tempDiv.style.fontFamily = "Arial, sans-serif";
-      tempDiv.style.lineHeight = "1.4";
-      tempDiv.style.color = "#000000";
-      tempDiv.style.fontSize = "10pt";
-      tempDiv.style.overflow = "visible";
-      tempDiv.style.pageBreakInside = "avoid";
+      // Find the live content node rendered inside the A4 preview
+      // This is the div with ref={contentRef} inside A4PaginatedPreview
+      const liveContentNode = previewRef?.current;
 
-      const { createRoot } = await import("react-dom/client");
-      const root = createRoot(tempDiv);
-      root.render(React.createElement(TemplateComponent, { data }));
-      document.body.appendChild(tempDiv);
+      if (!liveContentNode) {
+        throw new Error(
+          "Could not find resume preview. Make sure the preview is visible on screen."
+        );
+      }
 
-      // Wait for rendering
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          tempDiv.offsetHeight;
-          resolve();
-        }, 1000);
-      });
-
-      // Get actual content height
-      const contentHeight = tempDiv.scrollHeight;
-      
-      // Convert to canvas with high DPI
-      const dpi = 300;
+      // Capture the live DOM — same styles, same fonts, same layout as what you see
+      const dpi = 192; // 2x for crisp output
       const scale = dpi / 96;
-      
-      const canvas = await html2canvas(tempDiv, {
-        scale: scale,
+
+      const canvas = await html2canvas(liveContentNode, {
+        scale,
         useCORS: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
         logging: false,
         letterRendering: true,
-        windowHeight: contentHeight,
-        windowWidth: tempDiv.offsetWidth,
+        // Capture the full scrollHeight so we get all pages
+        windowWidth: liveContentNode.scrollWidth,
+        windowHeight: liveContentNode.scrollHeight,
+        width: liveContentNode.scrollWidth,
+        height: liveContentNode.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
+        ignoreElements: (el) => {
+          // Skip the page-number badge and navigation controls
+          return (
+            el.classList?.contains("pointer-events-none") ||
+            el.tagName === "BUTTON" ||
+            el.dataset?.pdfIgnore === "true"
+          );
+        },
       });
 
-      root.unmount();
-      if (tempDiv.parentNode) {
-        document.body.removeChild(tempDiv);
-      }
-
-      // Create PDF
+      // Build PDF page by page
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
-        compress: false,
+        compress: true,
       });
 
-      const pageContentWidth = pageWidthMM - marginLeftMM - marginRightMM;
-      const pageContentHeight = pageHeightMM - marginTopMM - marginBottomMM;
-
-      // Canvas dimensions
-      const canvasWidth = canvas.width;
+      const contentWidthMM = pageWidthMM - marginMM * 2;
+      const contentHeightMM = pageHeightMM - marginMM * 2;
+      const pixelsPerMM = dpi / 25.4;
+      const contentHeightPx = contentHeightMM * pixelsPerMM;
       const canvasHeight = canvas.height;
+      const canvasWidth = canvas.width;
+      const totalPages = Math.ceil(canvasHeight / contentHeightPx);
 
-      // Calculate pixels per mm at the scale we used
-      const pixelsPerMM = (dpi / 25.4);
-      
-      // Height of content area in pixels
-      const contentHeightPixels = pageContentHeight * pixelsPerMM;
-      
-      // Calculate number of pages needed
-      const totalPages = Math.ceil(canvasHeight / contentHeightPixels);
-
-      console.log(`PDF Info:
-        Canvas size: ${canvasWidth}x${canvasHeight}px
-        Page content area: ${pageContentWidth}x${pageContentHeight}mm
-        Content height pixels: ${contentHeightPixels}px
-        Total pages: ${totalPages}`);
-
-      // Add each page to PDF
       for (let pageNum = 0; pageNum < totalPages; pageNum++) {
-        if (pageNum > 0) {
-          pdf.addPage();
-        }
+        if (pageNum > 0) pdf.addPage();
 
-        // Calculate what portion of the canvas to use for this page
-        const sourceYPixels = pageNum * contentHeightPixels;
-        const remainingHeightPixels = canvasHeight - sourceYPixels;
-        const pageHeightPixels = Math.min(contentHeightPixels, remainingHeightPixels);
+        const sourceY = pageNum * contentHeightPx;
+        const sliceHeight = Math.min(contentHeightPx, canvasHeight - sourceY);
 
-        // Create image for this page section
         const pageCanvas = document.createElement("canvas");
         pageCanvas.width = canvasWidth;
-        pageCanvas.height = pageHeightPixels;
+        pageCanvas.height = sliceHeight;
 
         const ctx = pageCanvas.getContext("2d");
-        if (!ctx) {
-          throw new Error("Failed to get canvas context");
-        }
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvasWidth, sliceHeight);
+        ctx.drawImage(canvas, 0, sourceY, canvasWidth, sliceHeight, 0, 0, canvasWidth, sliceHeight);
 
-        // Draw the slice
-        ctx.drawImage(
-          canvas,
-          0,
-          sourceYPixels,
-          canvasWidth,
-          pageHeightPixels,
-          0,
-          0,
-          canvasWidth,
-          pageHeightPixels
-        );
-
-        // Convert to image data
         const imgData = pageCanvas.toDataURL("image/png");
+        const imgHeightMM = sliceHeight / pixelsPerMM;
 
-        // Add to PDF with proper sizing
-        const imgWidthMM = pageContentWidth;
-        const imgHeightMM = (pageHeightPixels / pixelsPerMM);
-
-        pdf.addImage(
-          imgData,
-          "PNG",
-          marginLeftMM,
-          marginTopMM,
-          imgWidthMM,
-          imgHeightMM
-        );
+        pdf.addImage(imgData, "PNG", marginMM, marginMM, contentWidthMM, imgHeightMM);
       }
 
-      // Save PDF
       const fileName = `${(data.profile.fullName || "resume").replace(/\s+/g, "_")}.pdf`;
       pdf.save(fileName);
 

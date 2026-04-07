@@ -17,6 +17,50 @@ export function Section({ title, accent, children }) {
   );
 }
 
+// Shared bullet list renderer — div-based, no CSS list-style
+function BulletList({ items }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div style={{ marginTop: "4px" }}>
+      {items.map((b, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            marginBottom: "2px",
+            gap: "6px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "11px",
+              lineHeight: "1.5",
+              color: "#4b5563",
+              flexShrink: 0,
+              marginTop: "0px",
+            }}
+          >
+            •
+          </span>
+          <span
+            style={{
+              fontSize: "11.5px",
+              lineHeight: "1.5",
+              color: "#374151",
+              flex: 1,
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            {b}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // Experience entry component
 export function ExperienceBlock({ e }) {
   return (
@@ -30,18 +74,7 @@ export function ExperienceBlock({ e }) {
       <div className="text-[11px] text-gray-500 mb-1 m-0">
         {e.start} - {e.end || "Present"} {e.location && `| ${e.location}`}
       </div>
-      {e.bullets && e.bullets.length > 0 && (
-        <ul 
-          className="list-disc text-[12px] text-gray-700 leading-[1.4] m-0 p-0" 
-          style={{ paddingLeft: "20px", marginTop: "4px" }}
-        >
-          {e.bullets.map((b, i) => (
-            <li key={i} className="text-[11.5px]" style={{ margin: 0, marginBottom: "2px" }}>
-              {b}
-            </li>
-          ))}
-        </ul>
-      )}
+      <BulletList items={e.bullets} />
     </div>
   );
 }
@@ -59,18 +92,7 @@ export function EducationBlock({ e }) {
       <div className="text-[11px] text-gray-500 mb-1 m-0">
         {e.start} - {e.end} {e.location && `| ${e.location}`}
       </div>
-      {e.bullets && e.bullets.length > 0 && (
-        <ul 
-          className="list-disc text-[12px] text-gray-700 leading-[1.4] m-0 p-0" 
-          style={{ paddingLeft: "20px", marginTop: "4px" }}
-        >
-          {e.bullets.map((b, i) => (
-            <li key={i} className="text-[11.5px]" style={{ margin: 0, marginBottom: "2px" }}>
-              {b}
-            </li>
-          ))}
-        </ul>
-      )}
+      <BulletList items={e.bullets} />
     </div>
   );
 }
@@ -85,18 +107,7 @@ export function ProjectsBlock({ p }) {
       <div className="text-[11px] text-gray-500 mb-1 m-0">
         {p.organization} | {p.start} - {p.end}
       </div>
-      {p.bullets && p.bullets.length > 0 && (
-        <ul 
-          className="list-disc text-[12px] text-gray-700 leading-[1.4] m-0 p-0" 
-          style={{ paddingLeft: "20px", marginTop: "4px" }}
-        >
-          {p.bullets.map((b, i) => (
-            <li key={i} className="text-[11.5px]" style={{ margin: 0, marginBottom: "2px" }}>
-              {b}
-            </li>
-          ))}
-        </ul>
-      )}
+      <BulletList items={p.bullets} />
     </div>
   );
 }
@@ -116,18 +127,7 @@ export function AchievementsBlock({ a }) {
           {a.year}
         </div>
       )}
-      {a.bullets && a.bullets.length > 0 && (
-        <ul 
-          className="list-disc text-[12px] text-gray-700 leading-[1.4] m-0 p-0" 
-          style={{ paddingLeft: "20px", marginTop: "4px" }}
-        >
-          {a.bullets.map((b, i) => (
-            <li key={i} className="text-[11.5px]" style={{ margin: 0, marginBottom: "2px" }}>
-              {b}
-            </li>
-          ))}
-        </ul>
-      )}
+      <BulletList items={a.bullets} />
     </div>
   );
 }
@@ -139,18 +139,7 @@ export function SkillsBlock({ group }) {
       <p className="font-semibold text-[12px] text-gray-800 m-0">
         {group.title}
       </p>
-      {group.bullets && group.bullets.length > 0 && (
-        <ul 
-          className="list-disc text-[11.5px] text-gray-700 leading-[1.3] m-0 p-0" 
-          style={{ paddingLeft: "16px" }}
-        >
-          {group.bullets.map((b, i) => (
-            <li key={i} className="text-[11px]" style={{ margin: 0 }}>
-              {b}
-            </li>
-          ))}
-        </ul>
-      )}
+      <BulletList items={group.bullets} />
     </div>
   );
 }

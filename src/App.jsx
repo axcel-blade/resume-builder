@@ -1,6 +1,6 @@
 /* src/App.jsx */
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Toolbar from "./components/Toolbar";
 import ResumeEditor from "./components/editors/ResumeEditor";
 import A4PaginatedPreview from "./components/preview/A4PaginatedPreview";
@@ -10,12 +10,12 @@ import { defaultData } from "./data/defaultData";
 
 export default function App() {
   const [data, setData] = useState(defaultData);
+  const previewRef = useRef(null);
 
   const set = (patch) => setData((prev) => ({ ...prev, ...patch }));
 
   const getTemplateComponent = () => {
     const template = data.meta?.template || "modern";
-    
     switch (template) {
       case "modern":
         return TemplateModern;
@@ -31,7 +31,7 @@ export default function App() {
       <div className="mx-auto flex flex-col lg:flex-row gap-4 p-4">
         {/* EDITOR PANEL */}
         <div className="w-full lg:w-1/2 flex flex-col gap-4">
-          <Toolbar data={data} set={set} />
+          <Toolbar data={data} set={set} previewRef={previewRef} />
 
           {/* EDITOR CONTENT */}
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
@@ -48,7 +48,11 @@ export default function App() {
               </p>
             </div>
             <div className="max-h-[calc(100vh-100px)] overflow-y-auto bg-gray-100 p-4">
-              <A4PaginatedPreview data={data} templateComponent={getTemplateComponent()} />
+              <A4PaginatedPreview
+                ref={previewRef}
+                data={data}
+                templateComponent={getTemplateComponent()}
+              />
             </div>
           </div>
         </div>
