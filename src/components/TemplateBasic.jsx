@@ -35,7 +35,7 @@ export default function TemplateBasic({ data }) {
       }}
     >
       {/* ── NAME (centered) ── */}
-      <div style={{ textAlign: "center", marginBottom: "10px" }}>
+      <div style={{ textAlign: "center", marginBottom: "8px" }}>
         <div
           style={{
             fontSize: "29px",
@@ -77,6 +77,9 @@ export default function TemplateBasic({ data }) {
             ))}
           </div>
         )}
+
+        {/* Divider — matches jsPDF drawHeaderBasic rule */}
+        <div style={{ height: "0.75px", backgroundColor: accent, marginTop: "6px" }} />
       </div>
 
       {/* ── SUMMARY ── */}

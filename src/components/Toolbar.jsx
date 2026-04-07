@@ -180,7 +180,7 @@ function drawHeaderBasic(pdf, data, y, accent) {
   pdf.setDrawColor(...hexToRgb(accent));
   pdf.setLineWidth(0.3);
   pdf.line(ML, y, ML + CONTENT_W, y);
-  y += 5;
+  y += 3;
 
   return y;
 }
