@@ -1,10 +1,387 @@
 /* src/components/Toolbar.jsx */
 
 import React, { useRef } from "react";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-export default function Toolbar({ data, set, previewRef }) {
+// ─── Layout constants (all in mm) ───────────────────────────────────────────
+const PAGE_W = 210;
+const PAGE_H = 297;
+const ML = 15; // margin left
+const MR = 15; // margin right
+const MT = 16; // margin top
+const MB = 16; // margin bottom
+const CONTENT_W = PAGE_W - ML - MR;
+
+// ─── Font sizes (pt) ────────────────────────────────────────────────────────
+const FS = {
+  name: 22,
+  title: 11,
+  contact: 9,
+  sectionHead: 8.5,
+  entryTitle: 10,
+  entryMeta: 8.5,
+  bullet: 9.5,
+  summary: 9.5,
+};
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+/** Convert hex colour to [r, g, b] 0-255 */
+function hexToRgb(hex) {
+  const h = hex.replace("#", "");
+  return [
+    parseInt(h.substring(0, 2), 16),
+    parseInt(h.substring(2, 4), 16),
+    parseInt(h.substring(4, 6), 16),
+  ];
+}
+
+/**
+ * Wrap text to fit within maxWidth mm.
+ * Returns an array of line strings.
+ */
+function wrapText(pdf, text, maxWidth) {
+  return pdf.splitTextToSize(text, maxWidth);
+}
+
+/**
+ * Draw wrapped text and return new Y position.
+ * lineHeight in mm.
+ */
+function drawText(pdf, text, x, y, maxWidth, lineHeightMM) {
+  const lines = wrapText(pdf, text, maxWidth);
+  lines.forEach((line) => {
+    pdf.text(line, x, y);
+    y += lineHeightMM;
+  });
+  return y;
+}
+
+/**
+ * Draw a section heading with an underline rule.
+ * Returns new Y.
+ */
+function drawSectionHead(pdf, label, y, accent) {
+  const [r, g, b] = hexToRgb(accent);
+  pdf.setFontSize(FS.sectionHead);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(r, g, b);
+  pdf.text(label.toUpperCase(), ML, y);
+  y += 1.5;
+  pdf.setDrawColor(r, g, b);
+  pdf.setLineWidth(0.3);
+  pdf.line(ML, y, ML + CONTENT_W, y);
+  pdf.setTextColor(0, 0, 0);
+  y += 4;
+  return y;
+}
+
+/**
+ * Add a new page and reset Y to top margin.
+ */
+function newPage(pdf) {
+  pdf.addPage();
+  return MT;
+}
+
+/**
+ * Check if adding `neededMM` from current y would overflow the page.
+ * If so, add a new page.
+ */
+function ensureSpace(pdf, y, neededMM) {
+  if (y + neededMM > PAGE_H - MB) {
+    return newPage(pdf);
+  }
+  return y;
+}
+
+// ─── Main export function ────────────────────────────────────────────────────
+
+function buildPDF(data) {
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const accent = data.meta?.accent || "#0ea5e9";
+  const [ar, ag, ab] = hexToRgb(accent);
+  const profile = data.profile;
+
+  let y = MT;
+
+  // ── NAME ──────────────────────────────────────────────────────────────────
+  pdf.setFontSize(FS.name);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(ar, ag, ab);
+  pdf.text(profile.fullName || "", ML, y);
+  y += 8;
+
+  // ── TITLE ─────────────────────────────────────────────────────────────────
+  if (profile.title) {
+    pdf.setFontSize(FS.title);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(60, 60, 60);
+    pdf.text(profile.title, ML, y);
+    y += 5.5;
+  }
+
+  // ── CONTACT LINE ─────────────────────────────────────────────────────────
+  pdf.setFontSize(FS.contact);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(80, 80, 80);
+  const contactParts = [
+    profile.email,
+    profile.phone,
+    profile.location,
+    profile.website,
+  ].filter(Boolean);
+  if (contactParts.length) {
+    pdf.text(contactParts.join("   "), ML, y);
+    y += 4.5;
+  }
+
+  // ── LINKS ─────────────────────────────────────────────────────────────────
+  if (data.links?.length) {
+    pdf.setFontSize(FS.contact);
+    pdf.setFont("helvetica", "normal");
+    data.links.forEach((l) => {
+      y = ensureSpace(pdf, y, 4.5);
+      pdf.setTextColor(80, 80, 80);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(`${l.label}`, ML, y);
+      const labelW = pdf.getTextWidth(`${l.label}  `);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(ar, ag, ab);
+      pdf.text(l.url, ML + labelW + 2, y);
+      y += 4.2;
+    });
+  }
+
+  y += 3; // gap before first section
+
+  // ── SUMMARY ───────────────────────────────────────────────────────────────
+  if (profile.summary) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, "Summary", y, accent);
+    pdf.setFontSize(FS.summary);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(50, 50, 50);
+    y = drawText(pdf, profile.summary, ML, y, CONTENT_W, 4.5);
+    y += 4;
+  }
+
+  // ── EXPERIENCE ────────────────────────────────────────────────────────────
+  if (data.experience?.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, "Experience", y, accent);
+
+    data.experience.forEach((e) => {
+      y = ensureSpace(pdf, y, 10);
+
+      // Role | Company
+      pdf.setFontSize(FS.entryTitle);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30, 30, 30);
+      const roleText = e.company ? `${e.role}` : e.role;
+      pdf.text(roleText, ML, y);
+      if (e.company) {
+        const roleW = pdf.getTextWidth(roleText);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(90, 90, 90);
+        pdf.text(` | ${e.company}`, ML + roleW, y);
+      }
+      y += 4.5;
+
+      // Date | Location
+      pdf.setFontSize(FS.entryMeta);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(120, 120, 120);
+      const meta = [
+        `${e.start} – ${e.end || "Present"}`,
+        e.location,
+      ].filter(Boolean).join("   |   ");
+      pdf.text(meta, ML, y);
+      y += 4;
+
+      // Bullets
+      if (e.bullets?.length) {
+        pdf.setFontSize(FS.bullet);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        e.bullets.forEach((b) => {
+          const lines = wrapText(pdf, b, CONTENT_W - 6);
+          y = ensureSpace(pdf, y, lines.length * 4 + 1);
+          lines.forEach((line, li) => {
+            pdf.text(line, ML + 6, y);
+            y += 4;
+          });
+        });
+      }
+      y += 3;
+    });
+  }
+
+  // ── PROJECTS ──────────────────────────────────────────────────────────────
+  if (data.projects?.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, "Projects", y, accent);
+
+    data.projects.forEach((p) => {
+      y = ensureSpace(pdf, y, 10);
+
+      pdf.setFontSize(FS.entryTitle);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30, 30, 30);
+      pdf.text(p.title || "", ML, y);
+      y += 4.5;
+
+      if (p.organization || p.start) {
+        pdf.setFontSize(FS.entryMeta);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(120, 120, 120);
+        const meta = [p.organization, `${p.start} – ${p.end}`].filter(Boolean).join("   |   ");
+        pdf.text(meta, ML, y);
+        y += 4;
+      }
+
+      if (p.bullets?.length) {
+        pdf.setFontSize(FS.bullet);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        p.bullets.forEach((b) => {
+          const lines = wrapText(pdf, b, CONTENT_W - 6);
+          y = ensureSpace(pdf, y, lines.length * 4 + 1);
+          lines.forEach((line) => {
+            pdf.text(line, ML + 6, y);
+            y += 4;
+          });
+        });
+      }
+      y += 3;
+    });
+  }
+
+  // ── EDUCATION ─────────────────────────────────────────────────────────────
+  if (data.education?.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, "Education", y, accent);
+
+    data.education.forEach((e) => {
+      y = ensureSpace(pdf, y, 10);
+
+      pdf.setFontSize(FS.entryTitle);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30, 30, 30);
+      pdf.text(e.degree || "", ML, y);
+      if (e.school) {
+        const dw = pdf.getTextWidth(e.degree || "");
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(90, 90, 90);
+        pdf.text(` | ${e.school}`, ML + dw, y);
+      }
+      y += 4.5;
+
+      if (e.start) {
+        pdf.setFontSize(FS.entryMeta);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(120, 120, 120);
+        const meta = [`${e.start} – ${e.end}`, e.location].filter(Boolean).join("   |   ");
+        pdf.text(meta, ML, y);
+        y += 4;
+      }
+
+      if (e.bullets?.length) {
+        pdf.setFontSize(FS.bullet);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        e.bullets.forEach((b) => {
+          const lines = wrapText(pdf, b, CONTENT_W - 6);
+          y = ensureSpace(pdf, y, lines.length * 4 + 1);
+          lines.forEach((line) => {
+            pdf.text(line, ML + 6, y);
+            y += 4;
+          });
+        });
+      }
+      y += 3;
+    });
+  }
+
+  // ── ACHIEVEMENTS ──────────────────────────────────────────────────────────
+  if (data.achievements?.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, "Achievements", y, accent);
+
+    data.achievements.forEach((a) => {
+      y = ensureSpace(pdf, y, 10);
+
+      pdf.setFontSize(FS.entryTitle);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30, 30, 30);
+      pdf.text(a.title || "", ML, y);
+      if (a.organization) {
+        const tw = pdf.getTextWidth(a.title || "");
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(90, 90, 90);
+        pdf.text(` | ${a.organization}`, ML + tw, y);
+      }
+      y += 4.5;
+
+      if (a.year) {
+        pdf.setFontSize(FS.entryMeta);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(120, 120, 120);
+        pdf.text(a.year, ML, y);
+        y += 4;
+      }
+
+      if (a.bullets?.length) {
+        pdf.setFontSize(FS.bullet);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        a.bullets.forEach((b) => {
+          const lines = wrapText(pdf, b, CONTENT_W - 6);
+          y = ensureSpace(pdf, y, lines.length * 4 + 1);
+          lines.forEach((line) => {
+            pdf.text(line, ML + 6, y);
+            y += 4;
+          });
+        });
+      }
+      y += 3;
+    });
+  }
+
+  // ── SKILLS ────────────────────────────────────────────────────────────────
+  if (data.skillGroups?.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, "Skills", y, accent);
+
+    data.skillGroups.forEach((g) => {
+      y = ensureSpace(pdf, y, 8);
+
+      pdf.setFontSize(FS.entryTitle);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30, 30, 30);
+      pdf.text(g.title || "", ML, y);
+      y += 4.5;
+
+      if (g.bullets?.length) {
+        pdf.setFontSize(FS.bullet);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        g.bullets.forEach((b) => {
+          y = ensureSpace(pdf, y, 4);
+          pdf.text(b, ML + 6, y);
+          y += 4;
+        });
+      }
+      y += 3;
+    });
+  }
+
+  return pdf;
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export default function Toolbar({ data, set }) {
   const fileInputRef = useRef(null);
 
   const exportJson = () => {
@@ -33,103 +410,20 @@ export default function Toolbar({ data, set, previewRef }) {
     if (confirm("Reset to starter content?")) window.location.reload();
   };
 
-  const savePDF = async (event) => {
+  const savePDF = (event) => {
     const btn = event.target;
     const originalText = btn.textContent;
+    btn.textContent = "Generating PDF...";
+    btn.disabled = true;
 
     try {
-      btn.textContent = "Generating PDF...";
-      btn.disabled = true;
-
-      // A4 dimensions
-      const pageWidthMM = 210;
-      const pageHeightMM = 297;
-      const marginMM = 15;
-
-      // Find the live content node rendered inside the A4 preview
-      // This is the div with ref={contentRef} inside A4PaginatedPreview
-      const liveContentNode = previewRef?.current;
-
-      if (!liveContentNode) {
-        throw new Error(
-          "Could not find resume preview. Make sure the preview is visible on screen."
-        );
-      }
-
-      // Capture the live DOM — same styles, same fonts, same layout as what you see
-      const dpi = 192; // 2x for crisp output
-      const scale = dpi / 96;
-
-      const canvas = await html2canvas(liveContentNode, {
-        scale,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        letterRendering: true,
-        // Capture the full scrollHeight so we get all pages
-        windowWidth: liveContentNode.scrollWidth,
-        windowHeight: liveContentNode.scrollHeight,
-        width: liveContentNode.scrollWidth,
-        height: liveContentNode.scrollHeight,
-        scrollX: 0,
-        scrollY: 0,
-        ignoreElements: (el) => {
-          // Skip the page-number badge and navigation controls
-          return (
-            el.classList?.contains("pointer-events-none") ||
-            el.tagName === "BUTTON" ||
-            el.dataset?.pdfIgnore === "true"
-          );
-        },
-      });
-
-      // Build PDF page by page
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-        compress: true,
-      });
-
-      const contentWidthMM = pageWidthMM - marginMM * 2;
-      const contentHeightMM = pageHeightMM - marginMM * 2;
-      const pixelsPerMM = dpi / 25.4;
-      const contentHeightPx = contentHeightMM * pixelsPerMM;
-      const canvasHeight = canvas.height;
-      const canvasWidth = canvas.width;
-      const totalPages = Math.ceil(canvasHeight / contentHeightPx);
-
-      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
-        if (pageNum > 0) pdf.addPage();
-
-        const sourceY = pageNum * contentHeightPx;
-        const sliceHeight = Math.min(contentHeightPx, canvasHeight - sourceY);
-
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = canvasWidth;
-        pageCanvas.height = sliceHeight;
-
-        const ctx = pageCanvas.getContext("2d");
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvasWidth, sliceHeight);
-        ctx.drawImage(canvas, 0, sourceY, canvasWidth, sliceHeight, 0, 0, canvasWidth, sliceHeight);
-
-        const imgData = pageCanvas.toDataURL("image/png");
-        const imgHeightMM = sliceHeight / pixelsPerMM;
-
-        pdf.addImage(imgData, "PNG", marginMM, marginMM, contentWidthMM, imgHeightMM);
-      }
-
+      const pdf = buildPDF(data);
       const fileName = `${(data.profile.fullName || "resume").replace(/\s+/g, "_")}.pdf`;
       pdf.save(fileName);
-
-      btn.textContent = originalText;
-      btn.disabled = false;
-      alert(`Success! PDF saved.\n${totalPages} page(s) generated`);
-    } catch (error) {
-      console.error("PDF generation error:", error);
-      alert(`Failed to generate PDF:\n${error.message}`);
+    } catch (err) {
+      console.error("PDF error:", err);
+      alert("Failed to generate PDF:\n" + err.message);
+    } finally {
       btn.textContent = originalText;
       btn.disabled = false;
     }
@@ -152,14 +446,12 @@ export default function Toolbar({ data, set, previewRef }) {
         <button
           className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 transition"
           onClick={reset}
-          aria-label="Reset resume to default content"
         >
           Reset
         </button>
         <button
           className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 transition"
           onClick={exportJson}
-          aria-label="Export resume as JSON file"
         >
           Export JSON
         </button>
@@ -169,19 +461,16 @@ export default function Toolbar({ data, set, previewRef }) {
           accept="application/json"
           className="hidden"
           onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])}
-          aria-label="Import JSON resume file"
         />
         <button
           className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 transition"
           onClick={() => fileInputRef.current?.click()}
-          aria-label="Import resume from JSON file"
         >
           Import JSON
         </button>
         <button
           className="rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 transition"
           onClick={savePDF}
-          aria-label="Export resume as PDF document"
         >
           Save as PDF
         </button>
