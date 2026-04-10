@@ -1,11 +1,12 @@
 # 📄 Vita Forge
 
-A React application for creating professional resumes with real-time A4 preview, two template designs, and text-based PDF export with selectable, searchable text.
+A React application for creating professional resumes with real-time A4 preview, two template designs, AI-powered summary generation, and text-based PDF export with selectable, searchable text.
 
 ## ✨ Features
 
 - **👁️ Live A4 Preview** — Paginated preview that mirrors the exported PDF exactly, page by page
 - **🎨 Two Templates** — Modern (left-aligned) and Basic (centered) layouts
+- **🤖 AI Summary Generator** — Generate or rewrite your professional summary using Claude AI, powered by your resume data
 - **📑 Full Section Support** — Profile, links, experience, projects, education, achievements, and skill groups
 - **🎯 Accent Color Picker** — Customize the accent color applied across headings, name, and section rules
 - **📄 Text-Based PDF Export** — Exports a real vector PDF using jsPDF with selectable, copyable, searchable text and clickable hyperlinks
@@ -21,6 +22,8 @@ A React application for creating professional resumes with real-time A4 preview,
 | **Vite** | Build tool & dev server |
 | **Tailwind CSS** | Utility-first styling |
 | **jsPDF** | Text-based PDF generation |
+| **Claude API (Anthropic)** | AI-powered summary generation |
+| **Vercel Serverless Functions** | Secure API proxy for Claude |
 | **JavaScript ES6+** | Core language |
 
 ## 🚀 Getting Started
@@ -29,6 +32,7 @@ A React application for creating professional resumes with real-time A4 preview,
 
 - Node.js 16+
 - npm or yarn
+- Anthropic API key (for AI summary feature) — get one at [console.anthropic.com](https://console.anthropic.com)
 
 ### Installation
 
@@ -46,6 +50,16 @@ npm run dev
 
 The app will be available at `http://localhost:5173`
 
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+```
+
+> ⚠️ Never commit your `.env` file. It is already in `.gitignore`.
+
 ### Build for Production
 
 ```bash
@@ -56,12 +70,13 @@ npm run preview
 ## 📖 Usage
 
 1. **Edit your profile** — Fill in name, title, contact details, and links
-2. **Add sections** — Add experience, education, projects, achievements, and skill groups
-3. **Choose a template** — Switch between Modern and Basic in the Resume Template card
-4. **Pick an accent color** — Use the color picker in the toolbar
-5. **Preview** — The right panel shows a paginated A4 preview, navigate pages with the arrows or keyboard
-6. **Export PDF** — Click **Save as PDF** to download a text-based PDF that matches the preview exactly
-7. **Save your data** — Use **Export JSON** to back up your resume; reload it later with **Import JSON**
+2. **Generate your summary** — Click **✦ Generate with AI** next to the Summary field to auto-generate a professional summary from your resume data. If a summary already exists, the button becomes **✦ Rewrite with AI**
+3. **Add sections** — Add experience, education, projects, achievements, and skill groups
+4. **Choose a template** — Switch between Modern and Basic in the Resume Template card
+5. **Pick an accent color** — Use the color picker in the toolbar
+6. **Preview** — The right panel shows a paginated A4 preview, navigate pages with the arrows or keyboard
+7. **Export PDF** — Click **Save as PDF** to download a text-based PDF that matches the preview exactly
+8. **Save your data** — Use **Export JSON** to back up your resume; reload it later with **Import JSON**
 
 ### Keyboard Shortcuts
 
@@ -74,30 +89,52 @@ npm run preview
 ## 📁 Project Structure
 
 ```
-src/
-├── components/
-│   ├── editors/
-│   │   ├── ResumeEditor.jsx          # Template selector + editor container
-│   │   ├── ProfileEditor.jsx         # Name, title, contact, links
-│   │   ├── ExperienceEditor.jsx      # Work experience entries
-│   │   ├── EducationEditor.jsx       # Education entries
-│   │   ├── ProjectsEditor.jsx        # Project entries
-│   │   ├── AchievementsEditor.jsx    # Achievement entries
-│   │   ├── SkillsEditor.jsx          # Skill group entries
-│   │   └── BulletsEditor.jsx         # Reusable bullet point list editor
-│   ├── preview/
-│   │   └── A4PaginatedPreview.jsx    # A4-sized paginated live preview
-│   ├── TemplateModern.jsx            # Modern template (left-aligned header)
-│   ├── TemplateBasic.jsx             # Basic template (centered header)
-│   ├── TemplateSharedParts.jsx       # Section, BulletList, and entry block components
-│   ├── Toolbar.jsx                   # Accent color, PDF export, JSON import/export
-│   └── SharedInputs.jsx              # Reusable UI: Label, Text, TextArea, IconButton, SectionCard
-├── data/
-│   └── defaultData.js                # Sample resume data (Sarah Mitchell)
-├── App.jsx                           # Root layout: editor + preview panels
-├── main.jsx                          # React entry point
-└── index.css                         # Tailwind directives
+├── api/
+│   └── generate_summary.js           # Vercel serverless function — secure Claude API proxy
+├── src/
+│   ├── components/
+│   │   ├── editors/
+│   │   │   ├── ResumeEditor.jsx          # Template selector + editor container
+│   │   │   ├── ProfileEditor.jsx         # Name, title, contact, links, AI summary button
+│   │   │   ├── ExperienceEditor.jsx      # Work experience entries
+│   │   │   ├── EducationEditor.jsx       # Education entries
+│   │   │   ├── ProjectsEditor.jsx        # Project entries
+│   │   │   ├── AchievementsEditor.jsx    # Achievement entries
+│   │   │   ├── SkillsEditor.jsx          # Skill group entries
+│   │   │   └── BulletsEditor.jsx         # Reusable bullet point list editor
+│   │   ├── preview/
+│   │   │   └── A4PaginatedPreview.jsx    # A4-sized paginated live preview
+│   │   ├── TemplateModern.jsx            # Modern template (left-aligned header)
+│   │   ├── TemplateBasic.jsx             # Basic template (centered header)
+│   │   ├── TemplateSharedParts.jsx       # Section, BulletList, and entry block components
+│   │   ├── Toolbar.jsx                   # Accent color, PDF export, JSON import/export
+│   │   └── SharedInputs.jsx              # Reusable UI: Label, Text, TextArea, IconButton, SectionCard
+│   ├── data/
+│   │   └── defaultData.js                # Sample resume data (Sarah Mitchell)
+│   ├── App.jsx                           # Root layout: editor + preview panels
+│   ├── main.jsx                          # React entry point
+│   └── index.css                         # Tailwind directives
 ```
+
+## 🤖 AI Summary Generator
+
+The AI summary feature uses **Claude by Anthropic** to generate or rewrite your professional summary based on your full resume data.
+
+### How it works
+
+- If the **Summary field is empty** → button shows **✦ Generate with AI** (blue)
+- If the **Summary field has content** → button shows **✦ Rewrite with AI** (amber)
+- While generating → button shows a spinner and is disabled
+
+The AI reads your name, title, experience, education, projects, skills, and achievements to produce a concise, compelling 2–4 sentence summary. You can edit the result freely after generation.
+
+### Setup for AI (Vercel deployment)
+
+1. Add your API key in **Vercel Dashboard → Settings → Environment Variables**:
+   ```
+   ANTHROPIC_API_KEY = sk-ant-your-key-here
+   ```
+2. The `api/generate_summary.js` serverless function acts as a secure proxy — your API key is never exposed to the browser.
 
 ## 🎨 Templates
 
@@ -173,6 +210,7 @@ Resume data is a single JSON object. You can export, edit, and re-import it at a
 
 ## 💡 Tips
 
+- **AI Summary** — Fill in your experience and skills first before generating a summary for better results
 - **Reorder items** — Use the ↑/↓ buttons on any experience, education, project, achievement, or skill group
 - **Quick bullets** — Type in the bullet input and press Enter; repeat to add multiple bullets fast
 - **Backup often** — Use **Export JSON** to save your progress locally; the app has no server-side storage
@@ -183,12 +221,14 @@ Resume data is a single JSON object. You can export, edit, and re-import it at a
 - No spell checker (use your browser's built-in spell check)
 - No image/photo support in resumes
 - Single-page app with no cloud sync — use JSON export to save your work
+- AI summary requires an Anthropic API key and Vercel deployment to function
 
 ## 🚀 Planned Enhancements
 
 - [ ] Sidebar two-column template
 - [ ] Cover letter editor and export
 - [ ] ATS keyword checker
+- [ ] AI bullet point suggestions per experience entry
 - [ ] More template designs
 - [ ] Dark mode
 
@@ -202,4 +242,4 @@ Pull requests welcome. For major changes, open an issue first to discuss what yo
 
 ---
 
-Made with ❤️ using React, Tailwind CSS, and jsPDF
+Made with ❤️ using React, Tailwind CSS, jsPDF, and Claude AI
