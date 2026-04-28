@@ -2,14 +2,21 @@
 
 import React, { useRef } from "react";
 import jsPDF from "jspdf";
+import {
+  formatDateRange,
+  sortByStartDesc,
+  normalizeBullets,
+} from "../utils/format";
 
 // ─── Layout constants (all in mm) ───────────────────────────────────────────
+// Bumped from 15/16 to 20mm so all four margins land in the community-required
+// 0.75–1 inch range (20mm ≈ 0.787").
 const PAGE_W    = 210;
 const PAGE_H    = 297;
-const ML        = 15;
-const MR        = 15;
-const MT        = 16;
-const MB        = 16;
+const ML        = 20;
+const MR        = 20;
+const MT        = 20;
+const MB        = 20;
 const CONTENT_W = PAGE_W - ML - MR;
 const BULLET_INDENT = 6;
 const BULLET_HANG   = 4;
@@ -26,7 +33,18 @@ const FS = {
   summary:      9.5,
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Community-approved section labels ──────────────────────────────────────
+const HEADINGS = {
+  summary:      "Summary",
+  experience:   "Professional Experience",
+  projects:     "Projects",
+  education:    "Education",
+  achievements: "Achievements and Awards",
+  skills:       "Key Skills",
+  references:   "References",
+};
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function hexToRgb(hex) {
   const h = hex.replace("#", "");
@@ -76,50 +94,41 @@ function drawBullet(pdf, text, y) {
   return y;
 }
 
-function drawBullets(pdf, bullets, y) {
+function drawBullets(pdf, bullets, y, { period = true } = {}) {
   if (!bullets?.length) return y;
+  const items = normalizeBullets(bullets, { period });
   pdf.setFontSize(FS.bullet);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(50, 50, 50);
-  bullets.forEach((b) => { y = drawBullet(pdf, b, y); });
+  items.forEach((b) => { y = drawBullet(pdf, b, y); });
   return y;
 }
 
 /**
  * Draw "Label  |  url" with the URL in accent colour + a clickable PDF link.
- * x      — left edge of the label
- * y      — baseline of the text
- * align  — "left" or "center" (for Basic)
- * Returns the URL's x position and width (used for centering hotspot).
  */
 function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
   const [ar, ag, ab] = accentRgb;
   const sep    = "  |  ";
   const href   = url.startsWith("http") ? url : `https://${url}`;
   const lineH  = 4.2;
-  const capH   = lineH; // approximate text cap height in mm
+  const capH   = lineH;
 
   if (align === "center") {
-    // For centered text we can't easily split colours, so draw whole line gray
-    // then add the link hotspot over the URL portion
     const fullLine  = `${label}${sep}${url}`;
     const fullW     = pdf.getTextWidth(fullLine);
     const labelSepW = pdf.getTextWidth(`${label}${sep}`);
     const urlW      = pdf.getTextWidth(url);
-    const lineStartX = (PAGE_W - fullW) / 2; // actual left edge of the full string
+    const lineStartX = (PAGE_W - fullW) / 2;
 
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(80, 80, 80);
     pdf.text(fullLine, PAGE_W / 2, y, { align: "center" });
 
-    // Recolour URL portion — overdraw in accent
     pdf.setTextColor(ar, ag, ab);
     pdf.text(url, lineStartX + labelSepW, y);
-
-    // Clickable hotspot
     pdf.link(lineStartX + labelSepW, y - capH + 1, urlW, capH, { url: href });
   } else {
-    // Left-aligned
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(80, 80, 80);
     pdf.text(label, x, y);
@@ -133,29 +142,25 @@ function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
     pdf.setTextColor(ar, ag, ab);
     pdf.text(url, x + labelW + sepW, y);
     const urlW = pdf.getTextWidth(url);
-
-    // Clickable hotspot over URL
     pdf.link(x + labelW + sepW, y - capH + 1, urlW, capH, { url: href });
   }
 
   return y + lineH;
 }
 
-// ─── Header: Modern (left-aligned) ───────────────────────────────────────────
+// ─── Headers ─────────────────────────────────────────────────────────────────
 
 function drawHeaderModern(pdf, data, y, accent) {
   const [ar, ag, ab] = hexToRgb(accent);
   const accentRgb = [ar, ag, ab];
   const p = data.profile;
 
-  // Name
   pdf.setFontSize(FS.name);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(ar, ag, ab);
   pdf.text(p.fullName || "", ML, y);
   y += 8;
 
-  // Title
   if (p.title) {
     pdf.setFontSize(FS.title);
     pdf.setFont("helvetica", "normal");
@@ -164,14 +169,12 @@ function drawHeaderModern(pdf, data, y, accent) {
     y += 5.5;
   }
 
-  // Contact line
   pdf.setFontSize(FS.contact);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(80, 80, 80);
   const contact = [p.email, p.phone, p.location, p.website].filter(Boolean).join("   ");
   if (contact) { pdf.text(contact, ML, y); y += 4.5; }
 
-  // Links — each row clickable
   if (data.links?.length) {
     pdf.setFontSize(FS.contact);
     data.links.forEach((l) => {
@@ -183,22 +186,18 @@ function drawHeaderModern(pdf, data, y, accent) {
   return y + 3;
 }
 
-// ─── Header: Basic (centered) ────────────────────────────────────────────────
-
 function drawHeaderBasic(pdf, data, y, accent) {
   const [ar, ag, ab] = hexToRgb(accent);
   const accentRgb = [ar, ag, ab];
   const p = data.profile;
   const cx = PAGE_W / 2;
 
-  // Name — centered
   pdf.setFontSize(FS.name);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(ar, ag, ab);
   pdf.text(p.fullName || "", cx, y, { align: "center" });
   y += 8;
 
-  // Title — centered
   if (p.title) {
     pdf.setFontSize(FS.title);
     pdf.setFont("helvetica", "normal");
@@ -207,14 +206,12 @@ function drawHeaderBasic(pdf, data, y, accent) {
     y += 5.5;
   }
 
-  // Contact — centered with | separators
   pdf.setFontSize(FS.contact);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(80, 80, 80);
   const contact = [p.email, p.phone, p.location, p.website].filter(Boolean).join("   |   ");
   if (contact) { pdf.text(contact, cx, y, { align: "center" }); y += 4.5; }
 
-  // Links — centered, clickable
   if (data.links?.length) {
     pdf.setFontSize(FS.contact);
     data.links.forEach((l) => {
@@ -226,14 +223,18 @@ function drawHeaderBasic(pdf, data, y, accent) {
   return y + 3;
 }
 
-// ─── Shared body ─────────────────────────────────────────────────────────────
+// ─── Body ───────────────────────────────────────────────────────────────────
 
 function drawBody(pdf, data, y, accent) {
+  // Sort the date-bearing sections reverse-chronologically.
+  const experience = sortByStartDesc(data.experience || []);
+  const projects   = sortByStartDesc(data.projects   || []);
+  const education  = sortByStartDesc(data.education  || []);
 
   // SUMMARY
   if (data.profile?.summary) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, "Summary", y, accent);
+    y = drawSectionHead(pdf, HEADINGS.summary, y, accent);
     pdf.setFontSize(FS.summary);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(50, 50, 50);
@@ -246,11 +247,11 @@ function drawBody(pdf, data, y, accent) {
     y += 3;
   }
 
-  // EXPERIENCE
-  if (data.experience?.length) {
+  // PROFESSIONAL EXPERIENCE
+  if (experience.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, "Experience", y, accent);
-    data.experience.forEach((e) => {
+    y = drawSectionHead(pdf, HEADINGS.experience, y, accent);
+    experience.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
       pdf.setFontSize(FS.entryTitle);
       pdf.setFont("helvetica", "bold");
@@ -267,46 +268,48 @@ function drawBody(pdf, data, y, accent) {
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(120, 120, 120);
       pdf.text(
-        [`${e.start} – ${e.end || "Present"}`, e.location].filter(Boolean).join("   |   "),
+        [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "),
         ML, y
       );
       y += 4;
-      y = drawBullets(pdf, e.bullets, y);
+      y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
   }
 
   // PROJECTS
-  if (data.projects?.length) {
+  if (projects.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, "Projects", y, accent);
-    data.projects.forEach((p) => {
+    y = drawSectionHead(pdf, HEADINGS.projects, y, accent);
+    projects.forEach((p) => {
       y = ensureSpace(pdf, y, 10);
       pdf.setFontSize(FS.entryTitle);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(30, 30, 30);
       pdf.text(p.title || "", ML, y);
       y += 4.5;
-      if (p.organization || p.start) {
+
+      const range = formatDateRange(p.start, p.end);
+      if (p.organization || range) {
         pdf.setFontSize(FS.entryMeta);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(120, 120, 120);
         pdf.text(
-          [p.organization, `${p.start} – ${p.end}`].filter(Boolean).join("   |   "),
+          [p.organization, range].filter(Boolean).join("   |   "),
           ML, y
         );
         y += 4;
       }
-      y = drawBullets(pdf, p.bullets, y);
+      y = drawBullets(pdf, p.bullets, y, { period: true });
       y += 3;
     });
   }
 
   // EDUCATION
-  if (data.education?.length) {
+  if (education.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, "Education", y, accent);
-    data.education.forEach((e) => {
+    y = drawSectionHead(pdf, HEADINGS.education, y, accent);
+    education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
       pdf.setFontSize(FS.entryTitle);
       pdf.setFont("helvetica", "bold");
@@ -319,25 +322,27 @@ function drawBody(pdf, data, y, accent) {
         pdf.text(` | ${e.school}`, ML + dw, y);
       }
       y += 4.5;
-      if (e.start) {
+
+      const range = formatDateRange(e.start, e.end);
+      if (range || e.location) {
         pdf.setFontSize(FS.entryMeta);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(120, 120, 120);
         pdf.text(
-          [`${e.start} – ${e.end}`, e.location].filter(Boolean).join("   |   "),
+          [range, e.location].filter(Boolean).join("   |   "),
           ML, y
         );
         y += 4;
       }
-      y = drawBullets(pdf, e.bullets, y);
+      y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
   }
 
-  // ACHIEVEMENTS
+  // ACHIEVEMENTS AND AWARDS
   if (data.achievements?.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, "Achievements", y, accent);
+    y = drawSectionHead(pdf, HEADINGS.achievements, y, accent);
     data.achievements.forEach((a) => {
       y = ensureSpace(pdf, y, 10);
       pdf.setFontSize(FS.entryTitle);
@@ -358,15 +363,15 @@ function drawBody(pdf, data, y, accent) {
         pdf.text(a.year, ML, y);
         y += 4;
       }
-      y = drawBullets(pdf, a.bullets, y);
+      y = drawBullets(pdf, a.bullets, y, { period: true });
       y += 3;
     });
   }
 
-  // SKILLS
+  // KEY SKILLS — period: false because skill rows are noun phrases
   if (data.skillGroups?.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, "Skills", y, accent);
+    y = drawSectionHead(pdf, HEADINGS.skills, y, accent);
     data.skillGroups.forEach((g) => {
       y = ensureSpace(pdf, y, 8);
       pdf.setFontSize(FS.entryTitle);
@@ -374,15 +379,61 @@ function drawBody(pdf, data, y, accent) {
       pdf.setTextColor(30, 30, 30);
       pdf.text(g.title || "", ML, y);
       y += 4.5;
-      y = drawBullets(pdf, g.bullets, y);
+      y = drawBullets(pdf, g.bullets, y, { period: false });
       y += 3;
+    });
+  }
+
+  // REFERENCES — always emitted; falls back to "available on request"
+  y = ensureSpace(pdf, y, 14);
+  y = drawSectionHead(pdf, HEADINGS.references, y, accent);
+  const refs = (data.references || []).filter((r) => r && (r.name || r.title));
+
+  if (!refs.length) {
+    pdf.setFontSize(FS.bullet);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(50, 50, 50);
+    pdf.text("References available on request.", ML, y);
+    y += 5;
+  } else {
+    refs.forEach((r) => {
+      y = ensureSpace(pdf, y, 12);
+      pdf.setFontSize(FS.entryTitle);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(30, 30, 30);
+      pdf.text(r.name || "", ML, y);
+      if (r.title) {
+        const nw = pdf.getTextWidth(r.name || "");
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(90, 90, 90);
+        pdf.text(` | ${r.title}`, ML + nw, y);
+      }
+      y += 4.5;
+
+      if (r.organization) {
+        pdf.setFontSize(FS.entryMeta);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(120, 120, 120);
+        pdf.text(r.organization, ML, y);
+        y += 4;
+      }
+
+      const contact = [r.email, r.phone].filter(Boolean).join("   |   ");
+      if (contact) {
+        pdf.setFontSize(FS.bullet);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(50, 50, 50);
+        pdf.text(contact, ML, y);
+        y += 4.5;
+      }
+      y += 2;
     });
   }
 
   return y;
 }
 
-// ─── Main builder ─────────────────────────────────────────────────────────────
+// ─── Main builder ───────────────────────────────────────────────────────────
 
 function buildPDF(data) {
   const pdf      = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -398,7 +449,7 @@ function buildPDF(data) {
   return pdf;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Component ──────────────────────────────────────────────────────────────
 
 export default function Toolbar({ data, set }) {
   const fileInputRef = useRef(null);

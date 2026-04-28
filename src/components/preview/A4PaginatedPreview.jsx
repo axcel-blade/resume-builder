@@ -12,15 +12,15 @@ const A4PaginatedPreview = forwardRef(function A4PaginatedPreview(
   const [pages, setPages] = useState([]);
 
   // A4 Constants at 96 DPI
-  const A4_WIDTH_PX = 794;   // 210mm
-  const A4_HEIGHT_PX = 1123; // 297mm
-  const MARGIN_PX = 56;      // ~15mm
+  const A4_WIDTH_PX  = 794;   // 210mm
+  const A4_HEIGHT_PX = 1123;  // 297mm
+  // 20mm ≈ 75.6px → 76px. Matches Toolbar.jsx so the preview shows the
+  // exact margins the PDF will export with (community requirement: 0.75"–1").
+  const MARGIN_PX = 76;
   const CONTENT_HEIGHT = A4_HEIGHT_PX - MARGIN_PX * 2;
 
-  // Expose the content node upward so Toolbar can screenshot it
   useImperativeHandle(ref, () => contentRef.current, []);
 
-  // Calculate pages when data changes
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!contentRef.current) {
@@ -49,7 +49,6 @@ const A4PaginatedPreview = forwardRef(function A4PaginatedPreview(
     return () => clearTimeout(timer);
   }, [data, CONTENT_HEIGHT]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === "ArrowRight" || e.key === "ArrowDown") {
@@ -73,7 +72,6 @@ const A4PaginatedPreview = forwardRef(function A4PaginatedPreview(
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      {/* A4 Page Display */}
       <div className="w-full flex justify-center">
         <A4Page
           pageNum={currentPage}
@@ -87,7 +85,6 @@ const A4PaginatedPreview = forwardRef(function A4PaginatedPreview(
         />
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center justify-center gap-4 bg-white rounded-lg border border-gray-200 p-3 shadow-sm">
         <button
           onClick={goToPreviousPage}
@@ -157,7 +154,6 @@ function A4Page({
           position: "relative",
         }}
       >
-        {/* Page number badge — excluded from PDF capture */}
         <div
           className="absolute text-xs text-gray-400 pointer-events-none bg-gray-50 rounded px-2 py-1"
           data-pdf-ignore="true"
@@ -166,7 +162,6 @@ function A4Page({
           Page {pageNum + 1}
         </div>
 
-        {/* Clipping window */}
         <div
           style={{
             height: `${CONTENT_HEIGHT}px`,
@@ -175,7 +170,6 @@ function A4Page({
             width: "100%",
           }}
         >
-          {/* Translates to show the correct page slice */}
           <div
             style={{
               transform: `translateY(-${pageNum * CONTENT_HEIGHT}px)`,
@@ -184,7 +178,6 @@ function A4Page({
               willChange: "transform",
             }}
           >
-            {/* ← THIS is what gets captured for the PDF */}
             <div ref={contentRef} style={{ width: "100%" }}>
               <TemplateComponent data={data} />
             </div>

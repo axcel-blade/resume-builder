@@ -7,6 +7,7 @@ import ProjectsEditor from "./ProjectsEditor";
 import EducationEditor from "./EducationEditor";
 import AchievementsEditor from "./AchievementsEditor";
 import SkillsEditor from "./SkillsEditor";
+import ReferencesEditor from "./ReferencesEditor";
 import { IconButton, SectionCard } from "../SharedInputs";
 
 export default function ResumeEditor({ data, set }) {
@@ -24,7 +25,6 @@ export default function ResumeEditor({ data, set }) {
 
   return (
     <div className="space-y-4">
-      {/* Template Selector */}
       <SectionCard
         title="Resume Template"
         action={
@@ -60,13 +60,13 @@ export default function ResumeEditor({ data, set }) {
         )}
       </SectionCard>
 
-      {/* Editors */}
       <ProfileEditor data={data} set={set} />
       <ExperienceEditor data={data} set={set} />
       <ProjectsEditor data={data} set={set} />
       <EducationEditor data={data} set={set} />
       <AchievementsEditor data={data} set={set} />
       <SkillsEditor data={data} set={set} />
+      <ReferencesEditor data={data} set={set} />
     </div>
   );
 }

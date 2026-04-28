@@ -84,8 +84,8 @@ export const defaultData = {
       end: "2017-05",
       bullets: [
         "Specialization in Distributed Systems and Machine Learning.",
-        "GPA: 3.85 / 4.0",
-        "Thesis: Optimizing Consensus Algorithms for High-Throughput Blockchain Networks",
+        "GPA: 3.85 / 4.0.",
+        "Thesis: Optimizing Consensus Algorithms for High-Throughput Blockchain Networks.",
       ],
     },
     {
@@ -96,9 +96,9 @@ export const defaultData = {
       start: "2011-08",
       end: "2015-05",
       bullets: [
-        "Cum Laude Honors, GPA: 3.8 / 4.0",
-        "Dean's List all semesters",
-        "Recipient of Merit Scholarship",
+        "Cum Laude Honors, GPA: 3.8 / 4.0.",
+        "Dean's List all semesters.",
+        "Recipient of Merit Scholarship.",
       ],
     },
   ],
@@ -147,7 +147,7 @@ export const defaultData = {
       year: "2023",
       bullets: [
         "Professional level certification with distinction.",
-        "Score: 92/100",
+        "Score: 92/100.",
       ],
     },
     {
@@ -202,4 +202,8 @@ export const defaultData = {
       bullets: ["Microservices", "Event-Driven Architecture", "System Design", "Domain-Driven Design"],
     },
   ],
+  // References — leaving this empty produces "References available on request"
+  // in the rendered resume, satisfying the mandatory-section rule. Users can
+  // populate it via the Referees editor with name/title/organization/email/phone.
+  references: [],
 };

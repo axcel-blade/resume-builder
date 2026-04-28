@@ -1,7 +1,7 @@
 /* src/components/TemplateBasic.jsx */
 
 // TemplateBasic uses the same layout as TemplateModern for PDF-preview parity.
-// The only visual difference: the name is centered.
+// The only visual difference: the name + header is centered.
 
 import React from "react";
 import {
@@ -11,13 +11,29 @@ import {
   AchievementsBlock,
   ProjectsBlock,
   SkillsBlock,
+  ReferencesBlock,
+  sortByStartDesc,
 } from "./TemplateSharedParts";
 
 const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
+const HEADINGS = {
+  summary:      "Summary",
+  experience:   "Professional Experience",
+  projects:     "Projects",
+  education:    "Education",
+  achievements: "Achievements and Awards",
+  skills:       "Key Skills",
+  references:   "References",
+};
+
 export default function TemplateBasic({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
   const p = data.profile;
+
+  const experience = sortByStartDesc(data.experience || []);
+  const education  = sortByStartDesc(data.education  || []);
+  const projects   = sortByStartDesc(data.projects   || []);
 
   return (
     <div
@@ -36,16 +52,7 @@ export default function TemplateBasic({ data }) {
     >
       {/* ── NAME (centered) ── */}
       <div style={{ textAlign: "center", marginBottom: "8px" }}>
-        <div
-          style={{
-            fontSize: "29px",
-            fontWeight: "700",
-            color: accent,
-            lineHeight: 1.1,
-            marginBottom: "4px",
-            fontFamily: FONT,
-          }}
-        >
+        <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily: FONT }}>
           {p.fullName}
         </div>
 
@@ -77,48 +84,49 @@ export default function TemplateBasic({ data }) {
             ))}
           </div>
         )}
-
-        {/* Divider removed */}
       </div>
 
-      {/* ── SUMMARY ── */}
       {p.summary && (
-        <Section title="Summary" accent={accent}>
+        <Section title={HEADINGS.summary} accent={accent}>
           <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, wordBreak: "break-word" }}>
             {p.summary}
           </div>
         </Section>
       )}
 
-      {data.experience?.length > 0 && (
-        <Section title="Experience" accent={accent}>
-          {data.experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
+      {experience.length > 0 && (
+        <Section title={HEADINGS.experience} accent={accent}>
+          {experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
         </Section>
       )}
 
-      {data.projects?.length > 0 && (
-        <Section title="Projects" accent={accent}>
-          {data.projects.map((p) => <ProjectsBlock key={p.id} p={p} />)}
+      {projects.length > 0 && (
+        <Section title={HEADINGS.projects} accent={accent}>
+          {projects.map((proj) => <ProjectsBlock key={proj.id} p={proj} />)}
         </Section>
       )}
 
-      {data.education?.length > 0 && (
-        <Section title="Education" accent={accent}>
-          {data.education.map((e) => <EducationBlock key={e.id} e={e} />)}
+      {education.length > 0 && (
+        <Section title={HEADINGS.education} accent={accent}>
+          {education.map((e) => <EducationBlock key={e.id} e={e} />)}
         </Section>
       )}
 
       {data.achievements?.length > 0 && (
-        <Section title="Achievements" accent={accent}>
+        <Section title={HEADINGS.achievements} accent={accent}>
           {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
         </Section>
       )}
 
       {data.skillGroups?.length > 0 && (
-        <Section title="Skills" accent={accent}>
+        <Section title={HEADINGS.skills} accent={accent}>
           {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
         </Section>
       )}
+
+      <Section title={HEADINGS.references} accent={accent}>
+        <ReferencesBlock references={data.references} />
+      </Section>
     </div>
   );
 }

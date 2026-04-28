@@ -8,19 +8,33 @@ import {
   AchievementsBlock,
   ProjectsBlock,
   SkillsBlock,
+  ReferencesBlock,
+  sortByStartDesc,
 } from "./TemplateSharedParts";
 
-// Matches jsPDF: ML=15mm, MR=15mm, MT=16mm → ~57px, 57px, 61px at 96dpi
-// We let the A4 wrapper handle margins, so padding here is 0.
-// Font: Helvetica (jsPDF default) → we use the system helvetica stack.
-
 const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+
+// Community-approved section labels (from the format checker's allowed list).
+// Centralised here so they can be tuned in one place if the rubric updates.
+const HEADINGS = {
+  summary:      "Summary",
+  experience:   "Professional Experience",
+  projects:     "Projects",
+  education:    "Education",
+  achievements: "Achievements and Awards",
+  skills:       "Key Skills",
+  references:   "References",
+};
 
 export default function TemplateModern({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
   const p = data.profile;
 
-  const accentRgb = accent;
+  // Reverse-chronological order is enforced at render time so users editing
+  // out of order don't break compliance.
+  const experience = sortByStartDesc(data.experience || []);
+  const education  = sortByStartDesc(data.education  || []);
+  const projects   = sortByStartDesc(data.projects   || []);
 
   return (
     <div
@@ -53,28 +67,13 @@ export default function TemplateModern({ data }) {
 
       {/* ── TITLE ── */}
       {p.title && (
-        <div
-          style={{
-            fontSize: "14.5px",
-            fontWeight: "400",
-            color: "#3c3c3c",
-            marginBottom: "5px",
-            fontFamily: FONT,
-          }}
-        >
+        <div style={{ fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginBottom: "5px", fontFamily: FONT }}>
           {p.title}
         </div>
       )}
 
       {/* ── CONTACT ── */}
-      <div
-        style={{
-          fontSize: "12px",
-          color: "#505050",
-          marginBottom: "4px",
-          fontFamily: FONT,
-        }}
-      >
+      <div style={{ fontSize: "12px", color: "#505050", marginBottom: "4px", fontFamily: FONT }}>
         {[p.email, p.phone, p.location, p.website].filter(Boolean).join("   ")}
       </div>
 
@@ -100,65 +99,52 @@ export default function TemplateModern({ data }) {
 
       {/* ── SUMMARY ── */}
       {p.summary && (
-        <Section title="Summary" accent={accent}>
-          <div
-            style={{
-              fontSize: "12px",
-              color: "#323232",
-              lineHeight: 1.6,
-              fontFamily: FONT,
-              wordBreak: "break-word",
-            }}
-          >
+        <Section title={HEADINGS.summary} accent={accent}>
+          <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, fontFamily: FONT, wordBreak: "break-word" }}>
             {p.summary}
           </div>
         </Section>
       )}
 
-      {/* ── EXPERIENCE ── */}
-      {data.experience?.length > 0 && (
-        <Section title="Experience" accent={accent}>
-          {data.experience.map((e) => (
-            <ExperienceBlock key={e.id} e={e} />
-          ))}
+      {/* ── PROFESSIONAL EXPERIENCE ── */}
+      {experience.length > 0 && (
+        <Section title={HEADINGS.experience} accent={accent}>
+          {experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
         </Section>
       )}
 
       {/* ── PROJECTS ── */}
-      {data.projects?.length > 0 && (
-        <Section title="Projects" accent={accent}>
-          {data.projects.map((p) => (
-            <ProjectsBlock key={p.id} p={p} />
-          ))}
+      {projects.length > 0 && (
+        <Section title={HEADINGS.projects} accent={accent}>
+          {projects.map((proj) => <ProjectsBlock key={proj.id} p={proj} />)}
         </Section>
       )}
 
       {/* ── EDUCATION ── */}
-      {data.education?.length > 0 && (
-        <Section title="Education" accent={accent}>
-          {data.education.map((e) => (
-            <EducationBlock key={e.id} e={e} />
-          ))}
+      {education.length > 0 && (
+        <Section title={HEADINGS.education} accent={accent}>
+          {education.map((e) => <EducationBlock key={e.id} e={e} />)}
         </Section>
       )}
 
-      {/* ── ACHIEVEMENTS ── */}
+      {/* ── ACHIEVEMENTS AND AWARDS ── */}
       {data.achievements?.length > 0 && (
-        <Section title="Achievements" accent={accent}>
-          {data.achievements.map((a) => (
-            <AchievementsBlock key={a.id} a={a} />
-          ))}
+        <Section title={HEADINGS.achievements} accent={accent}>
+          {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
         </Section>
       )}
 
-      {/* ── SKILLS ── */}
+      {/* ── KEY SKILLS ── */}
       {data.skillGroups?.length > 0 && (
-        <Section title="Skills" accent={accent}>
-          {data.skillGroups.map((g) => (
-            <SkillsBlock key={g.id} group={g} />
-          ))}
+        <Section title={HEADINGS.skills} accent={accent}>
+          {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
         </Section>
       )}
+
+      {/* ── REFERENCES (mandatory — falls back to "available on request") ── */}
+      <Section title={HEADINGS.references} accent={accent}>
+        <ReferencesBlock references={data.references} />
+      </Section>
     </div>
   );
 }
