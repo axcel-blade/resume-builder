@@ -3,10 +3,13 @@
 import React, { useState } from "react";
 import ProfileEditor from "./ProfileEditor";
 import ExperienceEditor from "./ExperienceEditor";
+import VoluntaryEditor from "./VoluntaryEditor";
 import ProjectsEditor from "./ProjectsEditor";
 import EducationEditor from "./EducationEditor";
 import AchievementsEditor from "./AchievementsEditor";
+import CertificatesEditor from "./CertificatesEditor";
 import SkillsEditor from "./SkillsEditor";
+import InterestsEditor from "./InterestsEditor";
 import ReferencesEditor from "./ReferencesEditor";
 import { IconButton, SectionCard } from "../SharedInputs";
 
@@ -60,13 +63,17 @@ export default function ResumeEditor({ data, set }) {
         )}
       </SectionCard>
 
-      <ProfileEditor data={data} set={set} />
-      <ExperienceEditor data={data} set={set} />
-      <ProjectsEditor data={data} set={set} />
-      <EducationEditor data={data} set={set} />
+      {/* Editors are listed in the same order they appear on the rendered resume. */}
+      <ProfileEditor      data={data} set={set} />
+      <ExperienceEditor   data={data} set={set} />
+      <VoluntaryEditor    data={data} set={set} />
+      <ProjectsEditor     data={data} set={set} />
+      <EducationEditor    data={data} set={set} />
       <AchievementsEditor data={data} set={set} />
-      <SkillsEditor data={data} set={set} />
-      <ReferencesEditor data={data} set={set} />
+      <CertificatesEditor data={data} set={set} />
+      <SkillsEditor       data={data} set={set} />
+      <InterestsEditor    data={data} set={set} />
+      <ReferencesEditor   data={data} set={set} />
     </div>
   );
 }

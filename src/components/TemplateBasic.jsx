@@ -1,8 +1,5 @@
 /* src/components/TemplateBasic.jsx */
 
-// TemplateBasic uses the same layout as TemplateModern for PDF-preview parity.
-// The only visual difference: the name + header is centered.
-
 import React from "react";
 import {
   Section,
@@ -11,6 +8,9 @@ import {
   AchievementsBlock,
   ProjectsBlock,
   SkillsBlock,
+  VoluntaryBlock,
+  CertificateBlock,
+  InterestsBlock,
   ReferencesBlock,
   sortByStartDesc,
 } from "./TemplateSharedParts";
@@ -20,10 +20,13 @@ const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const HEADINGS = {
   summary:      "Summary",
   experience:   "Professional Experience",
+  voluntary:    "Voluntary Experience",
   projects:     "Projects",
   education:    "Education",
   achievements: "Achievements and Awards",
+  certificates: "Certificates & Licences",
   skills:       "Key Skills",
+  interests:    "Interests",
   references:   "References",
 };
 
@@ -31,9 +34,12 @@ export default function TemplateBasic({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
   const p = data.profile;
 
-  const experience = sortByStartDesc(data.experience || []);
-  const education  = sortByStartDesc(data.education  || []);
-  const projects   = sortByStartDesc(data.projects   || []);
+  const experience   = sortByStartDesc(data.experience   || []);
+  const voluntary    = sortByStartDesc(data.voluntary    || []);
+  const projects     = sortByStartDesc(data.projects     || []);
+  const education    = sortByStartDesc(data.education    || []);
+  const certificates = sortByStartDesc(data.certificates || [], "year");
+  const interests    = (data.interests || []).filter(Boolean);
 
   return (
     <div
@@ -100,6 +106,12 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
+      {voluntary.length > 0 && (
+        <Section title={HEADINGS.voluntary} accent={accent}>
+          {voluntary.map((v) => <VoluntaryBlock key={v.id} v={v} />)}
+        </Section>
+      )}
+
       {projects.length > 0 && (
         <Section title={HEADINGS.projects} accent={accent}>
           {projects.map((proj) => <ProjectsBlock key={proj.id} p={proj} />)}
@@ -118,9 +130,21 @@ export default function TemplateBasic({ data }) {
         </Section>
       )}
 
+      {certificates.length > 0 && (
+        <Section title={HEADINGS.certificates} accent={accent}>
+          {certificates.map((c) => <CertificateBlock key={c.id} c={c} />)}
+        </Section>
+      )}
+
       {data.skillGroups?.length > 0 && (
         <Section title={HEADINGS.skills} accent={accent}>
           {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
+        </Section>
+      )}
+
+      {interests.length > 0 && (
+        <Section title={HEADINGS.interests} accent={accent}>
+          <InterestsBlock interests={interests} />
         </Section>
       )}
 

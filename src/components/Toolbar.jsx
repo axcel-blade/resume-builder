@@ -3,14 +3,13 @@
 import React, { useRef } from "react";
 import jsPDF from "jspdf";
 import {
+  formatDate,
   formatDateRange,
   sortByStartDesc,
   normalizeBullets,
 } from "../utils/format";
 
-// ─── Layout constants (all in mm) ───────────────────────────────────────────
-// Bumped from 15/16 to 20mm so all four margins land in the community-required
-// 0.75–1 inch range (20mm ≈ 0.787").
+// ─── Layout (mm) — 20mm margins ≈ 0.787" (community 0.75–1" range) ──────────
 const PAGE_W    = 210;
 const PAGE_H    = 297;
 const ML        = 20;
@@ -21,7 +20,6 @@ const CONTENT_W = PAGE_W - ML - MR;
 const BULLET_INDENT = 6;
 const BULLET_HANG   = 4;
 
-// ─── Font sizes (pt) ────────────────────────────────────────────────────────
 const FS = {
   name:        22,
   title:       11,
@@ -33,14 +31,16 @@ const FS = {
   summary:      9.5,
 };
 
-// ─── Community-approved section labels ──────────────────────────────────────
 const HEADINGS = {
   summary:      "Summary",
   experience:   "Professional Experience",
+  voluntary:    "Voluntary Experience",
   projects:     "Projects",
   education:    "Education",
   achievements: "Achievements and Awards",
+  certificates: "Certificates & Licences",
   skills:       "Key Skills",
+  interests:    "Interests",
   references:   "References",
 };
 
@@ -104,9 +104,30 @@ function drawBullets(pdf, bullets, y, { period = true } = {}) {
   return y;
 }
 
-/**
- * Draw "Label  |  url" with the URL in accent colour + a clickable PDF link.
- */
+// "Title  | secondary" entry header — bold title + grey secondary on same line
+function drawEntryHeader(pdf, title, secondary, y) {
+  pdf.setFontSize(FS.entryTitle);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(30, 30, 30);
+  pdf.text(title || "", ML, y);
+  if (secondary) {
+    const w = pdf.getTextWidth(title || "");
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(90, 90, 90);
+    pdf.text(` | ${secondary}`, ML + w, y);
+  }
+  return y + 4.5;
+}
+
+function drawMetaLine(pdf, text, y) {
+  if (!text) return y;
+  pdf.setFontSize(FS.entryMeta);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(120, 120, 120);
+  pdf.text(text, ML, y);
+  return y + 4;
+}
+
 function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
   const [ar, ag, ab] = accentRgb;
   const sep    = "  |  ";
@@ -148,7 +169,7 @@ function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
   return y + lineH;
 }
 
-// ─── Headers ─────────────────────────────────────────────────────────────────
+// ─── Headers ────────────────────────────────────────────────────────────────
 
 function drawHeaderModern(pdf, data, y, accent) {
   const [ar, ag, ab] = hexToRgb(accent);
@@ -226,10 +247,12 @@ function drawHeaderBasic(pdf, data, y, accent) {
 // ─── Body ───────────────────────────────────────────────────────────────────
 
 function drawBody(pdf, data, y, accent) {
-  // Sort the date-bearing sections reverse-chronologically.
-  const experience = sortByStartDesc(data.experience || []);
-  const projects   = sortByStartDesc(data.projects   || []);
-  const education  = sortByStartDesc(data.education  || []);
+  const experience   = sortByStartDesc(data.experience   || []);
+  const voluntary    = sortByStartDesc(data.voluntary    || []);
+  const projects     = sortByStartDesc(data.projects     || []);
+  const education    = sortByStartDesc(data.education    || []);
+  const certificates = sortByStartDesc(data.certificates || [], "year");
+  const interests    = (data.interests || []).filter((s) => String(s).trim());
 
   // SUMMARY
   if (data.profile?.summary) {
@@ -253,26 +276,22 @@ function drawBody(pdf, data, y, accent) {
     y = drawSectionHead(pdf, HEADINGS.experience, y, accent);
     experience.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
-      pdf.setFontSize(FS.entryTitle);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(e.role || "", ML, y);
-      if (e.company) {
-        const rw = pdf.getTextWidth(e.role || "");
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(90, 90, 90);
-        pdf.text(` | ${e.company}`, ML + rw, y);
-      }
-      y += 4.5;
-      pdf.setFontSize(FS.entryMeta);
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(120, 120, 120);
-      pdf.text(
-        [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "),
-        ML, y
-      );
-      y += 4;
+      y = drawEntryHeader(pdf, e.role, e.company, y);
+      y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
+      y += 3;
+    });
+  }
+
+  // VOLUNTARY EXPERIENCE
+  if (voluntary.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, HEADINGS.voluntary, y, accent);
+    voluntary.forEach((v) => {
+      y = ensureSpace(pdf, y, 10);
+      y = drawEntryHeader(pdf, v.role, v.organization, y);
+      y = drawMetaLine(pdf, [formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   "), y);
+      y = drawBullets(pdf, v.bullets, y, { period: true });
       y += 3;
     });
   }
@@ -283,23 +302,9 @@ function drawBody(pdf, data, y, accent) {
     y = drawSectionHead(pdf, HEADINGS.projects, y, accent);
     projects.forEach((p) => {
       y = ensureSpace(pdf, y, 10);
-      pdf.setFontSize(FS.entryTitle);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(p.title || "", ML, y);
-      y += 4.5;
-
+      y = drawEntryHeader(pdf, p.title, null, y);
       const range = formatDateRange(p.start, p.end);
-      if (p.organization || range) {
-        pdf.setFontSize(FS.entryMeta);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(120, 120, 120);
-        pdf.text(
-          [p.organization, range].filter(Boolean).join("   |   "),
-          ML, y
-        );
-        y += 4;
-      }
+      y = drawMetaLine(pdf, [p.organization, range].filter(Boolean).join("   |   "), y);
       y = drawBullets(pdf, p.bullets, y, { period: true });
       y += 3;
     });
@@ -311,29 +316,8 @@ function drawBody(pdf, data, y, accent) {
     y = drawSectionHead(pdf, HEADINGS.education, y, accent);
     education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
-      pdf.setFontSize(FS.entryTitle);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(e.degree || "", ML, y);
-      if (e.school) {
-        const dw = pdf.getTextWidth(e.degree || "");
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(90, 90, 90);
-        pdf.text(` | ${e.school}`, ML + dw, y);
-      }
-      y += 4.5;
-
-      const range = formatDateRange(e.start, e.end);
-      if (range || e.location) {
-        pdf.setFontSize(FS.entryMeta);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(120, 120, 120);
-        pdf.text(
-          [range, e.location].filter(Boolean).join("   |   "),
-          ML, y
-        );
-        y += 4;
-      }
+      y = drawEntryHeader(pdf, e.degree, e.school, y);
+      y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
@@ -345,46 +329,67 @@ function drawBody(pdf, data, y, accent) {
     y = drawSectionHead(pdf, HEADINGS.achievements, y, accent);
     data.achievements.forEach((a) => {
       y = ensureSpace(pdf, y, 10);
-      pdf.setFontSize(FS.entryTitle);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(a.title || "", ML, y);
-      if (a.organization) {
-        const tw = pdf.getTextWidth(a.title || "");
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(90, 90, 90);
-        pdf.text(` | ${a.organization}`, ML + tw, y);
-      }
-      y += 4.5;
-      if (a.year) {
-        pdf.setFontSize(FS.entryMeta);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(120, 120, 120);
-        pdf.text(a.year, ML, y);
-        y += 4;
-      }
+      y = drawEntryHeader(pdf, a.title, a.organization, y);
+      if (a.year) y = drawMetaLine(pdf, a.year, y);
       y = drawBullets(pdf, a.bullets, y, { period: true });
       y += 3;
     });
   }
 
-  // KEY SKILLS — period: false because skill rows are noun phrases
+  // CERTIFICATES & LICENCES
+  if (certificates.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, HEADINGS.certificates, y, accent);
+    certificates.forEach((c) => {
+      y = ensureSpace(pdf, y, 10);
+      y = drawEntryHeader(pdf, c.title, c.issuer, y);
+
+      const metaParts = [];
+      if (c.year) {
+        metaParts.push(c.expiry
+          ? `Issued ${formatDate(c.year)} · Expires ${formatDate(c.expiry)}`
+          : `Issued ${formatDate(c.year)}`);
+      } else if (c.expiry) {
+        metaParts.push(`Expires ${formatDate(c.expiry)}`);
+      }
+      if (c.credentialId) metaParts.push(`Credential ID: ${c.credentialId}`);
+      y = drawMetaLine(pdf, metaParts.join("   |   "), y);
+
+      y = drawBullets(pdf, c.bullets, y, { period: true });
+      y += 3;
+    });
+  }
+
+  // KEY SKILLS
   if (data.skillGroups?.length) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.skills, y, accent);
     data.skillGroups.forEach((g) => {
       y = ensureSpace(pdf, y, 8);
-      pdf.setFontSize(FS.entryTitle);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(g.title || "", ML, y);
-      y += 4.5;
+      y = drawEntryHeader(pdf, g.title, null, y);
       y = drawBullets(pdf, g.bullets, y, { period: false });
       y += 3;
     });
   }
 
-  // REFERENCES — always emitted; falls back to "available on request"
+  // INTERESTS — single inline pipe-separated line
+  if (interests.length) {
+    y = ensureSpace(pdf, y, 12);
+    y = drawSectionHead(pdf, HEADINGS.interests, y, accent);
+    pdf.setFontSize(FS.bullet);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(50, 50, 50);
+    const line = interests.join("  •  ");
+    const lines = pdf.splitTextToSize(line, CONTENT_W);
+    lines.forEach((l) => {
+      y = ensureSpace(pdf, y, 5);
+      pdf.text(l, ML, y);
+      y += 4.5;
+    });
+    y += 3;
+  }
+
+  // REFERENCES — always emitted
   y = ensureSpace(pdf, y, 14);
   y = drawSectionHead(pdf, HEADINGS.references, y, accent);
   const refs = (data.references || []).filter((r) => r && (r.name || r.title));
@@ -398,25 +403,8 @@ function drawBody(pdf, data, y, accent) {
   } else {
     refs.forEach((r) => {
       y = ensureSpace(pdf, y, 12);
-      pdf.setFontSize(FS.entryTitle);
-      pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(30, 30, 30);
-      pdf.text(r.name || "", ML, y);
-      if (r.title) {
-        const nw = pdf.getTextWidth(r.name || "");
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(90, 90, 90);
-        pdf.text(` | ${r.title}`, ML + nw, y);
-      }
-      y += 4.5;
-
-      if (r.organization) {
-        pdf.setFontSize(FS.entryMeta);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(120, 120, 120);
-        pdf.text(r.organization, ML, y);
-        y += 4;
-      }
+      y = drawEntryHeader(pdf, r.name, r.title, y);
+      if (r.organization) y = drawMetaLine(pdf, r.organization, y);
 
       const contact = [r.email, r.phone].filter(Boolean).join("   |   ");
       if (contact) {

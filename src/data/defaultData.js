@@ -142,16 +142,6 @@ export const defaultData = {
     },
     {
       id: "ach2",
-      title: "AWS Solutions Architect Certified",
-      organization: "Amazon Web Services",
-      year: "2023",
-      bullets: [
-        "Professional level certification with distinction.",
-        "Score: 92/100.",
-      ],
-    },
-    {
-      id: "ach3",
       title: "Engineering Excellence Award",
       organization: "CloudVenture Technologies",
       year: "2023",
@@ -160,7 +150,7 @@ export const defaultData = {
       ],
     },
     {
-      id: "ach4",
+      id: "ach3",
       title: "Hackathon Winner - Cloud Innovation Challenge",
       organization: "Global Tech Summit 2022",
       year: "2022",
@@ -202,8 +192,31 @@ export const defaultData = {
       bullets: ["Microservices", "Event-Driven Architecture", "System Design", "Domain-Driven Design"],
     },
   ],
-  // References — leaving this empty produces "References available on request"
-  // in the rendered resume, satisfying the mandatory-section rule. Users can
-  // populate it via the Referees editor with name/title/organization/email/phone.
+
+  // ─── Optional sections ────────────────────────────────────────────────────
+  // All render only when they hold at least one populated entry. An empty
+  // array means the section is hidden from preview and PDF.
+
+  // Voluntary / community work — same shape as `experience`
+  voluntary: [],
+
+  // Certificates & Licences — credential records
+  // shape: { id, title, issuer, year, expiry?, credentialId?, bullets? }
+  certificates: [
+    {
+      id: "cert1",
+      title: "AWS Solutions Architect — Professional",
+      issuer: "Amazon Web Services",
+      year: "2023",
+      expiry: "2026-06",
+      credentialId: "AWS-PSA-92347",
+      bullets: ["Score: 92/100, achieved with distinction."],
+    },
+  ],
+
+  // Interests / Leisure Interests — flat list of short labels
+  interests: [],
+
+  // References — empty array prints "References available on request"
   references: [],
 };

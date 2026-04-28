@@ -8,21 +8,25 @@ import {
   AchievementsBlock,
   ProjectsBlock,
   SkillsBlock,
+  VoluntaryBlock,
+  CertificateBlock,
+  InterestsBlock,
   ReferencesBlock,
   sortByStartDesc,
 } from "./TemplateSharedParts";
 
 const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
-// Community-approved section labels (from the format checker's allowed list).
-// Centralised here so they can be tuned in one place if the rubric updates.
 const HEADINGS = {
   summary:      "Summary",
   experience:   "Professional Experience",
+  voluntary:    "Voluntary Experience",
   projects:     "Projects",
   education:    "Education",
   achievements: "Achievements and Awards",
+  certificates: "Certificates & Licences",
   skills:       "Key Skills",
+  interests:    "Interests",
   references:   "References",
 };
 
@@ -30,11 +34,12 @@ export default function TemplateModern({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
   const p = data.profile;
 
-  // Reverse-chronological order is enforced at render time so users editing
-  // out of order don't break compliance.
-  const experience = sortByStartDesc(data.experience || []);
-  const education  = sortByStartDesc(data.education  || []);
-  const projects   = sortByStartDesc(data.projects   || []);
+  const experience  = sortByStartDesc(data.experience  || []);
+  const voluntary   = sortByStartDesc(data.voluntary   || []);
+  const projects    = sortByStartDesc(data.projects    || []);
+  const education   = sortByStartDesc(data.education   || []);
+  const certificates = sortByStartDesc(data.certificates || [], "year");
+  const interests   = (data.interests || []).filter(Boolean);
 
   return (
     <div
@@ -52,16 +57,7 @@ export default function TemplateModern({ data }) {
       }}
     >
       {/* ── NAME ── */}
-      <div
-        style={{
-          fontSize: "29px",
-          fontWeight: "700",
-          color: accent,
-          lineHeight: 1.1,
-          marginBottom: "4px",
-          fontFamily: FONT,
-        }}
-      >
+      <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily: FONT }}>
         {p.fullName}
       </div>
 
@@ -97,7 +93,6 @@ export default function TemplateModern({ data }) {
         </div>
       )}
 
-      {/* ── SUMMARY ── */}
       {p.summary && (
         <Section title={HEADINGS.summary} accent={accent}>
           <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, fontFamily: FONT, wordBreak: "break-word" }}>
@@ -106,42 +101,55 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* ── PROFESSIONAL EXPERIENCE ── */}
       {experience.length > 0 && (
         <Section title={HEADINGS.experience} accent={accent}>
           {experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
         </Section>
       )}
 
-      {/* ── PROJECTS ── */}
+      {voluntary.length > 0 && (
+        <Section title={HEADINGS.voluntary} accent={accent}>
+          {voluntary.map((v) => <VoluntaryBlock key={v.id} v={v} />)}
+        </Section>
+      )}
+
       {projects.length > 0 && (
         <Section title={HEADINGS.projects} accent={accent}>
           {projects.map((proj) => <ProjectsBlock key={proj.id} p={proj} />)}
         </Section>
       )}
 
-      {/* ── EDUCATION ── */}
       {education.length > 0 && (
         <Section title={HEADINGS.education} accent={accent}>
           {education.map((e) => <EducationBlock key={e.id} e={e} />)}
         </Section>
       )}
 
-      {/* ── ACHIEVEMENTS AND AWARDS ── */}
       {data.achievements?.length > 0 && (
         <Section title={HEADINGS.achievements} accent={accent}>
           {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
         </Section>
       )}
 
-      {/* ── KEY SKILLS ── */}
+      {certificates.length > 0 && (
+        <Section title={HEADINGS.certificates} accent={accent}>
+          {certificates.map((c) => <CertificateBlock key={c.id} c={c} />)}
+        </Section>
+      )}
+
       {data.skillGroups?.length > 0 && (
         <Section title={HEADINGS.skills} accent={accent}>
           {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
         </Section>
       )}
 
-      {/* ── REFERENCES (mandatory — falls back to "available on request") ── */}
+      {interests.length > 0 && (
+        <Section title={HEADINGS.interests} accent={accent}>
+          <InterestsBlock interests={interests} />
+        </Section>
+      )}
+
+      {/* References — always rendered (mandatory) */}
       <Section title={HEADINGS.references} accent={accent}>
         <ReferencesBlock references={data.references} />
       </Section>

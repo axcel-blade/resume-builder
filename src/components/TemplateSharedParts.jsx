@@ -1,12 +1,9 @@
 /* src/components/TemplateSharedParts.jsx */
 
 import React from "react";
-import { formatDateRange, sortByStartDesc, normalizeBullets } from "../utils/format";
+import { formatDate, formatDateRange, sortByStartDesc, normalizeBullets } from "../utils/format";
 
-// ─── Matches jsPDF layout constants ──────────────────────────────────────────
-// PDF: ML=20mm, MR=20mm, MT=20mm — replicated by the wrapper. Font sizes
-// matched pt→px (1pt ≈ 1.333px at 96dpi).
-
+// ─── Layout / typography constants — match jsPDF output ──────────────────────
 const C = {
   name:    { fontSize: "29px",   fontWeight: "700", lineHeight: 1.1 },
   title:   { fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginTop: "4px" },
@@ -16,8 +13,6 @@ const C = {
   rule:    { height: "0.75px",   marginTop: "2px", marginBottom: "5px" },
   eTitle:  { fontSize: "13px",   fontWeight: "700", color: "#1e1e1e" },
   eComp:   { fontSize: "13px",   fontWeight: "400", color: "#5a5a5a" },
-  // Date meta — matched on every entry type so the format checker sees one
-  // consistent style (no italics, no bold, same colour, same size).
   eMeta:   { fontSize: "11px",   color: "#787878",  marginTop: "1px", marginBottom: "3px",
              fontStyle: "normal", fontWeight: "400" },
   bullet:  { fontSize: "12px",   color: "#323232",  lineHeight: 1.55 },
@@ -65,7 +60,7 @@ function BulletList({ items, period = true }) {
 export function ExperienceBlock({ e }) {
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "0" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
         <span style={C.eTitle}>{e.role}</span>
         {e.company && <span style={C.eComp}>&nbsp;| {e.company}</span>}
       </div>
@@ -124,17 +119,64 @@ export function SkillsBlock({ group }) {
   return (
     <div style={{ marginBottom: "10px" }}>
       <div style={{ ...C.eTitle, marginBottom: "1px" }}>{group.title}</div>
-      {/* Skills are noun phrases — period: false keeps "React.js" from becoming "React.js." */}
       <BulletList items={group.bullets} period={false} />
     </div>
   );
 }
 
-// ─── References ──────────────────────────────────────────────────────────────
-// Renders an optional list of referees or, if none, the standard
-// "References available on request" line. The community guide treats this
-// section as mandatory, so the template always emits something here.
+// Voluntary entries share the Experience shape (role/org/location/dates/bullets)
+export function VoluntaryBlock({ v }) {
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
+        <span style={C.eTitle}>{v.role}</span>
+        {v.organization && <span style={C.eComp}>&nbsp;| {v.organization}</span>}
+      </div>
+      <div style={C.eMeta}>
+        {[formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   ")}
+      </div>
+      <BulletList items={v.bullets} period />
+    </div>
+  );
+}
 
+// Certificate entries — meta line shows issue year, optional expiry, optional ID.
+export function CertificateBlock({ c }) {
+  const metaParts = [];
+  if (c.year) {
+    metaParts.push(c.expiry ? `Issued ${formatDate(c.year)} · Expires ${formatDate(c.expiry)}`
+                            : `Issued ${formatDate(c.year)}`);
+  } else if (c.expiry) {
+    metaParts.push(`Expires ${formatDate(c.expiry)}`);
+  }
+  if (c.credentialId) metaParts.push(`Credential ID: ${c.credentialId}`);
+
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
+        <span style={C.eTitle}>{c.title}</span>
+        {c.issuer && <span style={C.eComp}>&nbsp;| {c.issuer}</span>}
+      </div>
+      {metaParts.length > 0 && (
+        <div style={C.eMeta}>{metaParts.join("   |   ")}</div>
+      )}
+      <BulletList items={c.bullets} period />
+    </div>
+  );
+}
+
+// Interests render as a single inline pipe-separated line — typical resume style.
+export function InterestsBlock({ interests }) {
+  const items = (interests || []).map((s) => String(s).trim()).filter(Boolean);
+  if (!items.length) return null;
+  return (
+    <div style={{ ...C.bullet, marginTop: "2px" }}>
+      {items.join("  •  ")}
+    </div>
+  );
+}
+
+// ─── References ──────────────────────────────────────────────────────────────
 export function ReferencesBlock({ references }) {
   const list = Array.isArray(references) ? references.filter((r) => r && (r.name || r.title)) : [];
 
@@ -164,6 +206,4 @@ export function ReferencesBlock({ references }) {
   );
 }
 
-// ─── Re-exported helpers ─────────────────────────────────────────────────────
-// Templates use these to sort experience/education before mapping.
 export { sortByStartDesc };
