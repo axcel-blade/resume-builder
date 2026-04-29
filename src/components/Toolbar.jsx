@@ -31,18 +31,34 @@ const FS = {
   summary:      9.5,
 };
 
+// Headings + section order match the on-screen templates exactly so the PDF
+// is a faithful copy of what the user sees in the preview.
 const HEADINGS = {
-  summary:      "Summary",
+  summary:      "Career Objective",
   experience:   "Professional Experience",
-  voluntary:    "Voluntary Experience",
-  projects:     "Projects",
   education:    "Education",
-  achievements: "Achievements and Awards",
-  certificates: "Certificates & Licences",
+  projects:     "Projects",
   skills:       "Key Skills",
+  achievements: "Achievements and Awards",
+  voluntary:    "Volunteer Work",
+  certificates: "Certificates & Licenses",
   interests:    "Interests",
   references:   "References",
 };
+
+// jsPDF only ships with three built-in fonts: helvetica, times, courier.
+// We map the user's font choice to the closest built-in. Sans-serif fonts
+// (Arial, Calibri, Verdana, Tahoma, Helvetica Neue) all collapse to
+// "helvetica"; serif choices map to "times". Embedding the actual TTF
+// files would let us honour the picked font exactly but is out of scope
+// here — this fallback at least respects sans-serif vs serif intent.
+function jsPdfFontFor(fontId) {
+  if (fontId === "georgia" || fontId === "times") return "times";
+  return "helvetica";
+}
+
+// Module-level font handle, set at the top of buildPDF().
+let BODY_FONT = "helvetica";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -66,7 +82,7 @@ function ensureSpace(pdf, y, neededMM) {
 function drawSectionHead(pdf, label, y, accent) {
   const [r, g, b] = hexToRgb(accent);
   pdf.setFontSize(FS.sectionHead);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(BODY_FONT, "bold");
   pdf.setTextColor(r, g, b);
   pdf.text(label.toUpperCase(), ML, y);
   y += 1.5;
@@ -98,21 +114,42 @@ function drawBullets(pdf, bullets, y, { period = true } = {}) {
   if (!bullets?.length) return y;
   const items = normalizeBullets(bullets, { period });
   pdf.setFontSize(FS.bullet);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(50, 50, 50);
   items.forEach((b) => { y = drawBullet(pdf, b, y); });
+  return y;
+}
+
+// Renders bullets joined into a single paragraph (Skills section). Mirrors
+// the on-screen SkillsBlock which uses paragraph form rather than bullets.
+function drawParagraph(pdf, bullets, y, { period = true } = {}) {
+  const items = (bullets || []).filter((b) => b && String(b).trim().length > 0);
+  if (!items.length) return y;
+  const paragraph = normalizeBullets(items, { period }).join(" ");
+
+  pdf.setFontSize(FS.bullet);
+  pdf.setFont(BODY_FONT, "normal");
+  pdf.setTextColor(50, 50, 50);
+
+  const lineH = 4.5;
+  const lines = pdf.splitTextToSize(paragraph, CONTENT_W);
+  lines.forEach((line) => {
+    y = ensureSpace(pdf, y, lineH + 1);
+    pdf.text(line, ML, y);
+    y += lineH;
+  });
   return y;
 }
 
 // "Title  | secondary" entry header — bold title + grey secondary on same line
 function drawEntryHeader(pdf, title, secondary, y) {
   pdf.setFontSize(FS.entryTitle);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(BODY_FONT, "bold");
   pdf.setTextColor(30, 30, 30);
   pdf.text(title || "", ML, y);
   if (secondary) {
     const w = pdf.getTextWidth(title || "");
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(90, 90, 90);
     pdf.text(` | ${secondary}`, ML + w, y);
   }
@@ -122,7 +159,7 @@ function drawEntryHeader(pdf, title, secondary, y) {
 function drawMetaLine(pdf, text, y) {
   if (!text) return y;
   pdf.setFontSize(FS.entryMeta);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(120, 120, 120);
   pdf.text(text, ML, y);
   return y + 4;
@@ -142,7 +179,7 @@ function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
     const urlW      = pdf.getTextWidth(url);
     const lineStartX = (PAGE_W - fullW) / 2;
 
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(80, 80, 80);
     pdf.text(fullLine, PAGE_W / 2, y, { align: "center" });
 
@@ -150,12 +187,12 @@ function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
     pdf.text(url, lineStartX + labelSepW, y);
     pdf.link(lineStartX + labelSepW, y - capH + 1, urlW, capH, { url: href });
   } else {
-    pdf.setFont("helvetica", "bold");
+    pdf.setFont(BODY_FONT, "bold");
     pdf.setTextColor(80, 80, 80);
     pdf.text(label, x, y);
     const labelW = pdf.getTextWidth(label);
 
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(80, 80, 80);
     pdf.text(sep, x + labelW, y);
     const sepW = pdf.getTextWidth(sep);
@@ -169,6 +206,55 @@ function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
   return y + lineH;
 }
 
+// Each referee renders with every field on its own row, matching
+// ReferencesBlock on the website:
+//   1. Name (bold)
+//   2. Position
+//   3. Organization
+//   4. Tel: phone
+//   5. Email: email
+function drawReferee(pdf, r, y) {
+  // 1. Name
+  if (r.name) {
+    y = ensureSpace(pdf, y, 6);
+    pdf.setFontSize(FS.entryTitle);
+    pdf.setFont(BODY_FONT, "bold");
+    pdf.setTextColor(30, 30, 30);
+    pdf.text(r.name, ML, y);
+    y += 4.5;
+  }
+
+  // Helper for each subsequent row.
+  const lineH = 4.2;
+  const drawRow = (label, value) => {
+    y = ensureSpace(pdf, y, lineH + 1);
+    pdf.setFontSize(FS.bullet);
+    pdf.setFont(BODY_FONT, "normal");
+    if (label) {
+      pdf.setTextColor(120, 120, 120);
+      pdf.text(label, ML, y);
+      const labelW = pdf.getTextWidth(label);
+      pdf.setTextColor(50, 50, 50);
+      pdf.text(value, ML + labelW, y);
+    } else {
+      pdf.setTextColor(50, 50, 50);
+      pdf.text(value, ML, y);
+    }
+    y += lineH;
+  };
+
+  // 2. Position
+  if (r.title)        drawRow(null, r.title);
+  // 3. Organization
+  if (r.organization) drawRow(null, r.organization);
+  // 4. Phone
+  if (r.phone)        drawRow("Tel: ", r.phone);
+  // 5. Email
+  if (r.email)        drawRow("Email: ", r.email);
+
+  return y;
+}
+
 // ─── Headers ────────────────────────────────────────────────────────────────
 
 function drawHeaderModern(pdf, data, y, accent) {
@@ -177,21 +263,21 @@ function drawHeaderModern(pdf, data, y, accent) {
   const p = data.profile;
 
   pdf.setFontSize(FS.name);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(BODY_FONT, "bold");
   pdf.setTextColor(ar, ag, ab);
   pdf.text(p.fullName || "", ML, y);
   y += 8;
 
   if (p.title) {
     pdf.setFontSize(FS.title);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(60, 60, 60);
     pdf.text(p.title, ML, y);
     y += 5.5;
   }
 
   pdf.setFontSize(FS.contact);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(80, 80, 80);
   const contact = [p.email, p.phone, p.location, p.website].filter(Boolean).join("   ");
   if (contact) { pdf.text(contact, ML, y); y += 4.5; }
@@ -214,21 +300,21 @@ function drawHeaderBasic(pdf, data, y, accent) {
   const cx = PAGE_W / 2;
 
   pdf.setFontSize(FS.name);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont(BODY_FONT, "bold");
   pdf.setTextColor(ar, ag, ab);
   pdf.text(p.fullName || "", cx, y, { align: "center" });
   y += 8;
 
   if (p.title) {
     pdf.setFontSize(FS.title);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(60, 60, 60);
     pdf.text(p.title, cx, y, { align: "center" });
     y += 5.5;
   }
 
   pdf.setFontSize(FS.contact);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(80, 80, 80);
   const contact = [p.email, p.phone, p.location, p.website].filter(Boolean).join("   |   ");
   if (contact) { pdf.text(contact, cx, y, { align: "center" }); y += 4.5; }
@@ -247,6 +333,13 @@ function drawHeaderBasic(pdf, data, y, accent) {
 // ─── Body ───────────────────────────────────────────────────────────────────
 
 function drawBody(pdf, data, y, accent) {
+  // Section order matches the on-screen templates exactly:
+  //   1. Career Objective         6. Achievements and Awards
+  //   2. Professional Experience  7. Volunteer Work
+  //   3. Education                8. Certificates & Licenses
+  //   4. Projects                 9. Interests
+  //   5. Key Skills              10. References
+
   const experience   = sortByStartDesc(data.experience   || []);
   const voluntary    = sortByStartDesc(data.voluntary    || []);
   const projects     = sortByStartDesc(data.projects     || []);
@@ -254,12 +347,12 @@ function drawBody(pdf, data, y, accent) {
   const certificates = sortByStartDesc(data.certificates || [], "year");
   const interests    = (data.interests || []).filter((s) => String(s).trim());
 
-  // SUMMARY
+  // 1. CAREER OBJECTIVE
   if (data.profile?.summary) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.summary, y, accent);
     pdf.setFontSize(FS.summary);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
     const lines = pdf.splitTextToSize(data.profile.summary, CONTENT_W);
     lines.forEach((line) => {
@@ -270,7 +363,7 @@ function drawBody(pdf, data, y, accent) {
     y += 3;
   }
 
-  // PROFESSIONAL EXPERIENCE
+  // 2. PROFESSIONAL EXPERIENCE
   if (experience.length) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.experience, y, accent);
@@ -283,20 +376,20 @@ function drawBody(pdf, data, y, accent) {
     });
   }
 
-  // VOLUNTARY EXPERIENCE
-  if (voluntary.length) {
+  // 3. EDUCATION
+  if (education.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, HEADINGS.voluntary, y, accent);
-    voluntary.forEach((v) => {
+    y = drawSectionHead(pdf, HEADINGS.education, y, accent);
+    education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, v.role, v.organization, y);
-      y = drawMetaLine(pdf, [formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   "), y);
-      y = drawBullets(pdf, v.bullets, y, { period: true });
+      y = drawEntryHeader(pdf, e.degree, e.school, y);
+      y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
+      y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
   }
 
-  // PROJECTS
+  // 4. PROJECTS
   if (projects.length) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.projects, y, accent);
@@ -310,20 +403,19 @@ function drawBody(pdf, data, y, accent) {
     });
   }
 
-  // EDUCATION
-  if (education.length) {
+  // 5. KEY SKILLS — group title + paragraph (matches website SkillsBlock)
+  if (data.skillGroups?.length) {
     y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, HEADINGS.education, y, accent);
-    education.forEach((e) => {
-      y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, e.degree, e.school, y);
-      y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
-      y = drawBullets(pdf, e.bullets, y, { period: true });
+    y = drawSectionHead(pdf, HEADINGS.skills, y, accent);
+    data.skillGroups.forEach((g) => {
+      y = ensureSpace(pdf, y, 8);
+      y = drawEntryHeader(pdf, g.title, null, y);
+      y = drawParagraph(pdf, g.bullets, y, { period: true });
       y += 3;
     });
   }
 
-  // ACHIEVEMENTS AND AWARDS
+  // 6. ACHIEVEMENTS AND AWARDS
   if (data.achievements?.length) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.achievements, y, accent);
@@ -336,7 +428,20 @@ function drawBody(pdf, data, y, accent) {
     });
   }
 
-  // CERTIFICATES & LICENCES
+  // 7. VOLUNTEER WORK
+  if (voluntary.length) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, HEADINGS.voluntary, y, accent);
+    voluntary.forEach((v) => {
+      y = ensureSpace(pdf, y, 10);
+      y = drawEntryHeader(pdf, v.role, v.organization, y);
+      y = drawMetaLine(pdf, [formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   "), y);
+      y = drawBullets(pdf, v.bullets, y, { period: true });
+      y += 3;
+    });
+  }
+
+  // 8. CERTIFICATES & LICENSES
   if (certificates.length) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.certificates, y, accent);
@@ -360,24 +465,12 @@ function drawBody(pdf, data, y, accent) {
     });
   }
 
-  // KEY SKILLS
-  if (data.skillGroups?.length) {
-    y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, HEADINGS.skills, y, accent);
-    data.skillGroups.forEach((g) => {
-      y = ensureSpace(pdf, y, 8);
-      y = drawEntryHeader(pdf, g.title, null, y);
-      y = drawBullets(pdf, g.bullets, y, { period: false });
-      y += 3;
-    });
-  }
-
-  // INTERESTS — single inline pipe-separated line
+  // 9. INTERESTS — single inline pipe-separated line
   if (interests.length) {
     y = ensureSpace(pdf, y, 12);
     y = drawSectionHead(pdf, HEADINGS.interests, y, accent);
     pdf.setFontSize(FS.bullet);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
     const line = interests.join("  •  ");
     const lines = pdf.splitTextToSize(line, CONTENT_W);
@@ -389,32 +482,23 @@ function drawBody(pdf, data, y, accent) {
     y += 3;
   }
 
-  // REFERENCES — always emitted
+  // 10. REFERENCES — always emitted, each referee row-by-row
   y = ensureSpace(pdf, y, 14);
   y = drawSectionHead(pdf, HEADINGS.references, y, accent);
   const refs = (data.references || []).filter((r) => r && (r.name || r.title));
 
   if (!refs.length) {
     pdf.setFontSize(FS.bullet);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
     pdf.text("References available on request.", ML, y);
     y += 5;
   } else {
     refs.forEach((r) => {
-      y = ensureSpace(pdf, y, 12);
-      y = drawEntryHeader(pdf, r.name, r.title, y);
-      if (r.organization) y = drawMetaLine(pdf, r.organization, y);
-
-      const contact = [r.email, r.phone].filter(Boolean).join("   |   ");
-      if (contact) {
-        pdf.setFontSize(FS.bullet);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(50, 50, 50);
-        pdf.text(contact, ML, y);
-        y += 4.5;
-      }
-      y += 2;
+      // Reserve enough space for a worst-case 5-row referee block.
+      y = ensureSpace(pdf, y, 24);
+      y = drawReferee(pdf, r, y);
+      y += 3;
     });
   }
 
@@ -427,6 +511,10 @@ function buildPDF(data) {
   const pdf      = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const accent   = data.meta?.accent || "#0ea5e9";
   const template = data.meta?.template || "modern";
+
+  // Resolve the user's font selection to a jsPDF built-in. All draw helpers
+  // read this module-level handle so font is applied consistently.
+  BODY_FONT = jsPdfFontFor(data.meta?.font);
 
   let y = MT;
   y = template === "basic"
