@@ -13,9 +13,8 @@ import {
   InterestsBlock,
   ReferencesBlock,
   sortByStartDesc,
+  getFontStack,
 } from "./TemplateSharedParts";
-
-const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
 /* Headings + order follow a typical professional resume:
    Profile → Professional Experience → Education → Projects → Key Skills →
@@ -36,6 +35,9 @@ const HEADINGS = {
 
 export default function TemplateBasic({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
+  // Font family is user-selectable; defaults to Helvetica Neue when unset.
+  // The workbook recommends sans-serif fonts (Arial, Calibri, Verdana).
+  const fontFamily = getFontStack(data.meta?.font);
   const p = data.profile;
 
   const experience   = sortByStartDesc(data.experience   || []);
@@ -48,7 +50,7 @@ export default function TemplateBasic({ data }) {
   return (
     <div
       style={{
-        fontFamily: FONT,
+        fontFamily,
         fontSize: "12px",
         lineHeight: 1.45,
         color: "#1a1a1a",
@@ -62,7 +64,7 @@ export default function TemplateBasic({ data }) {
     >
       {/* ── NAME (centered) ── */}
       <div style={{ textAlign: "center", marginBottom: "8px" }}>
-        <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily: FONT }}>
+        <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily }}>
           {p.fullName}
         </div>
 

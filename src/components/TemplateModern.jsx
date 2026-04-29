@@ -13,9 +13,8 @@ import {
   InterestsBlock,
   ReferencesBlock,
   sortByStartDesc,
+  getFontStack,
 } from "./TemplateSharedParts";
-
-const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
 /* Headings + order follow a typical professional resume:
    Profile → Professional Experience → Education → Projects → Key Skills →
@@ -36,6 +35,10 @@ const HEADINGS = {
 
 export default function TemplateModern({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
+  // Font family is user-selectable; defaults to Helvetica Neue when unset.
+  // The workbook recommends sans-serif fonts (Arial, Calibri, Verdana) for
+  // resumes — these are surfaced as preferred options in the picker.
+  const fontFamily = getFontStack(data.meta?.font);
   const p = data.profile;
 
   const experience   = sortByStartDesc(data.experience   || []);
@@ -48,7 +51,7 @@ export default function TemplateModern({ data }) {
   return (
     <div
       style={{
-        fontFamily: FONT,
+        fontFamily,
         fontSize: "12px",
         lineHeight: 1.45,
         color: "#1a1a1a",
@@ -61,19 +64,19 @@ export default function TemplateModern({ data }) {
       }}
     >
       {/* ── NAME ── */}
-      <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily: FONT }}>
+      <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily }}>
         {p.fullName}
       </div>
 
       {/* ── TITLE ── */}
       {p.title && (
-        <div style={{ fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginBottom: "5px", fontFamily: FONT }}>
+        <div style={{ fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginBottom: "5px", fontFamily }}>
           {p.title}
         </div>
       )}
 
       {/* ── CONTACT ── */}
-      <div style={{ fontSize: "12px", color: "#505050", marginBottom: "4px", fontFamily: FONT }}>
+      <div style={{ fontSize: "12px", color: "#505050", marginBottom: "4px", fontFamily }}>
         {[p.email, p.phone, p.location, p.website].filter(Boolean).join("   ")}
       </div>
 
@@ -81,7 +84,7 @@ export default function TemplateModern({ data }) {
       {data.links?.length > 0 && (
         <div style={{ marginBottom: "10px" }}>
           {data.links.map((l) => (
-            <div key={l.id} style={{ fontSize: "12px", lineHeight: 1.6, fontFamily: FONT }}>
+            <div key={l.id} style={{ fontSize: "12px", lineHeight: 1.6, fontFamily }}>
               <span style={{ fontWeight: "700", color: "#505050" }}>{l.label}</span>
               <span style={{ color: "#505050" }}>  |  </span>
               <a
@@ -100,7 +103,7 @@ export default function TemplateModern({ data }) {
       {/* 1. Career Objective */}
       {p.summary && (
         <Section title={HEADINGS.summary} accent={accent}>
-          <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, fontFamily: FONT, wordBreak: "break-word" }}>
+          <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, fontFamily, wordBreak: "break-word" }}>
             {p.summary}
           </div>
         </Section>

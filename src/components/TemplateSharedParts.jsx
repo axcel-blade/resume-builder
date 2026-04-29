@@ -3,6 +3,29 @@
 import React from "react";
 import { formatDate, formatDateRange, sortByStartDesc, normalizeBullets } from "../utils/format";
 
+// ─── Font families ───────────────────────────────────────────────────────────
+// Selectable font options. Sans-serif fonts are listed first as they're the
+// workbook's recommended choice for resumes — Arial, Calibri and Verdana are
+// explicitly named (Resume Workbook p.24, Cover Letter Workbook p.10) for
+// being easy to read on screen and in print. Serif options are included for
+// users who prefer a more traditional look.
+export const FONT_FAMILIES = [
+  { id: "helvetica", name: "Helvetica Neue",   recommended: true,  stack: '"Helvetica Neue", Helvetica, Arial, sans-serif' },
+  { id: "arial",     name: "Arial",            recommended: true,  stack: 'Arial, "Helvetica Neue", Helvetica, sans-serif' },
+  { id: "calibri",   name: "Calibri",          recommended: true,  stack: 'Calibri, Candara, "Segoe UI", "San Francisco", sans-serif' },
+  { id: "verdana",   name: "Verdana",          recommended: true,  stack: 'Verdana, Geneva, "DejaVu Sans", sans-serif' },
+  { id: "tahoma",    name: "Tahoma",           recommended: false, stack: 'Tahoma, "Trebuchet MS", "DejaVu Sans", sans-serif' },
+  { id: "georgia",   name: "Georgia",          recommended: false, stack: 'Georgia, "Times New Roman", Times, serif' },
+  { id: "times",     name: "Times New Roman",  recommended: false, stack: '"Times New Roman", Times, Georgia, serif' },
+];
+
+export const DEFAULT_FONT_ID = "helvetica";
+
+export function getFontStack(fontId) {
+  const found = FONT_FAMILIES.find((f) => f.id === fontId);
+  return (found || FONT_FAMILIES[0]).stack;
+}
+
 // ─── Layout / typography constants — match jsPDF output ──────────────────────
 const C = {
   name:    { fontSize: "29px",   fontWeight: "700", lineHeight: 1.1 },
