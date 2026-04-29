@@ -115,11 +115,28 @@ export function AchievementsBlock({ a }) {
   );
 }
 
+// ─── Skills ──────────────────────────────────────────────────────────────────
+// Group title (bold) + paragraph description below — matches the workbook's
+// professional/functional-resume style (Diego Romesco example, p.46):
+//
+//   Communication
+//   Skilled communicator with the ability to positively motivate others,
+//   frequently attending community events to represent Cricket WA…
+//
+// Bullets entered in the editor are joined into a single paragraph so the
+// underlying data shape (group.bullets[]) doesn't need to change.
 export function SkillsBlock({ group }) {
+  const items = (group.bullets || []).filter((b) => b && String(b).trim().length > 0);
+  const paragraph = normalizeBullets(items, { period: true }).join(" ");
+
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ ...C.eTitle, marginBottom: "1px" }}>{group.title}</div>
-      <BulletList items={group.bullets} period={false} />
+      <div style={{ ...C.eTitle, marginBottom: "2px" }}>{group.title}</div>
+      {paragraph && (
+        <div style={{ ...C.bullet, lineHeight: 1.55, wordBreak: "break-word" }}>
+          {paragraph}
+        </div>
+      )}
     </div>
   );
 }
@@ -176,9 +193,17 @@ export function InterestsBlock({ interests }) {
   );
 }
 
-// ─── References ──────────────────────────────────────────────────────────────
+// ─── References ─────────────────────────────────────────────────────────────
+// Each referee is rendered as one row, with all 5 fields surfaced:
+//   Row line 1:  Name  |  Position, Company
+//   Row line 2:  Tel: phone   ·   Email: email
+//
+// Referees are stacked one beneath the other (row by row), making each entry
+// a clean, self-contained block that's easy to scan.
 export function ReferencesBlock({ references }) {
-  const list = Array.isArray(references) ? references.filter((r) => r && (r.name || r.title)) : [];
+  const list = Array.isArray(references)
+    ? references.filter((r) => r && (r.name || r.title))
+    : [];
 
   if (!list.length) {
     return (
@@ -188,20 +213,37 @@ export function ReferencesBlock({ references }) {
 
   return (
     <div>
-      {list.map((r) => (
-        <div key={r.id} style={{ marginBottom: "10px" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-            <span style={C.eTitle}>{r.name}</span>
-            {r.title && <span style={C.eComp}>&nbsp;| {r.title}</span>}
-          </div>
-          {r.organization && <div style={C.eMeta}>{r.organization}</div>}
-          {(r.email || r.phone) && (
-            <div style={{ ...C.bullet, marginTop: "2px" }}>
-              {[r.email, r.phone].filter(Boolean).join("   |   ")}
+      {list.map((r) => {
+        // "Position, Company" — joined neatly when both exist.
+        const positionLine = [r.title, r.organization].filter(Boolean).join(", ");
+
+        // Phone + email rendered side by side on the same row line.
+        const contactParts = [];
+        if (r.phone) contactParts.push(<><span style={{ color: "#787878" }}>Tel:</span>&nbsp;{r.phone}</>);
+        if (r.email) contactParts.push(<><span style={{ color: "#787878" }}>Email:</span>&nbsp;{r.email}</>);
+
+        return (
+          <div key={r.id} style={{ marginBottom: "8px" }}>
+            {/* Row line 1 — Name | Position, Company */}
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
+              <span style={C.eTitle}>{r.name}</span>
+              {positionLine && <span style={C.eComp}>&nbsp;| {positionLine}</span>}
             </div>
-          )}
-        </div>
-      ))}
+
+            {/* Row line 2 — Phone · Email */}
+            {contactParts.length > 0 && (
+              <div style={{ ...C.bullet, marginTop: "1px" }}>
+                {contactParts.map((part, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <span style={{ color: "#787878" }}>&nbsp;&nbsp;·&nbsp;&nbsp;</span>}
+                    {part}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

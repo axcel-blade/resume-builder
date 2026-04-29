@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import ProfileEditor from "./ProfileEditor";
 import ExperienceEditor from "./ExperienceEditor";
-import VoluntaryEditor from "./VoluntaryEditor";
-import ProjectsEditor from "./ProjectsEditor";
 import EducationEditor from "./EducationEditor";
-import AchievementsEditor from "./AchievementsEditor";
-import CertificatesEditor from "./CertificatesEditor";
+import ProjectsEditor from "./ProjectsEditor";
 import SkillsEditor from "./SkillsEditor";
+import AchievementsEditor from "./AchievementsEditor";
+import VoluntaryEditor from "./VoluntaryEditor";
+import CertificatesEditor from "./CertificatesEditor";
 import InterestsEditor from "./InterestsEditor";
 import ReferencesEditor from "./ReferencesEditor";
 import { IconButton, SectionCard } from "../SharedInputs";
@@ -63,15 +63,28 @@ export default function ResumeEditor({ data, set }) {
         )}
       </SectionCard>
 
-      {/* Editors are listed in the same order they appear on the rendered resume. */}
+      {/*
+        Editors are listed in the same order they appear on the rendered resume.
+        Order follows a typical professional resume:
+          1. Profile (Personal Details + Career Objective)
+          2. Professional Experience
+          3. Education
+          4. Projects
+          5. Key Skills
+          6. Achievements and Awards
+          7. Volunteer Work
+          8. Certificates & Licenses
+          9. Interests
+         10. References
+      */}
       <ProfileEditor      data={data} set={set} />
       <ExperienceEditor   data={data} set={set} />
-      <VoluntaryEditor    data={data} set={set} />
-      <ProjectsEditor     data={data} set={set} />
       <EducationEditor    data={data} set={set} />
-      <AchievementsEditor data={data} set={set} />
-      <CertificatesEditor data={data} set={set} />
+      <ProjectsEditor     data={data} set={set} />
       <SkillsEditor       data={data} set={set} />
+      <AchievementsEditor data={data} set={set} />
+      <VoluntaryEditor    data={data} set={set} />
+      <CertificatesEditor data={data} set={set} />
       <InterestsEditor    data={data} set={set} />
       <ReferencesEditor   data={data} set={set} />
     </div>
