@@ -194,12 +194,15 @@ export function InterestsBlock({ interests }) {
 }
 
 // ─── References ─────────────────────────────────────────────────────────────
-// Each referee is rendered as one row, with all 5 fields surfaced:
-//   Row line 1:  Name  |  Position, Company
-//   Row line 2:  Tel: phone   ·   Email: email
+// Each referee renders with every field on its own row, in this order:
+//   1. Name           (bold)
+//   2. Position
+//   3. Organization
+//   4. Telephone number
+//   5. Email address
 //
-// Referees are stacked one beneath the other (row by row), making each entry
-// a clean, self-contained block that's easy to scan.
+// Referees are stacked one beneath the other so each entry reads as a clean,
+// self-contained block.
 export function ReferencesBlock({ references }) {
   const list = Array.isArray(references)
     ? references.filter((r) => r && (r.name || r.title))
@@ -213,37 +216,34 @@ export function ReferencesBlock({ references }) {
 
   return (
     <div>
-      {list.map((r) => {
-        // "Position, Company" — joined neatly when both exist.
-        const positionLine = [r.title, r.organization].filter(Boolean).join(", ");
+      {list.map((r) => (
+        <div key={r.id} style={{ marginBottom: "10px" }}>
+          {/* 1. Name */}
+          {r.name && <div style={C.eTitle}>{r.name}</div>}
 
-        // Phone + email rendered side by side on the same row line.
-        const contactParts = [];
-        if (r.phone) contactParts.push(<><span style={{ color: "#787878" }}>Tel:</span>&nbsp;{r.phone}</>);
-        if (r.email) contactParts.push(<><span style={{ color: "#787878" }}>Email:</span>&nbsp;{r.email}</>);
+          {/* 2. Position */}
+          {r.title && <div style={{ ...C.bullet, marginTop: "1px" }}>{r.title}</div>}
 
-        return (
-          <div key={r.id} style={{ marginBottom: "8px" }}>
-            {/* Row line 1 — Name | Position, Company */}
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-              <span style={C.eTitle}>{r.name}</span>
-              {positionLine && <span style={C.eComp}>&nbsp;| {positionLine}</span>}
+          {/* 3. Organization */}
+          {r.organization && (
+            <div style={{ ...C.bullet, marginTop: "1px" }}>{r.organization}</div>
+          )}
+
+          {/* 4. Telephone number */}
+          {r.phone && (
+            <div style={{ ...C.bullet, marginTop: "1px" }}>
+              <span style={{ color: "#787878" }}>Tel:</span>&nbsp;{r.phone}
             </div>
+          )}
 
-            {/* Row line 2 — Phone · Email */}
-            {contactParts.length > 0 && (
-              <div style={{ ...C.bullet, marginTop: "1px" }}>
-                {contactParts.map((part, i) => (
-                  <React.Fragment key={i}>
-                    {i > 0 && <span style={{ color: "#787878" }}>&nbsp;&nbsp;·&nbsp;&nbsp;</span>}
-                    {part}
-                  </React.Fragment>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          {/* 5. Email address */}
+          {r.email && (
+            <div style={{ ...C.bullet, marginTop: "1px" }}>
+              <span style={{ color: "#787878" }}>Email:</span>&nbsp;{r.email}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
