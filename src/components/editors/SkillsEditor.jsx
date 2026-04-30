@@ -38,7 +38,7 @@ export default function SkillsEditor({ data, set }) {
 
   return (
     <SectionCard
-      title="Skills"
+      title="Key Skills"
       action={<IconButton onClick={add}>+ Add Group</IconButton>}
     >
       <div className="space-y-4">

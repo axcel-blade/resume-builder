@@ -8,6 +8,7 @@ import {
   sortByStartDesc,
   normalizeBullets,
 } from "../utils/format";
+import { getSectionOrder } from "./TemplateSharedParts";
 
 // ─── Layout (mm) — 20mm margins ≈ 0.787" (community 0.75–1" range) ──────────
 const PAGE_W    = 210;
@@ -47,18 +48,10 @@ const HEADINGS = {
 };
 
 // jsPDF only ships with three built-in fonts: helvetica, times, courier.
-// We map the user's font choice to the closest built-in. Sans-serif fonts
-// (Arial, Calibri, Verdana, Tahoma, Helvetica Neue) all collapse to
-// "helvetica"; serif choices map to "times". Embedding the actual TTF
-// files would let us honour the picked font exactly but is out of scope
-// here — this fallback at least respects sans-serif vs serif intent.
-function jsPdfFontFor(fontId) {
-  if (fontId === "georgia" || fontId === "times") return "times";
-  return "helvetica";
-}
-
-// Module-level font handle, set at the top of buildPDF().
-let BODY_FONT = "helvetica";
+// We standardise on helvetica everywhere since the on-screen templates use a
+// sans-serif stack (Helvetica Neue → Arial fallback) and the workbook
+// recommends sans-serif for resumes (Resume Workbook p.24).
+const BODY_FONT = "helvetica";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -206,15 +199,8 @@ function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
   return y + lineH;
 }
 
-// Each referee renders with every field on its own row, matching
-// ReferencesBlock on the website:
-//   1. Name (bold)
-//   2. Position
-//   3. Organization
-//   4. Tel: phone
-//   5. Email: email
+// Each referee renders with every field on its own row.
 function drawReferee(pdf, r, y) {
-  // 1. Name
   if (r.name) {
     y = ensureSpace(pdf, y, 6);
     pdf.setFontSize(FS.entryTitle);
@@ -224,7 +210,6 @@ function drawReferee(pdf, r, y) {
     y += 4.5;
   }
 
-  // Helper for each subsequent row.
   const lineH = 4.2;
   const drawRow = (label, value) => {
     y = ensureSpace(pdf, y, lineH + 1);
@@ -243,13 +228,9 @@ function drawReferee(pdf, r, y) {
     y += lineH;
   };
 
-  // 2. Position
   if (r.title)        drawRow(null, r.title);
-  // 3. Organization
   if (r.organization) drawRow(null, r.organization);
-  // 4. Phone
   if (r.phone)        drawRow("Tel: ", r.phone);
-  // 5. Email
   if (r.email)        drawRow("Email: ", r.email);
 
   return y;
@@ -330,70 +311,44 @@ function drawHeaderBasic(pdf, data, y, accent) {
   return y + 3;
 }
 
-// ─── Body ───────────────────────────────────────────────────────────────────
+// ─── Section drawers (one per moveable body section) ────────────────────────
+// Keyed by section id so we can dispatch through `data.meta.sectionOrder`
+// and produce a PDF whose section ordering exactly matches the live preview.
 
-function drawBody(pdf, data, y, accent) {
-  // Section order matches the on-screen templates exactly:
-  //   1. Career Objective         6. Achievements and Awards
-  //   2. Professional Experience  7. Volunteer Work
-  //   3. Education                8. Certificates & Licenses
-  //   4. Projects                 9. Interests
-  //   5. Key Skills              10. References
-
-  const experience   = sortByStartDesc(data.experience   || []);
-  const voluntary    = sortByStartDesc(data.voluntary    || []);
-  const projects     = sortByStartDesc(data.projects     || []);
-  const education    = sortByStartDesc(data.education    || []);
-  const certificates = sortByStartDesc(data.certificates || [], "year");
-  const interests    = (data.interests || []).filter((s) => String(s).trim());
-
-  // 1. CAREER OBJECTIVE
-  if (data.profile?.summary) {
-    y = ensureSpace(pdf, y, 14);
-    y = drawSectionHead(pdf, HEADINGS.summary, y, accent);
-    pdf.setFontSize(FS.summary);
-    pdf.setFont(BODY_FONT, "normal");
-    pdf.setTextColor(50, 50, 50);
-    const lines = pdf.splitTextToSize(data.profile.summary, CONTENT_W);
-    lines.forEach((line) => {
-      y = ensureSpace(pdf, y, 5);
-      pdf.text(line, ML, y);
-      y += 4.5;
-    });
-    y += 3;
-  }
-
-  // 2. PROFESSIONAL EXPERIENCE
-  if (experience.length) {
+const SECTION_DRAWERS = {
+  experience(pdf, data, y, accent, ctx) {
+    if (!ctx.experience.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.experience, y, accent);
-    experience.forEach((e) => {
+    ctx.experience.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, e.role, e.company, y);
       y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 3. EDUCATION
-  if (education.length) {
+  education(pdf, data, y, accent, ctx) {
+    if (!ctx.education.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.education, y, accent);
-    education.forEach((e) => {
+    ctx.education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, e.degree, e.school, y);
       y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 4. PROJECTS
-  if (projects.length) {
+  projects(pdf, data, y, accent, ctx) {
+    if (!ctx.projects.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.projects, y, accent);
-    projects.forEach((p) => {
+    ctx.projects.forEach((p) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, p.title, null, y);
       const range = formatDateRange(p.start, p.end);
@@ -401,10 +356,11 @@ function drawBody(pdf, data, y, accent) {
       y = drawBullets(pdf, p.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 5. KEY SKILLS — group title + paragraph (matches website SkillsBlock)
-  if (data.skillGroups?.length) {
+  skills(pdf, data, y, accent /*, ctx */) {
+    if (!data.skillGroups?.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.skills, y, accent);
     data.skillGroups.forEach((g) => {
@@ -413,10 +369,11 @@ function drawBody(pdf, data, y, accent) {
       y = drawParagraph(pdf, g.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 6. ACHIEVEMENTS AND AWARDS
-  if (data.achievements?.length) {
+  achievements(pdf, data, y, accent /*, ctx */) {
+    if (!data.achievements?.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.achievements, y, accent);
     data.achievements.forEach((a) => {
@@ -426,26 +383,28 @@ function drawBody(pdf, data, y, accent) {
       y = drawBullets(pdf, a.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 7. VOLUNTEER WORK
-  if (voluntary.length) {
+  voluntary(pdf, data, y, accent, ctx) {
+    if (!ctx.voluntary.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.voluntary, y, accent);
-    voluntary.forEach((v) => {
+    ctx.voluntary.forEach((v) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, v.role, v.organization, y);
       y = drawMetaLine(pdf, [formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   "), y);
       y = drawBullets(pdf, v.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 8. CERTIFICATES & LICENSES
-  if (certificates.length) {
+  certificates(pdf, data, y, accent, ctx) {
+    if (!ctx.certificates.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.certificates, y, accent);
-    certificates.forEach((c) => {
+    ctx.certificates.forEach((c) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, c.title, c.issuer, y);
 
@@ -463,26 +422,67 @@ function drawBody(pdf, data, y, accent) {
       y = drawBullets(pdf, c.bullets, y, { period: true });
       y += 3;
     });
-  }
+    return y;
+  },
 
-  // 9. INTERESTS — single inline pipe-separated line
-  if (interests.length) {
+  interests(pdf, data, y, accent, ctx) {
+    if (!ctx.interests.length) return y;
     y = ensureSpace(pdf, y, 12);
     y = drawSectionHead(pdf, HEADINGS.interests, y, accent);
     pdf.setFontSize(FS.bullet);
     pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
-    const line = interests.join("  •  ");
+    const line = ctx.interests.join("  •  ");
     const lines = pdf.splitTextToSize(line, CONTENT_W);
     lines.forEach((l) => {
       y = ensureSpace(pdf, y, 5);
       pdf.text(l, ML, y);
       y += 4.5;
     });
+    return y + 3;
+  },
+};
+
+// ─── Body ───────────────────────────────────────────────────────────────────
+
+function drawBody(pdf, data, y, accent) {
+  // Career Objective and References are pinned (top + bottom respectively).
+  // Everything between them is rendered in the order stored in
+  // data.meta.sectionOrder so the PDF matches the on-screen preview.
+
+  const ctx = {
+    experience:   sortByStartDesc(data.experience   || []),
+    voluntary:    sortByStartDesc(data.voluntary    || []),
+    projects:     sortByStartDesc(data.projects     || []),
+    education:    sortByStartDesc(data.education    || []),
+    certificates: sortByStartDesc(data.certificates || [], "year"),
+    interests:    (data.interests || []).filter((s) => String(s).trim()),
+  };
+
+  // Career Objective — always first
+  if (data.profile?.summary) {
+    y = ensureSpace(pdf, y, 14);
+    y = drawSectionHead(pdf, HEADINGS.summary, y, accent);
+    pdf.setFontSize(FS.summary);
+    pdf.setFont(BODY_FONT, "normal");
+    pdf.setTextColor(50, 50, 50);
+    const lines = pdf.splitTextToSize(data.profile.summary, CONTENT_W);
+    lines.forEach((line) => {
+      y = ensureSpace(pdf, y, 5);
+      pdf.text(line, ML, y);
+      y += 4.5;
+    });
     y += 3;
   }
 
-  // 10. REFERENCES — always emitted, each referee row-by-row
+  // Moveable sections — iterate user-defined order
+  const sectionOrder = getSectionOrder(data.meta);
+  sectionOrder.forEach((id) => {
+    const drawer = SECTION_DRAWERS[id];
+    if (drawer) y = drawer(pdf, data, y, accent, ctx);
+  });
+
+  // References — always last
   y = ensureSpace(pdf, y, 14);
   y = drawSectionHead(pdf, HEADINGS.references, y, accent);
   const refs = (data.references || []).filter((r) => r && (r.name || r.title));
@@ -511,10 +511,6 @@ function buildPDF(data) {
   const pdf      = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const accent   = data.meta?.accent || "#0ea5e9";
   const template = data.meta?.template || "modern";
-
-  // Resolve the user's font selection to a jsPDF built-in. All draw helpers
-  // read this module-level handle so font is applied consistently.
-  BODY_FONT = jsPdfFontFor(data.meta?.font);
 
   let y = MT;
   y = template === "basic"

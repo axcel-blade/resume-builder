@@ -32,7 +32,7 @@ export default function AchievementsEditor({ data, set }) {
     i < data.achievements.length - 1 && set({ achievements: swap(data.achievements, i, i + 1) });
 
   return (
-    <SectionCard title="Achievements" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Achievements and Awards" action={<IconButton onClick={add}>+ Add</IconButton>}>
       <div className="space-y-4">
         {data.achievements.map((a, i) => (
           <div key={a.id} className="rounded-xl border border-gray-200 p-3">

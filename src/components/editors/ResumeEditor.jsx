@@ -11,8 +11,33 @@ import VoluntaryEditor from "./VoluntaryEditor";
 import CertificatesEditor from "./CertificatesEditor";
 import InterestsEditor from "./InterestsEditor";
 import ReferencesEditor from "./ReferencesEditor";
-import { IconButton, SectionCard, Label } from "../SharedInputs";
-import { FONT_FAMILIES, DEFAULT_FONT_ID } from "../TemplateSharedParts";
+import { IconButton, SectionCard } from "../SharedInputs";
+import { getSectionOrder } from "../TemplateSharedParts";
+
+// ─── Section maps ──────────────────────────────────────────────────────────
+// Labels match the headings rendered on the resume itself, so the editor
+// reads the same as the document the user is producing.
+const SECTION_LABELS = {
+  experience:   "Professional Experience",
+  education:    "Education",
+  projects:     "Projects",
+  skills:       "Key Skills",
+  achievements: "Achievements and Awards",
+  voluntary:    "Volunteer Work",
+  certificates: "Certificates & Licenses",
+  interests:    "Interests",
+};
+
+const SECTION_EDITORS = {
+  experience:   ExperienceEditor,
+  education:    EducationEditor,
+  projects:     ProjectsEditor,
+  skills:       SkillsEditor,
+  achievements: AchievementsEditor,
+  voluntary:    VoluntaryEditor,
+  certificates: CertificatesEditor,
+  interests:    InterestsEditor,
+};
 
 export default function ResumeEditor({ data, set }) {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -27,8 +52,16 @@ export default function ResumeEditor({ data, set }) {
     setShowTemplateSelector(false);
   };
 
-  const currentFontId = data.meta?.font || DEFAULT_FONT_ID;
-  const setFont = (fontId) => set({ meta: { ...data.meta, font: fontId } });
+  // ── Section reordering ────────────────────────────────────────────────────
+  const sectionOrder = getSectionOrder(data.meta);
+
+  const moveSection = (index, delta) => {
+    const next = sectionOrder.slice();
+    const target = index + delta;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    set({ meta: { ...data.meta, sectionOrder: next } });
+  };
 
   return (
     <div className="space-y-4">
@@ -67,66 +100,64 @@ export default function ResumeEditor({ data, set }) {
         )}
       </SectionCard>
 
-      {/* ── Typography (font family picker) ──────────────────────────────────
-          The Curtin Resume Workbook (p.24) recommends sans-serif fonts —
-          Arial, Calibri, and Verdana — as easiest to read on screen and in
-          print. Recommended fonts are flagged in the picker below. */}
-      <SectionCard title="Typography">
-        <div className="mb-2">
-          <Label htmlFor="font-family-select">Font Family</Label>
-        </div>
-        <select
-          id="font-family-select"
-          value={currentFontId}
-          onChange={(e) => setFont(e.target.value)}
-          className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-400"
-          style={{ fontFamily: (FONT_FAMILIES.find((f) => f.id === currentFontId) || FONT_FAMILIES[0]).stack }}
-        >
-          <optgroup label="Recommended (sans-serif)">
-            {FONT_FAMILIES.filter((f) => f.recommended).map((f) => (
-              <option key={f.id} value={f.id} style={{ fontFamily: f.stack }}>
-                {f.name}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Other">
-            {FONT_FAMILIES.filter((f) => !f.recommended).map((f) => (
-              <option key={f.id} value={f.id} style={{ fontFamily: f.stack }}>
-                {f.name}
-              </option>
-            ))}
-          </optgroup>
-        </select>
-        <p className="mt-2 text-xs text-gray-500 italic">
-          Sans-serif fonts (Arial, Calibri, Verdana) are recommended for resumes —
-          they're easier to read on screen and in print.
+      {/* ── Section Order ─────────────────────────────────────────────────────
+          Lets the user reorder the moveable body sections. Profile (header
+          + Career Objective) and References stay fixed at the top and
+          bottom of the resume respectively, so they're not listed here. */}
+      <SectionCard title="Section Order">
+        <p className="text-xs text-gray-500 italic mb-3">
+          Reorder how sections appear on your resume. Profile (top) and References
+          (bottom) are fixed.
         </p>
+        <ul className="space-y-1.5">
+          {sectionOrder.map((id, i) => (
+            <li
+              key={id}
+              className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
+            >
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-gray-300 bg-white text-xs font-semibold text-gray-600">
+                  {i + 1}
+                </span>
+                <span className="text-sm font-medium text-gray-700">
+                  {SECTION_LABELS[id] || id}
+                </span>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => moveSection(i, -1)}
+                  disabled={i === 0}
+                  title="Move up"
+                  className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ↑
+                </button>
+                <button
+                  onClick={() => moveSection(i, +1)}
+                  disabled={i === sectionOrder.length - 1}
+                  title="Move down"
+                  className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  ↓
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </SectionCard>
 
-      {/*
-        Editors are listed in the same order they appear on the rendered resume.
-        Order follows a typical professional resume:
-          1. Profile (Personal Details + Career Objective)
-          2. Professional Experience
-          3. Education
-          4. Projects
-          5. Key Skills
-          6. Achievements and Awards
-          7. Volunteer Work
-          8. Certificates & Licenses
-          9. Interests
-         10. References
-      */}
-      <ProfileEditor      data={data} set={set} />
-      <ExperienceEditor   data={data} set={set} />
-      <EducationEditor    data={data} set={set} />
-      <ProjectsEditor     data={data} set={set} />
-      <SkillsEditor       data={data} set={set} />
-      <AchievementsEditor data={data} set={set} />
-      <VoluntaryEditor    data={data} set={set} />
-      <CertificatesEditor data={data} set={set} />
-      <InterestsEditor    data={data} set={set} />
-      <ReferencesEditor   data={data} set={set} />
+      {/* Profile is fixed at the top */}
+      <ProfileEditor data={data} set={set} />
+
+      {/* Moveable editors — rendered in the user-defined order so the editor
+          mirrors the resume layout. */}
+      {sectionOrder.map((id) => {
+        const Editor = SECTION_EDITORS[id];
+        return Editor ? <Editor key={id} data={data} set={set} /> : null;
+      })}
+
+      {/* References is fixed at the bottom */}
+      <ReferencesEditor data={data} set={set} />
     </div>
   );
 }

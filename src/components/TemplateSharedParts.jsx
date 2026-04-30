@@ -3,27 +3,40 @@
 import React from "react";
 import { formatDate, formatDateRange, sortByStartDesc, normalizeBullets } from "../utils/format";
 
-// ─── Font families ───────────────────────────────────────────────────────────
-// Selectable font options. Sans-serif fonts are listed first as they're the
-// workbook's recommended choice for resumes — Arial, Calibri and Verdana are
-// explicitly named (Resume Workbook p.24, Cover Letter Workbook p.10) for
-// being easy to read on screen and in print. Serif options are included for
-// users who prefer a more traditional look.
-export const FONT_FAMILIES = [
-  { id: "helvetica", name: "Helvetica Neue",   recommended: true,  stack: '"Helvetica Neue", Helvetica, Arial, sans-serif' },
-  { id: "arial",     name: "Arial",            recommended: true,  stack: 'Arial, "Helvetica Neue", Helvetica, sans-serif' },
-  { id: "calibri",   name: "Calibri",          recommended: true,  stack: 'Calibri, Candara, "Segoe UI", "San Francisco", sans-serif' },
-  { id: "verdana",   name: "Verdana",          recommended: true,  stack: 'Verdana, Geneva, "DejaVu Sans", sans-serif' },
-  { id: "tahoma",    name: "Tahoma",           recommended: false, stack: 'Tahoma, "Trebuchet MS", "DejaVu Sans", sans-serif' },
-  { id: "georgia",   name: "Georgia",          recommended: false, stack: 'Georgia, "Times New Roman", Times, serif' },
-  { id: "times",     name: "Times New Roman",  recommended: false, stack: '"Times New Roman", Times, Georgia, serif' },
+// ─── Font ────────────────────────────────────────────────────────────────────
+// Single hardcoded sans-serif stack. The Curtin Resume Workbook (p.24)
+// recommends sans-serif fonts (Arial, Calibri, Helvetica) as easiest to
+// read on screen and in print, so we standardise on Helvetica Neue with
+// Arial fallbacks across all templates and the PDF export.
+export const RESUME_FONT_STACK =
+  '"Helvetica Neue", Helvetica, Arial, sans-serif';
+
+// ─── Section ordering ────────────────────────────────────────────────────────
+// Default order of the *moveable* body sections — i.e. those that appear
+// between the always-on-top Career Objective and the always-at-bottom
+// References. The user can reorder these via the Section Order panel in
+// the editor; the chosen order is persisted in `data.meta.sectionOrder`.
+export const DEFAULT_SECTION_ORDER = [
+  "experience",
+  "education",
+  "projects",
+  "skills",
+  "achievements",
+  "voluntary",
+  "certificates",
+  "interests",
 ];
 
-export const DEFAULT_FONT_ID = "helvetica";
-
-export function getFontStack(fontId) {
-  const found = FONT_FAMILIES.find((f) => f.id === fontId);
-  return (found || FONT_FAMILIES[0]).stack;
+// Returns a safe, complete section order. Unknown ids are dropped, and any
+// known sections missing from the stored order are appended at the end so
+// nothing silently disappears after upgrades or partial JSON imports.
+export function getSectionOrder(meta) {
+  const stored = meta?.sectionOrder;
+  if (!Array.isArray(stored) || stored.length === 0) return DEFAULT_SECTION_ORDER;
+  const known = new Set(DEFAULT_SECTION_ORDER);
+  const filtered = stored.filter((id) => known.has(id));
+  const missing = DEFAULT_SECTION_ORDER.filter((id) => !filtered.includes(id));
+  return [...filtered, ...missing];
 }
 
 // ─── Layout / typography constants — match jsPDF output ──────────────────────
@@ -140,14 +153,7 @@ export function AchievementsBlock({ a }) {
 
 // ─── Skills ──────────────────────────────────────────────────────────────────
 // Group title (bold) + paragraph description below — matches the workbook's
-// professional/functional-resume style (Diego Romesco example, p.46):
-//
-//   Communication
-//   Skilled communicator with the ability to positively motivate others,
-//   frequently attending community events to represent Cricket WA…
-//
-// Bullets entered in the editor are joined into a single paragraph so the
-// underlying data shape (group.bullets[]) doesn't need to change.
+// professional/functional-resume style (Diego Romesco example, p.46).
 export function SkillsBlock({ group }) {
   const items = (group.bullets || []).filter((b) => b && String(b).trim().length > 0);
   const paragraph = normalizeBullets(items, { period: true }).join(" ");
@@ -164,7 +170,6 @@ export function SkillsBlock({ group }) {
   );
 }
 
-// Voluntary entries share the Experience shape (role/org/location/dates/bullets)
 export function VoluntaryBlock({ v }) {
   return (
     <div style={{ marginBottom: "10px" }}>
@@ -180,7 +185,6 @@ export function VoluntaryBlock({ v }) {
   );
 }
 
-// Certificate entries — meta line shows issue year, optional expiry, optional ID.
 export function CertificateBlock({ c }) {
   const metaParts = [];
   if (c.year) {
@@ -205,7 +209,6 @@ export function CertificateBlock({ c }) {
   );
 }
 
-// Interests render as a single inline pipe-separated line — typical resume style.
 export function InterestsBlock({ interests }) {
   const items = (interests || []).map((s) => String(s).trim()).filter(Boolean);
   if (!items.length) return null;
@@ -217,15 +220,6 @@ export function InterestsBlock({ interests }) {
 }
 
 // ─── References ─────────────────────────────────────────────────────────────
-// Each referee renders with every field on its own row, in this order:
-//   1. Name           (bold)
-//   2. Position
-//   3. Organization
-//   4. Telephone number
-//   5. Email address
-//
-// Referees are stacked one beneath the other so each entry reads as a clean,
-// self-contained block.
 export function ReferencesBlock({ references }) {
   const list = Array.isArray(references)
     ? references.filter((r) => r && (r.name || r.title))
@@ -241,25 +235,16 @@ export function ReferencesBlock({ references }) {
     <div>
       {list.map((r) => (
         <div key={r.id} style={{ marginBottom: "10px" }}>
-          {/* 1. Name */}
           {r.name && <div style={C.eTitle}>{r.name}</div>}
-
-          {/* 2. Position */}
           {r.title && <div style={{ ...C.bullet, marginTop: "1px" }}>{r.title}</div>}
-
-          {/* 3. Organization */}
           {r.organization && (
             <div style={{ ...C.bullet, marginTop: "1px" }}>{r.organization}</div>
           )}
-
-          {/* 4. Telephone number */}
           {r.phone && (
             <div style={{ ...C.bullet, marginTop: "1px" }}>
               <span style={{ color: "#787878" }}>Tel:</span>&nbsp;{r.phone}
             </div>
           )}
-
-          {/* 5. Email address */}
           {r.email && (
             <div style={{ ...C.bullet, marginTop: "1px" }}>
               <span style={{ color: "#787878" }}>Email:</span>&nbsp;{r.email}

@@ -32,7 +32,7 @@ export default function ExperienceEditor({ data, set }) {
     i < data.experience.length - 1 && set({ experience: swap(data.experience, i, i + 1) });
 
   return (
-    <SectionCard title="Experience" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Professional Experience" action={<IconButton onClick={add}>+ Add</IconButton>}>
       <div className="space-y-4">
         {data.experience.map((e, i) => (
           <div key={e.id} className="rounded-xl border border-gray-200 p-3">

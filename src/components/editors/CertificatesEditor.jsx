@@ -30,7 +30,7 @@ export default function CertificatesEditor({ data, set }) {
   const dn = (i) => i < list.length - 1 && set({ certificates: swap(list, i, i + 1) });
 
   return (
-    <SectionCard title="Certificates & Licences" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Certificates & Licenses" action={<IconButton onClick={add}>+ Add</IconButton>}>
       {list.length === 0 ? (
         <p className="text-xs text-gray-500 italic">
           Optional section — only shown on the resume when at least one credential is added.

@@ -13,13 +13,11 @@ import {
   InterestsBlock,
   ReferencesBlock,
   sortByStartDesc,
-  getFontStack,
+  getSectionOrder,
+  RESUME_FONT_STACK,
 } from "./TemplateSharedParts";
 
-/* Headings + order follow a typical professional resume:
-   Profile → Professional Experience → Education → Projects → Key Skills →
-   Achievements and Awards → Volunteer Work → Certificates & Licenses →
-   Interests → References. */
+/* Headings used both on the rendered resume and in the editor labels. */
 const HEADINGS = {
   summary:      "Career Objective",
   experience:   "Professional Experience",
@@ -35,10 +33,7 @@ const HEADINGS = {
 
 export default function TemplateModern({ data }) {
   const accent = data.meta?.accent || "#0ea5e9";
-  // Font family is user-selectable; defaults to Helvetica Neue when unset.
-  // The workbook recommends sans-serif fonts (Arial, Calibri, Verdana) for
-  // resumes — these are surfaced as preferred options in the picker.
-  const fontFamily = getFontStack(data.meta?.font);
+  const fontFamily = RESUME_FONT_STACK;
   const p = data.profile;
 
   const experience   = sortByStartDesc(data.experience   || []);
@@ -47,6 +42,64 @@ export default function TemplateModern({ data }) {
   const education    = sortByStartDesc(data.education    || []);
   const certificates = sortByStartDesc(data.certificates || [], "year");
   const interests    = (data.interests || []).filter(Boolean);
+
+  // ── Body sections, keyed by id so we can render them in user-defined order ──
+  const renderSection = (id) => {
+    switch (id) {
+      case "experience":
+        return experience.length > 0 && (
+          <Section title={HEADINGS.experience} accent={accent}>
+            {experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
+          </Section>
+        );
+      case "education":
+        return education.length > 0 && (
+          <Section title={HEADINGS.education} accent={accent}>
+            {education.map((e) => <EducationBlock key={e.id} e={e} />)}
+          </Section>
+        );
+      case "projects":
+        return projects.length > 0 && (
+          <Section title={HEADINGS.projects} accent={accent}>
+            {projects.map((proj) => <ProjectsBlock key={proj.id} p={proj} />)}
+          </Section>
+        );
+      case "skills":
+        return data.skillGroups?.length > 0 && (
+          <Section title={HEADINGS.skills} accent={accent}>
+            {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
+          </Section>
+        );
+      case "achievements":
+        return data.achievements?.length > 0 && (
+          <Section title={HEADINGS.achievements} accent={accent}>
+            {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
+          </Section>
+        );
+      case "voluntary":
+        return voluntary.length > 0 && (
+          <Section title={HEADINGS.voluntary} accent={accent}>
+            {voluntary.map((v) => <VoluntaryBlock key={v.id} v={v} />)}
+          </Section>
+        );
+      case "certificates":
+        return certificates.length > 0 && (
+          <Section title={HEADINGS.certificates} accent={accent}>
+            {certificates.map((c) => <CertificateBlock key={c.id} c={c} />)}
+          </Section>
+        );
+      case "interests":
+        return interests.length > 0 && (
+          <Section title={HEADINGS.interests} accent={accent}>
+            <InterestsBlock interests={interests} />
+          </Section>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const sectionOrder = getSectionOrder(data.meta);
 
   return (
     <div
@@ -100,7 +153,7 @@ export default function TemplateModern({ data }) {
         </div>
       )}
 
-      {/* 1. Career Objective */}
+      {/* Career Objective — always pinned to the top of the body */}
       {p.summary && (
         <Section title={HEADINGS.summary} accent={accent}>
           <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, fontFamily, wordBreak: "break-word" }}>
@@ -109,63 +162,12 @@ export default function TemplateModern({ data }) {
         </Section>
       )}
 
-      {/* 2. Professional Experience */}
-      {experience.length > 0 && (
-        <Section title={HEADINGS.experience} accent={accent}>
-          {experience.map((e) => <ExperienceBlock key={e.id} e={e} />)}
-        </Section>
-      )}
+      {/* Moveable sections, rendered in user-defined order */}
+      {sectionOrder.map((id) => (
+        <React.Fragment key={id}>{renderSection(id)}</React.Fragment>
+      ))}
 
-      {/* 3. Education */}
-      {education.length > 0 && (
-        <Section title={HEADINGS.education} accent={accent}>
-          {education.map((e) => <EducationBlock key={e.id} e={e} />)}
-        </Section>
-      )}
-
-      {/* 4. Projects */}
-      {projects.length > 0 && (
-        <Section title={HEADINGS.projects} accent={accent}>
-          {projects.map((proj) => <ProjectsBlock key={proj.id} p={proj} />)}
-        </Section>
-      )}
-
-      {/* 5. Key Skills — group title + paragraph (workbook functional/business style) */}
-      {data.skillGroups?.length > 0 && (
-        <Section title={HEADINGS.skills} accent={accent}>
-          {data.skillGroups.map((g) => <SkillsBlock key={g.id} group={g} />)}
-        </Section>
-      )}
-
-      {/* 6. Achievements and Awards */}
-      {data.achievements?.length > 0 && (
-        <Section title={HEADINGS.achievements} accent={accent}>
-          {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
-        </Section>
-      )}
-
-      {/* 7. Volunteer Work */}
-      {voluntary.length > 0 && (
-        <Section title={HEADINGS.voluntary} accent={accent}>
-          {voluntary.map((v) => <VoluntaryBlock key={v.id} v={v} />)}
-        </Section>
-      )}
-
-      {/* 8. Certificates & Licenses */}
-      {certificates.length > 0 && (
-        <Section title={HEADINGS.certificates} accent={accent}>
-          {certificates.map((c) => <CertificateBlock key={c.id} c={c} />)}
-        </Section>
-      )}
-
-      {/* 9. Interests */}
-      {interests.length > 0 && (
-        <Section title={HEADINGS.interests} accent={accent}>
-          <InterestsBlock interests={interests} />
-        </Section>
-      )}
-
-      {/* 10. References — always rendered, row-by-row with all 5 fields */}
+      {/* References — always pinned to the bottom */}
       <Section title={HEADINGS.references} accent={accent}>
         <ReferencesBlock references={data.references} />
       </Section>

@@ -30,7 +30,7 @@ export default function VoluntaryEditor({ data, set }) {
   const dn = (i) => i < list.length - 1 && set({ voluntary: swap(list, i, i + 1) });
 
   return (
-    <SectionCard title="Voluntary Experience" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Volunteer Work" action={<IconButton onClick={add}>+ Add</IconButton>}>
       {list.length === 0 ? (
         <p className="text-xs text-gray-500 italic">
           Optional section — only shown on the resume when at least one entry is added.
