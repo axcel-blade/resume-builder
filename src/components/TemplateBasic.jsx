@@ -132,21 +132,21 @@ export default function TemplateBasic({ data }) {
           {[p.email, p.phone, p.location, p.website].filter(Boolean).join("   ")}
         </div>
 
+        {/* Single centered row of clickable labels, separated by bullets */}
         {data.links?.length > 0 && (
-          <div style={{ marginBottom: "4px" }}>
-            {data.links.map((l) => (
-              <div key={l.id} style={{ fontSize: "12px", lineHeight: 1.6 }}>
-                <span style={{ fontWeight: "700", color: "#505050" }}>{l.label}</span>
-                <span style={{ color: "#505050" }}>  |  </span>
+          <div style={{ fontSize: "12px", lineHeight: 1.6, marginBottom: "4px" }}>
+            {data.links.map((l, i) => (
+              <React.Fragment key={l.id}>
+                {i > 0 && <span style={{ color: "#505050" }}>  •  </span>}
                 <a
-                  href={l.url.startsWith("http") ? l.url : `https://${l.url}`}
+                  href={(l.url || "").startsWith("http") ? l.url : `https://${l.url || ""}`}
                   target="_blank"
                   rel="noreferrer"
-                  style={{ color: accent, textDecoration: "none" }}
+                  style={{ color: accent, textDecoration: "none", fontWeight: "700" }}
                 >
-                  {l.url}
+                  {l.label || l.url}
                 </a>
-              </div>
+              </React.Fragment>
             ))}
           </div>
         )}

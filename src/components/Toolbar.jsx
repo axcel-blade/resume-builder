@@ -158,45 +158,75 @@ function drawMetaLine(pdf, text, y) {
   return y + 4;
 }
 
-function drawLinkRow(pdf, label, url, x, y, accentRgb, align = "left") {
+// Renders all profile links on a single row of clickable labels separated by
+// bullets, e.g.  LinkedIn  •  GitHub  •  Portfolio. Greedy-packs onto extra
+// lines if the row exceeds the content width. Each label gets its own
+// pdf.link() hotspot so the click target is exactly the visible text.
+function drawLinksInline(pdf, links, y, accentRgb, align = "left") {
+  if (!links?.length) return y;
   const [ar, ag, ab] = accentRgb;
-  const sep    = "  |  ";
-  const href   = url.startsWith("http") ? url : `https://${url}`;
-  const lineH  = 4.2;
-  const capH   = lineH;
+  const sep   = "  •  ";
+  const lineH = 4.5;
+  const capH  = 4.2;
+  const maxW  = CONTENT_W;
 
-  if (align === "center") {
-    const fullLine  = `${label}${sep}${url}`;
-    const fullW     = pdf.getTextWidth(fullLine);
-    const labelSepW = pdf.getTextWidth(`${label}${sep}`);
-    const urlW      = pdf.getTextWidth(url);
-    const lineStartX = (PAGE_W - fullW) / 2;
+  pdf.setFontSize(FS.contact);
 
-    pdf.setFont(BODY_FONT, "normal");
-    pdf.setTextColor(80, 80, 80);
-    pdf.text(fullLine, PAGE_W / 2, y, { align: "center" });
+  // Pre-measure separator (regular weight) and each label (bold weight).
+  pdf.setFont(BODY_FONT, "normal");
+  const sepW = pdf.getTextWidth(sep);
 
-    pdf.setTextColor(ar, ag, ab);
-    pdf.text(url, lineStartX + labelSepW, y);
-    pdf.link(lineStartX + labelSepW, y - capH + 1, urlW, capH, { url: href });
-  } else {
-    pdf.setFont(BODY_FONT, "bold");
-    pdf.setTextColor(80, 80, 80);
-    pdf.text(label, x, y);
-    const labelW = pdf.getTextWidth(label);
+  pdf.setFont(BODY_FONT, "bold");
+  const items = links.map((l) => {
+    const text = l.label || l.url || "";
+    const url  = l.url || "";
+    return {
+      text,
+      href: url.startsWith("http") ? url : `https://${url}`,
+      w:    pdf.getTextWidth(text),
+    };
+  });
 
-    pdf.setFont(BODY_FONT, "normal");
-    pdf.setTextColor(80, 80, 80);
-    pdf.text(sep, x + labelW, y);
-    const sepW = pdf.getTextWidth(sep);
+  // Greedy line packing.
+  const lines = [];
+  let line = [];
+  let lineW = 0;
+  items.forEach((it) => {
+    const need = line.length === 0 ? it.w : sepW + it.w;
+    if (lineW + need > maxW && line.length > 0) {
+      lines.push({ items: line, w: lineW });
+      line = [it];
+      lineW = it.w;
+    } else {
+      line.push(it);
+      lineW += need;
+    }
+  });
+  if (line.length > 0) lines.push({ items: line, w: lineW });
 
-    pdf.setTextColor(ar, ag, ab);
-    pdf.text(url, x + labelW + sepW, y);
-    const urlW = pdf.getTextWidth(url);
-    pdf.link(x + labelW + sepW, y - capH + 1, urlW, capH, { url: href });
-  }
+  // Render each packed line, centering or left-aligning per template.
+  lines.forEach(({ items: row, w }) => {
+    y = ensureSpace(pdf, y, lineH);
+    let x = align === "center" ? (PAGE_W - w) / 2 : ML;
 
-  return y + lineH;
+    row.forEach((it, i) => {
+      if (i > 0) {
+        pdf.setFont(BODY_FONT, "normal");
+        pdf.setTextColor(80, 80, 80);
+        pdf.text(sep, x, y);
+        x += sepW;
+      }
+      pdf.setFont(BODY_FONT, "bold");
+      pdf.setTextColor(ar, ag, ab);
+      pdf.text(it.text, x, y);
+      pdf.link(x, y - capH + 1, it.w, capH, { url: it.href });
+      x += it.w;
+    });
+
+    y += lineH;
+  });
+
+  return y;
 }
 
 // Each referee renders with every field on its own row.
@@ -264,11 +294,7 @@ function drawHeaderModern(pdf, data, y, accent) {
   if (contact) { pdf.text(contact, ML, y); y += 4.5; }
 
   if (data.links?.length) {
-    pdf.setFontSize(FS.contact);
-    data.links.forEach((l) => {
-      y = ensureSpace(pdf, y, 4.5);
-      y = drawLinkRow(pdf, l.label, l.url, ML, y, accentRgb, "left");
-    });
+    y = drawLinksInline(pdf, data.links, y, accentRgb, "left");
   }
 
   return y + 3;
@@ -301,11 +327,7 @@ function drawHeaderBasic(pdf, data, y, accent) {
   if (contact) { pdf.text(contact, cx, y, { align: "center" }); y += 4.5; }
 
   if (data.links?.length) {
-    pdf.setFontSize(FS.contact);
-    data.links.forEach((l) => {
-      y = ensureSpace(pdf, y, 4.5);
-      y = drawLinkRow(pdf, l.label, l.url, ML, y, accentRgb, "center");
-    });
+    y = drawLinksInline(pdf, data.links, y, accentRgb, "center");
   }
 
   return y + 3;
