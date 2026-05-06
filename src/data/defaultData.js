@@ -327,3 +327,20 @@ export const defaultData = {
     },
   ],
 };
+
+export const defaultCoverLetterData = {
+  fullName: "Sarah Mitchell",
+  email: "sarah.mitchell@example.com",
+  phone: "+1 (555) 234-5678",
+  jobTitle: "Senior Full-Stack Engineer",
+  companyName: "Drop Digital Design",
+  recipientName: "Mrs Andrea Smith",
+  recipientTitle: "HR Manager",
+  companyAddress: "Drop Digital Design\n152 Silston Way\nClydeson WA 6000",
+  topSkills: "Cloud Architecture, React, TypeScript, System Design",
+  achievements:
+    "Led migration to Kubernetes, reducing deployment time by 75%; mentored 12 engineers and improved team velocity by 40%",
+  whyCompany:
+    "I admire your product storytelling and high-quality digital production standards, and I am excited to contribute to a team that values clear user impact.",
+  tone: "professional",
+};

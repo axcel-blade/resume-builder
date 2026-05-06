@@ -15,6 +15,7 @@ import {
   readProfileBundle,
   writeProfileBundle,
 } from "../apps/shared/services/profileBundle";
+import { defaultCoverLetterData } from "../data/defaultData";
 
 // ─── Layout (mm) — 20mm margins ≈ 0.787" (community 0.75–1" range) ──────────
 const PAGE_W    = 210;
@@ -551,14 +552,14 @@ function buildPDF(data) {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-export default function Toolbar({ data }) {
+export default function Toolbar({ data, set }) {
   const fileInputRef = useRef(null);
 
   const exportJson = () => {
     const bundle = readProfileBundle();
     const payload = buildProfileExport({
       resume: data,
-      coverLetter: bundle.coverLetter || {},
+      coverLetter: bundle.coverLetter || defaultCoverLetterData,
     });
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url  = URL.createObjectURL(blob);

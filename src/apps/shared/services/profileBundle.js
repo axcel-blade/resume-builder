@@ -26,10 +26,13 @@ export function writeProfileBundle(patch) {
 }
 
 export function buildProfileExport({ resume, coverLetter }) {
+  const safeCoverLetter = coverLetter || {};
+  const { applicationSource, referenceNumber, ...exportCoverLetter } = safeCoverLetter;
+
   return {
     version: "1.0.0",
     resume: resume || {},
-    coverLetter: coverLetter || {},
+    coverLetter: exportCoverLetter,
   };
 }
 

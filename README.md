@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.3.9-blue)
+![Version](https://img.shields.io/badge/version-0.4.2-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -106,6 +106,16 @@ npm install
 
 ## Version History
 
+- `0.4.2`
+  - Removed legacy `applicationSource` and `referenceNumber` fields from exported cover-letter JSON payloads
+  - Centralized export sanitization in shared profile bundle builder
+- `0.4.1`
+  - Updated JSON export to always include both `resume` and `coverLetter` payloads
+  - Added default fallbacks so export remains complete even when one module has not been opened yet
+  - Restored resume import handling by wiring resume-builder toolbar `set` prop
+- `0.4.0`
+  - Added `defaultCoverLetterData` with realistic sample content for cover-letter module
+  - Updated cover-letter page initialization to load sample defaults when no saved/imported data exists
 - `0.3.9`
   - Updated main layout to keep footer pinned at the bottom of the page on short content screens
   - Applied flex-based page structure for consistent footer placement across routes

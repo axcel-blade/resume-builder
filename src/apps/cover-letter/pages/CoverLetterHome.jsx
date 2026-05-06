@@ -11,21 +11,9 @@ import {
   readProfileBundle,
   writeProfileBundle,
 } from "../../shared/services/profileBundle";
+import { defaultCoverLetterData, defaultData } from "../../../data/defaultData";
 
-const initialForm = {
-  fullName: "",
-  email: "",
-  phone: "",
-  jobTitle: "",
-  companyName: "",
-  recipientName: "",
-  recipientTitle: "",
-  companyAddress: "",
-  topSkills: "",
-  achievements: "",
-  whyCompany: "",
-  tone: "professional",
-};
+const initialForm = defaultCoverLetterData;
 
 const sanitizeLine = (value) => (value || "").replace(/\s+/g, " ").trim();
 
@@ -79,7 +67,9 @@ export default function CoverLetterHome() {
     }
     if (bundle.resume) {
       setFormData(deriveFromResume(bundle.resume));
+      return;
     }
+    setFormData(defaultCoverLetterData);
   }, []);
 
   useEffect(() => {
@@ -104,7 +94,7 @@ export default function CoverLetterHome() {
   const handleExportJson = () => {
     const bundle = readProfileBundle();
     const payload = buildProfileExport({
-      resume: bundle.resume || {},
+      resume: bundle.resume || defaultData,
       coverLetter: formData,
     });
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });

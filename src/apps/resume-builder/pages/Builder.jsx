@@ -39,7 +39,7 @@ export default function Builder() {
         Create a focused, professional resume by filling in your profile, experience, and skills with live
         A4 preview support.
       </p>
-      <Toolbar data={data} />
+      <Toolbar data={data} set={set} />
       <div className="mx-auto flex flex-col gap-4 lg:flex-row">
         <div className="w-full lg:w-1/2">
           <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
