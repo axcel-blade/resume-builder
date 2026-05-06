@@ -551,7 +551,7 @@ function buildPDF(data) {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-export default function Toolbar({ data, set }) {
+export default function Toolbar({ data }) {
   const fileInputRef = useRef(null);
 
   const exportJson = () => {
@@ -608,18 +608,8 @@ export default function Toolbar({ data, set }) {
   };
 
   return (
-    <div className="sticky top-0 z-10 mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm print:hidden">
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-gray-700">Accent</span>
-        <input
-          type="color"
-          className="h-9 w-9 cursor-pointer rounded-xl border border-gray-300 p-1"
-          value={data.meta.accent}
-          onChange={(e) => set({ meta: { ...data.meta, accent: e.target.value } })}
-          aria-label="Select resume accent color"
-        />
-      </div>
-      <div className="flex items-center gap-2">
+    <div className="sticky top-0 z-40 mb-4 mt-4 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm print:hidden">
+      <div className="flex flex-wrap items-center gap-2">
         <button className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 transition" onClick={reset}>Reset</button>
         <button className="rounded-xl border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50 transition" onClick={exportJson}>Export JSON</button>
         <input ref={fileInputRef} type="file" accept="application/json" className="hidden"

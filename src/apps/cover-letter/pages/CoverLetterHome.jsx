@@ -202,12 +202,17 @@ export default function CoverLetterHome() {
       </div>
       <div className="mx-auto mt-4 flex flex-col gap-4 lg:flex-row">
         <div className="w-full lg:w-1/2">
-          <div className="max-h-[calc(100vh-230px)] overflow-y-auto">
-            <CoverLetterForm
-              formData={formData}
-              setFormData={setFormData}
-              hasResumeIdentity={hasResumeIdentity}
-            />
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-2">
+              <p className="text-sm font-semibold text-gray-700">Your Details</p>
+            </div>
+            <div className="max-h-[calc(100vh-160px)] overflow-y-auto bg-gray-100 p-4">
+              <CoverLetterForm
+                formData={formData}
+                setFormData={setFormData}
+                hasResumeIdentity={hasResumeIdentity}
+              />
+            </div>
           </div>
         </div>
         <div className="w-full lg:w-1/2">

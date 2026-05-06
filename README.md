@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.3.3-blue)
+![Version](https://img.shields.io/badge/version-0.3.7-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -106,6 +106,19 @@ npm install
 
 ## Version History
 
+- `0.3.7`
+  - Removed static "Resume Builder AI assistant is coming soon" banner from resume page
+  - Updated `Rewrite with AI` action to show a popup "coming soon" message on click
+- `0.3.6`
+  - Added resume-builder title and descriptive intro text to match cover-letter page style
+  - Improved page-level context for resume editing and live preview workflow
+- `0.3.5`
+  - Updated resume-builder to use cover-letter style top action navbar
+  - Matched left `Profile` panel height/scroll behavior with `Resume Preview (A4 Pages)` panel
+  - Refined resume split layout to keep editor and preview boxes visually consistent
+- `0.3.4`
+  - Matched `Your Details` panel height and container behavior with `Cover Letter Preview (A4)` panel
+  - Updated cover-letter split layout so both left/right boxes stay visually consistent
 - `0.3.3`
   - Fixed sticky layering so the cover-letter action bar stays above preview header while scrolling
   - Prevented `Cover Letter Preview (A4)` header from covering Reset/Export/Import/Save controls

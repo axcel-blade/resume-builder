@@ -82,17 +82,8 @@ async function generateSummary(data, existingSummary) {
     };
 
     const handleAiSummary = async () => {
-        setAiLoading(true);
         setAiError("");
-        try {
-        const summary = await generateSummary(data, p.summary);
-        set({ profile: { ...p, summary } });
-        } catch (err) {
-        setAiError("Failed to generate summary. Please try again.");
-        console.error("AI error:", err);
-        } finally {
-        setAiLoading(false);
-        }
+        alert("Rewrite with AI is coming soon.");
     };
 
     const hasSummary = p.summary && p.summary.trim().length > 0;
