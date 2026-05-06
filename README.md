@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.3.1-blue)
+![Version](https://img.shields.io/badge/version-0.3.3-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -106,6 +106,13 @@ npm install
 
 ## Version History
 
+- `0.3.3`
+  - Fixed sticky layering so the cover-letter action bar stays above preview header while scrolling
+  - Prevented `Cover Letter Preview (A4)` header from covering Reset/Export/Import/Save controls
+- `0.3.2`
+  - Updated cover-letter editor/preview body layout to mirror resume-builder split view
+  - Kept existing cover-letter action bar (Reset, Export JSON, Import JSON, Save as PDF)
+  - Refined preview container styling for cleaner integration in the new panel layout
 - `0.3.1`
   - Tuned cover-letter PDF spacing to better match workbook Example 1 block layout
   - Added explicit paragraph/block gap handling during PDF export for cleaner letter sections

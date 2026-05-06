@@ -154,12 +154,12 @@ export default function CoverLetterHome() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8">
+    <section className="mx-auto max-w-[1700px] p-4">
       <h1 className="text-3xl font-bold text-gray-900">Cover Letter Writer</h1>
       <p className="mt-2 max-w-3xl text-gray-600">
         Create a focused, role-specific draft letter by filling in your details and experience highlights.
       </p>
-      <div className="sticky top-0 z-10 mt-4 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm print:hidden">
+      <div className="sticky top-0 z-40 mt-4 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm print:hidden">
         <button
           type="button"
           className="rounded-xl border border-gray-300 px-3 py-2 text-sm transition hover:bg-gray-50"
@@ -200,13 +200,26 @@ export default function CoverLetterHome() {
           {isSavingPdf ? "Saving PDF..." : "Save as PDF"}
         </button>
       </div>
-      <div className="mt-6 grid gap-5 lg:grid-cols-2">
-        <CoverLetterForm
-          formData={formData}
-          setFormData={setFormData}
-          hasResumeIdentity={hasResumeIdentity}
-        />
-        <CoverLetterPreview letter={letter} />
+      <div className="mx-auto mt-4 flex flex-col gap-4 lg:flex-row">
+        <div className="w-full lg:w-1/2">
+          <div className="max-h-[calc(100vh-230px)] overflow-y-auto">
+            <CoverLetterForm
+              formData={formData}
+              setFormData={setFormData}
+              hasResumeIdentity={hasResumeIdentity}
+            />
+          </div>
+        </div>
+        <div className="w-full lg:w-1/2">
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <div className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-2">
+              <p className="text-sm font-semibold text-gray-700">Cover Letter Preview (A4)</p>
+            </div>
+            <div className="max-h-[calc(100vh-160px)] overflow-y-auto bg-gray-100 p-4">
+              <CoverLetterPreview letter={letter} />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
