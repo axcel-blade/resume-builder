@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.3.7-blue)
+![Version](https://img.shields.io/badge/version-0.3.9-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -106,6 +106,12 @@ npm install
 
 ## Version History
 
+- `0.3.9`
+  - Updated main layout to keep footer pinned at the bottom of the page on short content screens
+  - Applied flex-based page structure for consistent footer placement across routes
+- `0.3.8`
+  - Expanded website content across Home, About, Products, Contact, and Footer
+  - Added richer product messaging, support details, and platform overview sections
 - `0.3.7`
   - Removed static "Resume Builder AI assistant is coming soon" banner from resume page
   - Updated `Rewrite with AI` action to show a popup "coming soon" message on click
