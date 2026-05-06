@@ -12,9 +12,9 @@ const products = [
   },
   {
     title: "Cover Letter Writer",
-    description: "Generate role-specific cover letters with guided content blocks.",
+    description: "Draft role-specific cover letters with guided inputs and live output preview.",
     to: "/apps/cover-letter",
-    status: "Coming Soon",
+    status: "Live",
   },
 ];
 

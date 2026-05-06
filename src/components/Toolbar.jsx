@@ -9,6 +9,12 @@ import {
   normalizeBullets,
 } from "../utils/format";
 import { getSectionOrder } from "./TemplateSharedParts";
+import {
+  buildProfileExport,
+  normalizeImportedProfile,
+  readProfileBundle,
+  writeProfileBundle,
+} from "../apps/shared/services/profileBundle";
 
 // ─── Layout (mm) — 20mm margins ≈ 0.787" (community 0.75–1" range) ──────────
 const PAGE_W    = 210;
@@ -549,7 +555,12 @@ export default function Toolbar({ data, set }) {
   const fileInputRef = useRef(null);
 
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const bundle = readProfileBundle();
+    const payload = buildProfileExport({
+      resume: data,
+      coverLetter: bundle.coverLetter || {},
+    });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
@@ -561,7 +572,14 @@ export default function Toolbar({ data, set }) {
   const importJson = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      try { set(JSON.parse(e.target.result)); }
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const normalized = normalizeImportedProfile(parsed);
+        if (normalized.resume) set(normalized.resume);
+        if (normalized.coverLetter) {
+          writeProfileBundle({ coverLetter: normalized.coverLetter });
+        }
+      }
       catch (err) { alert("Invalid JSON file: " + err.message); }
     };
     reader.readAsText(file);

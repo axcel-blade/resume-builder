@@ -1,18 +1,30 @@
 /* src/apps/resume-builder/pages/Builder.jsx */
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Toolbar from "../../../components/Toolbar";
 import ResumeEditor from "../../../components/editors/ResumeEditor";
 import A4PaginatedPreview from "../../../components/preview/A4PaginatedPreview";
 import TemplateModern from "../../../components/TemplateModern";
 import TemplateBasic from "../../../components/TemplateBasic";
 import { defaultData } from "../../../data/defaultData";
+import { readProfileBundle, writeProfileBundle } from "../../shared/services/profileBundle";
 
 export default function Builder() {
   const [data, setData] = useState(defaultData);
   const previewRef = useRef(null);
 
   const set = (patch) => setData((prev) => ({ ...prev, ...patch }));
+
+  useEffect(() => {
+    const bundle = readProfileBundle();
+    if (bundle.resume) {
+      setData(bundle.resume);
+    }
+  }, []);
+
+  useEffect(() => {
+    writeProfileBundle({ resume: data });
+  }, [data]);
 
   const getTemplateComponent = () => {
     const template = data.meta?.template || "modern";

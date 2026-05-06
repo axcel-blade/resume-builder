@@ -8,8 +8,8 @@ export default function Home() {
     <section className="mx-auto max-w-6xl px-4 py-12">
       <h1 className="text-4xl font-bold text-gray-900">Build better resumes faster.</h1>
       <p className="mt-4 max-w-2xl text-gray-600">
-        Vita Forge is a website that hosts career tools. Start with Resume Builder now and move to Cover
-        Letter Writer when it launches.
+        Vita Forge is a website that hosts career tools. Build your resume and draft role-specific cover
+        letters in one platform.
       </p>
       <Link
         to="/products"
