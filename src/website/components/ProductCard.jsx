@@ -22,7 +22,7 @@ export default function ProductCard({ title, description, to, status, image }) {
         to={to}
         className="mt-4 inline-flex rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700"
       >
-        Open App
+        Get Started
       </Link>
     </article>
   );
