@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.4.9-blue)
+![Version](https://img.shields.io/badge/version-0.5.0-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -63,6 +63,23 @@ Default local URL: `http://localhost:5173`
 - `/apps/resume-builder/preview` - Resume preview page
 - `/apps/cover-letter` - Cover Letter Writer app
 
+## SEO Setup
+
+- Route-level SEO is configured in `src/routes/AppRoutes.jsx` via reusable `src/core/seo/Seo.jsx`
+- Each route now sets:
+  - page title
+  - meta description
+  - canonical URL
+  - Open Graph tags
+  - Twitter card tags
+  - JSON-LD structured data (where applicable)
+- Technical SEO files:
+  - `public/robots.txt`
+  - `public/sitemap.xml`
+  - `public/og-image.svg`
+- Site-level SEO constants:
+  - `src/core/config/seo.js`
+
 ## Project Structure
 
 ```txt
@@ -106,6 +123,9 @@ npm install
 
 ## Version History
 
+- `0.5.0`
+  - Added full SEO foundation with per-route meta tags, canonical URLs, Open Graph, Twitter cards, and JSON-LD
+  - Added `robots.txt`, `sitemap.xml`, and default social preview image for better indexing and sharing
 - `0.4.9`
   - Set Resume Builder product card image to `my-resume.svg`
   - Updated Home page hero image to `interview.svg`

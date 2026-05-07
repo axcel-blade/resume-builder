@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Vita Forge">
+  <rect width="1200" height="630" fill="#0f172a" />
+  <rect x="52" y="52" width="1096" height="526" rx="24" fill="#111827" stroke="#38bdf8" stroke-width="4" />
+  <text x="120" y="270" fill="#e5e7eb" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700">
+    Vita Forge
+  </text>
+  <text x="120" y="350" fill="#cbd5e1" font-family="Arial, Helvetica, sans-serif" font-size="38">
+    Professional Templates " ATS-Friendly
+  </text>
+  <text x="120" y="420" fill="#94a3b8" font-family="Arial, Helvetica, sans-serif" font-size="30">
+    Build resumes and cover letters with confidence
+  </text>
+</svg>
