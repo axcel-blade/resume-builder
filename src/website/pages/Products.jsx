@@ -2,6 +2,8 @@
 
 import React from "react";
 import ProductCard from "../components/ProductCard";
+import resumeImage from "../assets/images/resume.svg";
+import interviewImage from "../assets/images/interview.svg";
 
 const products = [
   {
@@ -9,12 +11,14 @@ const products = [
     description: "Create, edit, preview, and export your resume with template support.",
     to: "/apps/resume-builder",
     status: "Live",
+    image: resumeImage,
   },
   {
     title: "Cover Letter Writer",
     description: "Draft role-specific cover letters with guided inputs and live output preview.",
     to: "/apps/cover-letter",
     status: "Live",
+    image: interviewImage,
   },
 ];
 

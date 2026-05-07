@@ -19,7 +19,7 @@ export function exportCoverLetterPdf({ letter, fullName }) {
   const rawLines = letter.split("\n");
   let y = MARGIN;
 
-  pdf.setFont("times", "normal");
+  pdf.setFont("helvetica", "normal");
   pdf.setFontSize(12);
 
   rawLines.forEach((line) => {

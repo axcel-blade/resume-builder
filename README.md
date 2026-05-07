@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.4.2-blue)
+![Version](https://img.shields.io/badge/version-0.4.5-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -106,6 +106,15 @@ npm install
 
 ## Version History
 
+- `0.4.5`
+  - Aligned Cover Letter preview font with Resume font stack for on-screen consistency
+  - Updated Cover Letter PDF export to use Helvetica so exported output matches Resume typography style
+- `0.4.4`
+  - Wired newly added website illustrations into `Home`, `About`, `Products`, and `Contact` pages
+  - Updated product visuals to use image imports from `src/website/assets/images`
+- `0.4.3`
+  - Added website image asset folder usage on landing/product pages
+  - Rendered product illustrations from `src/website/assets/images` in product cards and homepage
 - `0.4.2`
   - Removed legacy `applicationSource` and `referenceNumber` fields from exported cover-letter JSON payloads
   - Centralized export sanitization in shared profile bundle builder

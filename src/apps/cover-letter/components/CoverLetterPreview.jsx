@@ -1,6 +1,7 @@
 /* src/apps/cover-letter/components/CoverLetterPreview.jsx */
 
 import React from "react";
+import { RESUME_FONT_STACK } from "../../../components/TemplateSharedParts";
 
 export default function CoverLetterPreview({ letter }) {
   return (
@@ -10,7 +11,7 @@ export default function CoverLetterPreview({ letter }) {
           <pre
             className="w-full whitespace-pre-wrap wrap-break-word text-gray-900"
             style={{
-              fontFamily: "'Times New Roman', Times, serif",
+              fontFamily: RESUME_FONT_STACK,
               fontSize: "16px",
               lineHeight: 1.5,
             }}

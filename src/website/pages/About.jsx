@@ -1,6 +1,7 @@
 /* src/website/pages/About.jsx */
 
 import React from "react";
+import directionImage from "../assets/images/right-direction.svg";
 
 export default function About() {
   return (
@@ -26,6 +27,13 @@ export default function About() {
             exchange patterns to keep every module connected and maintainable.
           </p>
         </article>
+      </div>
+      <div className="mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <img
+          src={directionImage}
+          alt="Career direction illustration"
+          className="mx-auto h-72 w-full max-w-3xl object-contain"
+        />
       </div>
     </section>
   );
