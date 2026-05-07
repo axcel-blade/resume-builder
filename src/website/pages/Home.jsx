@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import heroImage from "../assets/images/career-development.svg";
+import heroImage from "../assets/images/interview.svg";
 
 export default function Home() {
   return (
@@ -11,8 +11,10 @@ export default function Home() {
         <div>
           <h1 className="text-4xl font-bold text-gray-900">Career documents, built in one workflow.</h1>
           <p className="mt-4 max-w-3xl text-gray-600">
-            Vita Forge helps job seekers create polished application materials quickly. Start with your resume,
-            refine role-focused content, and generate matching cover letters with a consistent tone and format.
+            Vita Forge helps create professional resumes and cover letters that help you impress recruiters,
+            pass ATS systems, and land your dream job with{" "}
+            <span className="font-semibold text-sky-700">PROFESSIONAL Templates</span> and{" "}
+            <span className="font-semibold text-sky-700">ATS-FRIENDLY</span> content.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -25,7 +27,7 @@ export default function Home() {
               to="/apps/resume-builder"
               className="inline-flex rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
             >
-              Open Resume Builder
+              Build My Resume
             </Link>
           </div>
         </div>

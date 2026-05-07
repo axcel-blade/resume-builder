@@ -1,7 +1,7 @@
 /* src/website/pages/Contact.jsx */
 
 import React from "react";
-import supportImage from "../assets/images/focused.svg";
+import supportImage from "../assets/images/contact.svg";
 
 export default function Contact() {
   return (

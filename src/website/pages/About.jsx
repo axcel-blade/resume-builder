@@ -1,7 +1,7 @@
 /* src/website/pages/About.jsx */
 
 import React from "react";
-import directionImage from "../assets/images/right-direction.svg";
+import directionImage from "../assets/images/direction.svg";
 
 export default function About() {
   return (

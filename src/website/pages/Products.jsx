@@ -2,8 +2,8 @@
 
 import React from "react";
 import ProductCard from "../components/ProductCard";
-import resumeImage from "../assets/images/resume.svg";
-import interviewImage from "../assets/images/interview.svg";
+import resumeImage from "../assets/images/my-resume.svg";
+import coverLetterImage from "../assets/images/cover-letter.svg";
 
 const products = [
   {
@@ -18,7 +18,7 @@ const products = [
     description: "Draft role-specific cover letters with guided inputs and live output preview.",
     to: "/apps/cover-letter",
     status: "Live",
-    image: interviewImage,
+    image: coverLetterImage,
   },
 ];
 
