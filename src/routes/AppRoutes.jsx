@@ -1,26 +1,37 @@
 /* src/routes/AppRoutes.jsx */
 
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import MainLayout from "../core/layouts/MainLayout";
 import Seo from "../core/seo/Seo";
 import { SITE_NAME, SITE_URL } from "../core/config/seo";
-import Home from "../website/pages/Home";
-import About from "../website/pages/About";
-import Products from "../website/pages/Products";
-import Contact from "../website/pages/Contact";
-import NotFound from "../website/pages/NotFound";
-import Builder from "../apps/resume-builder/pages/Builder";
-import Templates from "../apps/resume-builder/pages/Templates";
-import Preview from "../apps/resume-builder/pages/Preview";
-import CoverLetterHome from "../apps/cover-letter/pages/CoverLetterHome";
+
+const Home = lazy(() => import("../website/pages/Home"));
+const About = lazy(() => import("../website/pages/About"));
+const Products = lazy(() => import("../website/pages/Products"));
+const Contact = lazy(() => import("../website/pages/Contact"));
+const NotFound = lazy(() => import("../website/pages/NotFound"));
+const Builder = lazy(() => import("../apps/resume-builder/pages/Builder"));
+const Templates = lazy(() => import("../apps/resume-builder/pages/Templates"));
+const Preview = lazy(() => import("../apps/resume-builder/pages/Preview"));
+const CoverLetterHome = lazy(() => import("../apps/cover-letter/pages/CoverLetterHome"));
 
 function withSeo(PageComponent, seoProps) {
   return (
     <>
       <Seo {...seoProps} />
-      <PageComponent />
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <PageComponent />
+      </Suspense>
     </>
+  );
+}
+
+function RouteLoadingFallback() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-12">
+      <p className="text-sm font-medium text-gray-600">Loading page...</p>
+    </section>
   );
 }
 
