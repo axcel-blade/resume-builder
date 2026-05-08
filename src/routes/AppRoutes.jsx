@@ -1,7 +1,7 @@
 /* src/routes/AppRoutes.jsx */
 
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import MainLayout from "../core/layouts/MainLayout";
 import Seo from "../core/seo/Seo";
 import { SITE_NAME, SITE_URL } from "../core/config/seo";
@@ -9,6 +9,7 @@ import Home from "../website/pages/Home";
 import About from "../website/pages/About";
 import Products from "../website/pages/Products";
 import Contact from "../website/pages/Contact";
+import NotFound from "../website/pages/NotFound";
 import Builder from "../apps/resume-builder/pages/Builder";
 import Templates from "../apps/resume-builder/pages/Templates";
 import Preview from "../apps/resume-builder/pages/Preview";
@@ -181,7 +182,16 @@ export default function AppRoutes() {
             },
           })}
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="*"
+          element={withSeo(NotFound, {
+            title: "Page Not Found",
+            path: "/404",
+            description:
+              "The page you requested could not be found. Return to Vita Forge home or browse available products.",
+            robots: "noindex, nofollow",
+          })}
+        />
       </Route>
     </Routes>
   );
