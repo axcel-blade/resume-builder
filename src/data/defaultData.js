@@ -1,16 +1,4 @@
-/* src/data/defaultData.js
- *
- * Starter content showing every section the resume builder supports.
- * Sarah Mitchell — a fictional senior engineer — fills out each editor with
- * realistic, paragraph-quality content so users can see exactly how each
- * section renders before they start editing.
- *
- * Notes:
- *   • meta.font defaults to "helvetica" — see TemplateSharedParts FONT_FAMILIES.
- *   • Skill group bullets are written as full sentences because the on-screen
- *     SkillsBlock joins them into a paragraph (workbook functional-resume style).
- *   • References are shown row-by-row — name, position, organization, phone, email.
- */
+/* src/data/defaultData.js */
 
 export const defaultData = {
   meta: {
@@ -20,78 +8,62 @@ export const defaultData = {
   },
 
   profile: {
-    fullName: "Sarah Mitchell",
-    title: "Senior Full-Stack Engineer | Cloud Architecture Specialist",
-    email: "sarah.mitchell@example.com",
-    phone: "+1 (555) 234-5678",
-    location: "San Francisco, CA",
-    website: "sarahmitchell.dev",
+    fullName: "Alex Carter",
+    title: "Software Engineer | Full-Stack Web Developer",
+    email: "alex.carter@example.com",
+    phone: "+1 (555) 017-8842",
+    location: "Austin, TX",
+    website: "alexcarter.dev",
     summary:
-      "Award-winning software architect with 8+ years of experience designing and deploying scalable cloud-native applications. Proven expertise in microservices architecture, DevOps practices, and leading high-performance engineering teams. Passionate about mentoring junior developers and driving technical excellence across the full software delivery lifecycle.",
+      "Results-driven software engineer with 5+ years of hands-on experience building web applications from concept to production. Strong background in React, Node.js, and relational databases with a focus on clean architecture, user-centered design, and reliable delivery. Comfortable collaborating across product, design, and engineering teams to ship practical solutions that improve customer experience and business outcomes.",
   },
 
   links: [
-    { id: "link1", label: "LinkedIn",  url: "linkedin.com/in/sarah-mitchell-engineer" },
-    { id: "link2", label: "GitHub",    url: "github.com/sarah-mitchell-dev" },
-    { id: "link3", label: "Portfolio", url: "sarahmitchell.dev" },
+    { id: "link1", label: "LinkedIn", url: "linkedin.com/in/alex-carter-dev" },
+    { id: "link2", label: "GitHub", url: "github.com/alexcarter-dev" },
+    { id: "link3", label: "Portfolio", url: "alexcarter.dev" },
   ],
 
   experience: [
     {
       id: "exp1",
-      role: "Principal Engineer",
-      company: "CloudVenture Technologies",
-      location: "San Francisco, CA",
-      start: "2022-06",
+      role: "Senior Software Engineer",
+      company: "Northstar Digital Labs",
+      location: "Austin, TX",
+      start: "2023-03",
       end: "Present",
       bullets: [
-        "Lead architectural decisions for 50+ microservices supporting 2M+ daily active users.",
-        "Spearheaded migration from monolithic to Kubernetes-based infrastructure, reducing deployment time by 75%.",
-        "Mentored 12 engineers, resulting in 3 promotions and improved team velocity of 40%.",
-        "Implemented comprehensive CI/CD pipelines using GitHub Actions, reducing deployment errors by 90%.",
-        "Designed and deployed event-driven architecture using Apache Kafka, handling 500K events/second.",
+        "Led development of customer portal features used by over 120,000 monthly users.",
+        "Reduced API response times by 42% through query tuning and cache-layer improvements.",
+        "Introduced automated release checks in GitHub Actions, cutting production regressions by 35%.",
+        "Mentored junior developers through code reviews and pair programming sessions.",
       ],
     },
     {
       id: "exp2",
-      role: "Senior Software Engineer",
-      company: "DataStream Solutions",
-      location: "Remote",
-      start: "2020-03",
-      end: "2022-05",
+      role: "Software Engineer",
+      company: "BlueRiver Systems",
+      location: "Dallas, TX",
+      start: "2020-08",
+      end: "2023-02",
       bullets: [
-        "Architected real-time analytics platform processing 10TB+ data daily using Apache Spark and PostgreSQL.",
-        "Led cross-functional team of 8 engineers to deliver features serving enterprise clients.",
-        "Optimized database queries and caching strategies, improving API response time by 65%.",
-        "Established code review standards and best practices, improving code quality metrics by 45%.",
-        "Developed internal tools for monitoring and alerting, reducing MTTR by 2 hours.",
+        "Built and maintained React and Node.js modules for internal operations and client reporting.",
+        "Implemented role-based authentication and audit logging for sensitive workflows.",
+        "Collaborated with QA to improve test coverage and stabilize release quality.",
+        "Migrated legacy endpoints to modern REST services without customer downtime.",
       ],
     },
     {
       id: "exp3",
-      role: "Full-Stack Developer",
-      company: "InnovateLabs Inc",
-      location: "New York, NY",
-      start: "2018-08",
-      end: "2020-02",
+      role: "Junior Web Developer",
+      company: "Pixel Forge Studio",
+      location: "Houston, TX",
+      start: "2018-06",
+      end: "2020-07",
       bullets: [
-        "Built customer-facing web application using React and Node.js serving 500K+ users.",
-        "Implemented payment integration with Stripe, processing $50M+ in annual transactions.",
-        "Designed and implemented microservices for user authentication and profile management.",
-        "Reduced frontend bundle size by 55% through code splitting and lazy loading.",
-      ],
-    },
-    {
-      id: "exp4",
-      role: "Junior Developer",
-      company: "TechStart Ventures",
-      location: "Boston, MA",
-      start: "2017-06",
-      end: "2018-07",
-      bullets: [
-        "Contributed to full-stack development of SaaS platform using React, Node.js, and MongoDB.",
-        "Implemented responsive UI components using Material-UI, improving user satisfaction by 35%.",
-        "Participated in agile ceremonies and contributed to sprint planning and retrospectives.",
+        "Created responsive landing pages and dashboards for small business clients.",
+        "Integrated third-party APIs for payment, email, and analytics features.",
+        "Improved Lighthouse performance by optimizing image delivery and client-side bundles.",
       ],
     },
   ],
@@ -99,28 +71,27 @@ export const defaultData = {
   education: [
     {
       id: "edu1",
-      degree: "Master of Science in Computer Science",
-      school: "Massachusetts Institute of Technology (MIT)",
-      location: "Cambridge, MA",
-      start: "2015-09",
-      end: "2017-05",
+      degree: "B.Sc. in Software Engineering",
+      school: "University of Texas at Dallas",
+      location: "Dallas, TX",
+      start: "2014-08",
+      end: "2018-05",
       bullets: [
-        "Specialization in Distributed Systems and Machine Learning.",
-        "GPA: 3.85 / 4.0",
-        "Thesis: Optimizing Consensus Algorithms for High-Throughput Blockchain Networks.",
+        "Focused on web systems, software architecture, and database engineering.",
+        "Completed capstone project on scalable scheduling systems.",
+        "Graduated with honors and served as peer tutor for programming fundamentals.",
       ],
     },
     {
       id: "edu2",
-      degree: "Bachelor of Science in Computer Engineering",
-      school: "University of California, Berkeley",
-      location: "Berkeley, CA",
-      start: "2011-08",
-      end: "2015-05",
+      degree: "Full-Stack Web Development Certificate",
+      school: "Austin Code Academy",
+      location: "Austin, TX",
+      start: "2019-01",
+      end: "2019-09",
       bullets: [
-        "Cum Laude Honors, GPA: 3.8 / 4.0",
-        "Dean's List all semesters",
-        "Recipient of Merit Scholarship",
+        "Completed project-based training in React, Node.js, and PostgreSQL.",
+        "Built three portfolio-ready applications using agile iteration cycles.",
       ],
     },
   ],
@@ -128,68 +99,62 @@ export const defaultData = {
   projects: [
     {
       id: "proj1",
-      title: "CloudSync — Distributed File Synchronization System",
-      organization: "Personal Project / Open Source",
-      start: "2023-06",
-      end: "2024-01",
+      title: "TaskFlow Pro",
+      organization: "Personal Project",
+      start: "2024-01",
+      end: "Present",
       bullets: [
-        "Developed P2P file synchronization system with conflict resolution using Go and gRPC.",
-        "Implemented end-to-end encryption using AES-256.",
-        "Achieved 2.5K GitHub stars and contributions from 15+ developers.",
-        "Published technical blog series with 50K+ views on distributed systems.",
+        "Developed a productivity web app with Kanban boards, reminders, and progress analytics.",
+        "Implemented JWT authentication and role-based project collaboration.",
+        "Deployed to cloud infrastructure with CI/CD and automated quality checks.",
+        "Repository: github.com/alexcarter-dev/taskflow-pro",
       ],
     },
     {
       id: "proj2",
-      title: "MetricsHub — Real-Time Observability Platform",
-      organization: "Side Project",
-      start: "2022-11",
-      end: "2023-08",
+      title: "EventHub API",
+      organization: "Open Source",
+      start: "2023-04",
+      end: "2023-12",
       bullets: [
-        "Built comprehensive monitoring dashboard supporting 50+ metric types.",
-        "Implemented custom alerting engine with ML-based anomaly detection.",
-        "Designed time-series database optimization achieving 99.9% query latency SLA.",
+        "Built a REST API for event ticketing and attendee management workflows.",
+        "Designed modular service layers and reusable validation middleware.",
+        "Wrote API documentation and usage examples for external contributors.",
       ],
     },
   ],
 
-  // ── Key Skills ────────────────────────────────────────────────────────────
-  // Each group renders as: bold theme heading + paragraph (workbook
-  // functional/business style). Bullets here are written as full sentences
-  // that flow as prose — the SkillsBlock joins them into one paragraph.
   skillGroups: [
     {
       id: "skill1",
-      title: "Cloud Architecture & DevOps",
+      title: "Programming Languages",
       bullets: [
-        "Eight years of hands-on experience designing AWS-native systems across EC2, S3, Lambda and RDS, with production exposure to Kubernetes, Docker and Terraform.",
-        "Built and maintained CI/CD pipelines using GitHub Actions and Jenkins that reduced release cycle time by 75% and deployment errors by 90% across multiple teams.",
+        "JavaScript and TypeScript for production-ready frontend and backend applications.",
+        "Python and SQL for automation scripts, data workflows, and service integrations.",
       ],
     },
     {
       id: "skill2",
-      title: "Software Engineering",
+      title: "Frontend & UI",
       bullets: [
-        "Expert-level proficiency in JavaScript, TypeScript, Python, Go and Java, with working knowledge of Rust and C#.",
-        "Strong command of full-stack frameworks including React, Next.js, Node.js, Express, Django and FastAPI, comfortable across both REST and GraphQL APIs.",
-        "Deep experience with PostgreSQL, MongoDB, Redis, Apache Spark, Kafka and Elasticsearch in high-throughput production environments.",
+        "React, Next.js, and Tailwind CSS for responsive and accessible interfaces.",
+        "Component-driven development patterns with reusable UI systems.",
       ],
     },
     {
       id: "skill3",
-      title: "Leadership & Mentorship",
+      title: "Backend & APIs",
       bullets: [
-        "Led cross-functional engineering teams of up to 12 people, with three direct reports promoted under my mentorship within the past 18 months.",
-        "Established code-review standards and engineering best-practice documentation that lifted measurable code-quality metrics by 45% across two organisations.",
-        "Regularly speak at internal tech-talks and external conferences, including a keynote to 5,000+ attendees at TechLeaders 2024.",
+        "Node.js and Express for REST APIs with authentication and validation.",
+        "Database design and query optimization using PostgreSQL and MongoDB.",
       ],
     },
     {
       id: "skill4",
-      title: "System Design & Architecture",
+      title: "Dev Tools & Collaboration",
       bullets: [
-        "Strong background in microservices, event-driven architecture, domain-driven design and large-scale system design under real-world reliability constraints.",
-        "Designed event-driven systems handling 500K events/second and analytics pipelines processing 10TB+ daily, with documented uptime above 99.9%.",
+        "Git, GitHub, and CI pipelines for reliable team delivery.",
+        "Agile teamwork, sprint planning, code reviews, and technical documentation.",
       ],
     },
   ],
@@ -197,150 +162,129 @@ export const defaultData = {
   achievements: [
     {
       id: "ach1",
-      title: "Cloud Architecture Award",
-      organization: "TechLeaders Conference 2024",
-      year: "2024",
+      title: "Engineering Excellence Award",
+      organization: "Northstar Digital Labs",
+      year: "2025",
       bullets: [
-        "Recognised for innovative microservices architecture design.",
-        "Keynote speaker at 5,000+ attendee conference.",
+        "Recognized for delivering high-impact performance improvements across customer-facing systems.",
+        "Acknowledged for mentorship and consistent cross-team collaboration.",
       ],
     },
     {
       id: "ach2",
-      title: "Engineering Excellence Award",
-      organization: "CloudVenture Technologies",
+      title: "Hackathon Finalist",
+      organization: "Texas Dev Summit",
       year: "2023",
       bullets: [
-        "Employee of the Year for technical impact and mentorship.",
-      ],
-    },
-    {
-      id: "ach3",
-      title: "Hackathon Winner — Cloud Innovation Challenge",
-      organization: "Global Tech Summit 2022",
-      year: "2022",
-      bullets: [
-        "Developed serverless application for real-time data processing.",
-        "Beat 200+ teams with innovative solution.",
+        "Built a rapid prototype for a civic services platform in a 24-hour team challenge.",
       ],
     },
   ],
 
-  // ── Volunteer Work ────────────────────────────────────────────────────────
   voluntary: [
     {
       id: "vol1",
-      role: "Volunteer Coding Mentor",
-      organization: "Code for Good Foundation",
-      location: "San Francisco, CA",
-      start: "2021-03",
+      role: "Coding Mentor",
+      organization: "CodeBridge Community",
+      location: "Austin, TX",
+      start: "2022-02",
       end: "Present",
       bullets: [
-        "Mentor cohorts of 6–8 underrepresented students each semester through a 12-week intro-to-web-development curriculum.",
-        "Designed and delivered weekly evening workshops on JavaScript, Git and modern web tooling.",
-        "Three former mentees have since secured paid junior engineering roles at local startups.",
+        "Delivered beginner-friendly coding sessions on HTML, JavaScript, and career readiness.",
+        "Supported students with project reviews and portfolio preparation.",
       ],
     },
     {
       id: "vol2",
-      role: "Technical Workshop Lead",
-      organization: "Women Who Code — Bay Area Chapter",
-      location: "San Francisco, CA",
-      start: "2019-09",
-      end: "2022-12",
+      role: "STEM Workshop Volunteer",
+      organization: "FutureMinds Initiative",
+      location: "Dallas, TX",
+      start: "2020-06",
+      end: "2021-12",
       bullets: [
-        "Hosted monthly technical workshops on cloud architecture and system design for 30–60 attendees.",
-        "Coordinated guest speakers from companies including Google, Stripe and Netflix.",
+        "Helped organize weekend workshops introducing high school students to software development.",
+        "Assisted facilitators with live coding demos and classroom support.",
       ],
     },
   ],
 
-  // ── Certificates & Licenses ───────────────────────────────────────────────
   certificates: [
     {
       id: "cert1",
-      title: "AWS Certified Solutions Architect — Professional",
+      title: "AWS Certified Developer - Associate",
       issuer: "Amazon Web Services",
-      year: "2023-04",
-      expiry: "2026-04",
-      credentialId: "AWS-PSA-2023-019384",
+      year: "2024-06",
+      expiry: "2027-06",
+      credentialId: "AWS-DEV-2024-9182",
       bullets: [
-        "Achieved 92/100 on first attempt.",
+        "Validated cloud development, deployment, and troubleshooting fundamentals.",
       ],
     },
     {
       id: "cert2",
-      title: "Certified Kubernetes Administrator (CKA)",
-      issuer: "Cloud Native Computing Foundation",
-      year: "2022-08",
-      expiry: "2025-08",
-      credentialId: "LF-CKA-22-7264",
-      bullets: [],
+      title: "Professional Scrum Master I (PSM I)",
+      issuer: "Scrum.org",
+      year: "2023-02",
+      expiry: "",
+      credentialId: "PSM-I-328174",
+      bullets: [
+        "Demonstrated practical understanding of Scrum values and agile facilitation.",
+      ],
     },
     {
       id: "cert3",
-      title: "HashiCorp Certified: Terraform Associate",
-      issuer: "HashiCorp",
-      year: "2021-11",
+      title: "Google IT Support Certificate",
+      issuer: "Google",
+      year: "2021-09",
       expiry: "",
-      credentialId: "",
-      bullets: [],
+      credentialId: "GOOG-ITS-2021-5521",
+      bullets: [
+        "Covered troubleshooting, networking basics, and system administration concepts.",
+      ],
     },
   ],
 
-  // ── Interests ─────────────────────────────────────────────────────────────
-  // Rendered inline, pipe-separated. Keep entries short.
   interests: [
-    "Trail running and ultra-marathons",
     "Open-source contribution",
-    "Chess (USCF rated)",
-    "Amateur astrophotography",
-    "Volunteer mentoring",
+    "Tech meetups",
+    "Mentoring junior developers",
+    "UI/UX design trends",
+    "Cycling",
   ],
 
-  // ── References ────────────────────────────────────────────────────────────
-  // Rendered row-by-row: Name → Position → Organization → Tel → Email.
   references: [
     {
       id: "ref1",
-      name: "Dr. Marcus Chen",
-      title: "VP of Engineering",
-      organization: "CloudVenture Technologies",
-      email: "marcus.chen@cloudventure.example.com",
-      phone: "+1 (555) 871-2034",
+      name: "Jordan Blake",
+      title: "Engineering Manager",
+      organization: "Northstar Digital Labs",
+      email: "jordan.blake@example.com",
+      phone: "+1 (555) 331-0021",
     },
     {
       id: "ref2",
-      name: "Priya Raman",
-      title: "Director of Platform Engineering",
-      organization: "DataStream Solutions",
-      email: "priya.raman@datastream.example.com",
-      phone: "+1 (555) 402-9981",
-    },
-    {
-      id: "ref3",
-      name: "Professor Helena Vasquez",
-      title: "Thesis Advisor, Distributed Systems",
-      organization: "Massachusetts Institute of Technology",
-      email: "h.vasquez@csail.mit.example.edu",
-      phone: "+1 (617) 253-1729",
+      name: "Taylor Morgan",
+      title: "Senior Product Manager",
+      organization: "BlueRiver Systems",
+      email: "taylor.morgan@example.com",
+      phone: "+1 (555) 240-1187",
     },
   ],
 };
 
 export const defaultCoverLetterData = {
-  fullName: "Sarah Mitchell",
-  email: "sarah.mitchell@example.com",
-  phone: "+1 (555) 234-5678",
-  jobTitle: "Senior Full-Stack Engineer",
-  companyName: "Drop Digital Design",
-  recipientName: "Mrs Andrea Smith",
-  recipientTitle: "HR Manager",
-  companyAddress: "Drop Digital Design\n152 Silston Way\nClydeson WA 6000",
-  topSkills: "Cloud Architecture, React, TypeScript, System Design",
+  fullName: "Alex Carter",
+  email: "alex.carter@example.com",
+  phone: "+1 (555) 017-8842",
+  jobTitle: "Software Engineer",
+  companyName: "BrightPath Technologies",
+  recipientName: "Ms Emily Roberts",
+  recipientTitle: "Hiring Manager",
+  companyAddress: "BrightPath Technologies\n2801 Greenway Plaza\nAustin, TX 78701",
+  topSkills: "React, Node.js, TypeScript, API Design",
   achievements:
-    "Led migration to Kubernetes, reducing deployment time by 75%; mentored 12 engineers and improved team velocity by 40%",
+    "Improved API performance by 42% and introduced CI quality gates that reduced regressions",
   whyCompany:
-    "I admire your product storytelling and high-quality digital production standards, and I am excited to contribute to a team that values clear user impact.",
+    "I value your product-first engineering culture and your focus on building simple, high-impact software experiences.",
   tone: "professional",
 };
