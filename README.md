@@ -1,6 +1,6 @@
 # Vita Forge Platform
 
-![Version](https://img.shields.io/badge/version-0.5.5-blue)
+![Version](https://img.shields.io/badge/version-0.5.6-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
 
 Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
@@ -124,6 +124,8 @@ npm install
 
 ## Version History
 
+- `0.5.6`
+  - Fixed Resume Builder reset to restore default data in-app without page reload, preventing 404 errors on nested routes
 - `0.5.5`
   - Replaced starter resume and cover-letter defaults with fully filled fictional sample data across every supported section
 - `0.5.4`
@@ -134,9 +136,6 @@ npm install
   - Updated product page CTA button label from `Start Now` to `Get Started`
 - `0.5.1`
   - Updated product page CTA button label from `Open App` to `Start Now`
-- `0.5.0`
-  - Added full SEO foundation with per-route meta tags, canonical URLs, Open Graph, Twitter cards, and JSON-LD
-  - Added `robots.txt`, `sitemap.xml`, and default social preview image for better indexing and sharing
 
 ## License
 

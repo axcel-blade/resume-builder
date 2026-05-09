@@ -15,7 +15,7 @@ import {
   readProfileBundle,
   writeProfileBundle,
 } from "../apps/shared/services/profileBundle";
-import { defaultCoverLetterData } from "../data/defaultData";
+import { defaultCoverLetterData, defaultData } from "../data/defaultData";
 
 // ─── Layout (mm) — 20mm margins ≈ 0.787" (community 0.75–1" range) ──────────
 const PAGE_W    = 210;
@@ -587,7 +587,10 @@ export default function Toolbar({ data, set }) {
   };
 
   const reset = () => {
-    if (confirm("Reset to starter content?")) window.location.reload();
+    if (!confirm("Reset to starter content?")) return;
+    // Avoid full-page reload because static hosts can return 404 on nested routes.
+    set(defaultData);
+    writeProfileBundle({ resume: defaultData });
   };
 
   const savePDF = (event) => {
