@@ -40,6 +40,50 @@ npm run preview
 
 Default local URL: `http://localhost:5173`
 
+## CI/CD
+
+### Pull request checks (`ci.yml`)
+
+Runs on `pull_request` and pushes to `main` / `master`:
+
+- `npm ci`
+- `npm run build`
+
+On pushes to `main`, the built `dist/` folder is uploaded as a short-lived workflow artifact.
+
+### Release deploy (`cd.yml`)
+
+Runs on:
+
+- GitHub Release `published`
+- version tags matching `v*` (for example `v0.5.7`)
+- manual `workflow_dispatch`
+
+Steps:
+
+- build production assets
+- copy `dist/index.html` to `dist/404.html` for SPA route fallback on static hosts
+- deploy to GitHub Pages (requires Pages enabled for this repository)
+
+### Required GitHub settings
+
+- **Branch protection (recommended):** require the `Build and Verify` check from CI before merge
+- **GitHub Pages:** Settings → Pages → Source: **GitHub Actions**
+- **Environment (optional):** `github-pages` with required reviewers for production deploys
+
+### Local validation
+
+```bash
+npm ci
+npm run build
+```
+
+### Manual deploy trigger
+
+```bash
+gh workflow run cd.yml
+```
+
 ## Features
 
 - Website pages: `Home`, `About`, `Products`, `Contact`
@@ -134,8 +178,6 @@ npm install
   - Added a dedicated website 404 page and routed all unknown URLs to a proper Not Found experience
 - `0.5.2`
   - Updated product page CTA button label from `Start Now` to `Get Started`
-- `0.5.1`
-  - Updated product page CTA button label from `Open App` to `Start Now`
 
 ## License
 
