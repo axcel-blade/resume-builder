@@ -4,29 +4,31 @@
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A modular career-tools platform for building professional, ATS-friendly resumes and cover letters — entirely in the browser, with no accounts and no data leaving your device.
+A browser-based career-tools platform for building professional, ATS-friendly resumes and cover letters. No accounts, no server — all data stays in your browser.
 
----
-
-## Overview
+## What it is
 
 | Module | Description |
 |---|---|
 | **Website** | Home, About, Products, and Contact pages |
-| **Resume Builder** | Structured section editor with live A4 preview and PDF export |
-| **Cover Letter Writer** | Guided form with tone selection, live draft preview, and PDF export |
+| **Resume Builder** | Section editor with live A4 preview and PDF export |
+| **Cover Letter Writer** | Guided form with live draft preview and PDF export |
 
----
+## What it does
 
-## Features
+**Resume Builder**
+- Edit profile, experience, education, skills, projects, certificates, achievements, volunteer work, interests, and references
+- Live A4-paginated preview that updates as you type
+- Modern and Basic layout templates with accent colour picker
+- Export to PDF or JSON; import a saved profile from JSON
 
-- **Resume Builder** — section editors for profile, experience, education, skills, projects, certificates, achievements, volunteer work, interests, and references; live A4-paginated preview; Modern and Basic templates; accent colour picker; PDF and JSON export
-- **Cover Letter Writer** — guided form with tone selection; auto-fills identity from a saved resume profile; live A4 draft preview; PDF and JSON export
-- **Platform** — custom browser-native router; route-level lazy loading; per-route SEO meta and JSON-LD; custom 404 page
+**Cover Letter Writer**
+- Guided form with tone selection
+- Auto-populates name, email, and phone from a saved resume profile
+- Live A4 draft preview
+- Export to PDF or JSON; import a saved profile from JSON
 
----
-
-## Tech Stack
+## Built with
 
 | Layer | Technology |
 |---|---|
@@ -38,9 +40,7 @@ A modular career-tools platform for building professional, ATS-friendly resumes 
 | PDF export | Browser `window.print()` + CSS `@media print` |
 | Runtime | Node.js 20+, npm 10+ |
 
----
-
-## Getting Started
+## How to run it
 
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
@@ -51,16 +51,13 @@ npm run dev
 
 Opens at `http://localhost:5173`
 
-**Build for production**
+**Production build**
 
 ```bash
-npm run build
-npm run preview
+npm run build && npm run preview
 ```
 
----
-
-## Project Structure
+## Where the code lives
 
 ```
 vita-forge/
@@ -79,16 +76,13 @@ vita-forge/
 └── package.json
 ```
 
----
-
-## Contributing
+## Contributing and support
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Git Flow, commit format, PR checklist
 - [CHANGELOG.md](CHANGELOG.md) — version history
 - [ROADMAP.md](ROADMAP.md) — planned features
 - [SECURITY.md](SECURITY.md) — vulnerability reporting
-
----
+- [SUPPORT.md](SUPPORT.md) — how to get help
 
 ## License
 
