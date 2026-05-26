@@ -1,23 +1,92 @@
-# Vita Forge Platform
+# Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.6-blue)
-![Status](https://img.shields.io/badge/status-active-success)
+![Version](https://img.shields.io/badge/version-0.5.7-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
+A modular career-tools platform for building professional, ATS-friendly resumes and cover letters — entirely in the browser, with no accounts and no data leaving your device.
 
-## Description
+---
 
-This project combines a marketing website and app experiences in one React codebase. Users can browse the website pages, open Resume Builder, and now create targeted cover-letter drafts using guided inputs with live preview output.
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Routes](#routes)
+- [SEO](#seo)
+- [CI/CD](#cicd)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Overview
+
+Vita Forge combines a marketing website and two app modules in a single React codebase:
+
+| Module | Description |
+|---|---|
+| **Website** | Home, About, Products, and Contact pages |
+| **Resume Builder** | Structured section editor with live A4 preview and PDF export |
+| **Cover Letter Writer** | Guided form with tone selection, live draft preview, and PDF export |
+
+All resume and cover letter data is stored in the browser via `localStorage`. No login required.
+
+---
+
+## Features
+
+- **Resume Builder**
+  - Section editors for profile, experience, education, skills, projects, certificates, achievements, volunteer work, interests, and references
+  - Live A4-paginated preview that updates as you type
+  - Template selector: Modern and Basic layouts
+  - Accent colour customisation
+  - Export to PDF via the browser print dialog
+  - Export / Import full profile as JSON
+
+- **Cover Letter Writer**
+  - Guided form fields with tone selection
+  - Auto-populates identity fields from a saved resume profile
+  - Live generated draft preview in A4 format
+  - Export to PDF via the browser print dialog
+  - Export / Import full profile as JSON
+
+- **Platform**
+  - Custom browser-native router — no third-party routing library
+  - Shared layout and navigation across website and apps
+  - Route-level lazy loading for fast first paint
+  - Per-route SEO: title, description, canonical, Open Graph, Twitter card, JSON-LD
+  - Custom 404 page for unknown routes
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| UI framework | React 19 |
+| Language | TypeScript 5.8 |
+| Build tool | Vite 8 |
+| Styling | Tailwind CSS 4 |
+| Routing | Custom History API router (`src/core/router/router.jsx`) |
+| PDF export | Browser `window.print()` + CSS `@media print` |
+| Runtime | Node.js 20+, npm 10+ |
+
+No third-party runtime feature libraries are used.
+
+---
 
 ## Getting Started
 
-### Dependencies
+### Prerequisites
 
 - Node.js 20+
 - npm 10+
-- Windows 10/11, macOS, or Linux
 
-### Installing
+### Install
 
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
@@ -25,160 +94,160 @@ cd vita-forge
 npm install
 ```
 
-### Executing program
+### Run development server
 
 ```bash
 npm run dev
 ```
 
-Build and preview:
+Opens at `http://localhost:5173`
+
+### Build for production
 
 ```bash
 npm run build
 npm run preview
 ```
 
-Default local URL: `http://localhost:5173`
-
-## CI/CD
-
-### Pull request checks (`ci.yml`)
-
-Runs on `pull_request` and pushes to `main` / `master`:
-
-- `npm ci`
-- `npm run build`
-
-On pushes to `main`, the built `dist/` folder is uploaded as a short-lived workflow artifact.
-
-### Release deploy (`cd.yml`)
-
-Runs on:
-
-- GitHub Release `published`
-- version tags matching `v*` (for example `v0.5.7`)
-- manual `workflow_dispatch`
-
-Steps:
-
-- build production assets
-- copy `dist/index.html` to `dist/404.html` for SPA route fallback on static hosts
-- deploy to GitHub Pages (requires Pages enabled for this repository)
-
-### Required GitHub settings
-
-- **Branch protection (recommended):** require the `Build and Verify` check from CI before merge
-- **GitHub Pages:** Settings → Pages → Source: **GitHub Actions**
-- **Environment (optional):** `github-pages` with required reviewers for production deploys
-
-### Local validation
+### Validate locally (mirrors CI)
 
 ```bash
 npm ci
 npm run build
 ```
 
-### Manual deploy trigger
+---
+
+## Project Structure
+
+```
+vita-forge/
+├── public/                    # Static assets (robots.txt, sitemap.xml, og-image.svg)
+├── api/
+│   └── generate_summary.js    # Optional serverless AI summary endpoint
+├── src/
+│   ├── core/
+│   │   ├── router/            # Custom History API router
+│   │   ├── layouts/           # MainLayout (Navbar + Outlet + Footer)
+│   │   ├── seo/               # Seo component (head tag injection)
+│   │   └── config/            # navLinks.js, seo.js
+│   ├── website/
+│   │   ├── pages/             # Home, About, Products, Contact, NotFound
+│   │   └── components/        # Navbar, Footer, ProductCard
+│   ├── apps/
+│   │   ├── resume-builder/
+│   │   │   └── pages/         # Builder, Templates, Preview
+│   │   └── cover-letter/
+│   │       ├── pages/         # CoverLetterHome
+│   │       ├── components/    # CoverLetterForm, CoverLetterPreview
+│   │       └── services/      # buildCoverLetter.js, exportCoverLetterPdf.js
+│   ├── components/            # Shared UI: Toolbar, templates, editors, preview
+│   ├── data/                  # defaultData.js (starter resume + cover letter)
+│   ├── routes/
+│   │   └── AppRoutes.jsx      # Route definitions with SEO wrappers
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css              # Tailwind import + print CSS
+├── .github/
+│   ├── workflows/             # ci.yml, cd.yml
+│   ├── ISSUE_TEMPLATE/        # bug_report.md, feature_request.md
+│   └── PULL_REQUEST_TEMPLATE.md
+├── package.json
+└── README.md
+```
+
+---
+
+## Routes
+
+| Path | Page |
+|---|---|
+| `/` | Home |
+| `/about` | About |
+| `/products` | Products |
+| `/contact` | Contact |
+| `/apps/resume-builder` | Resume Builder |
+| `/apps/resume-builder/templates` | Template selector |
+| `/apps/resume-builder/preview` | Full resume preview |
+| `/apps/cover-letter` | Cover Letter Writer |
+| `*` | 404 Not Found |
+
+---
+
+## SEO
+
+Each route sets its own head tags through `src/core/seo/Seo.jsx`:
+
+- Page title and meta description
+- Canonical URL
+- Open Graph and Twitter card tags
+- JSON-LD structured data (Organisation, WebSite, SoftwareApplication, etc.)
+
+Technical SEO files are in `public/`:
+
+| File | Purpose |
+|---|---|
+| `robots.txt` | Crawler directives |
+| `sitemap.xml` | Site map for indexing |
+| `og-image.svg` | Open Graph share image |
+
+Site-level constants live in `src/core/config/seo.js`.
+
+---
+
+## CI/CD
+
+### CI — `ci.yml`
+
+Runs on pull requests and pushes to `main` / `master`:
+
+1. `npm ci`
+2. `npm run build`
+
+On pushes to `main`, the built `dist/` folder is uploaded as a workflow artifact.
+
+### CD — `cd.yml`
+
+Triggers on:
+
+- GitHub Release published
+- Tags matching `v*`
+- Manual `workflow_dispatch`
+
+Steps:
+
+1. Build production assets
+2. Copy `dist/index.html` → `dist/404.html` for SPA fallback on static hosts
+3. Deploy to GitHub Pages
+
+### Required GitHub settings
+
+| Setting | Value |
+|---|---|
+| Branch protection | Require `Build and Verify` check before merge |
+| Pages source | GitHub Actions |
+| Environment (optional) | `github-pages` with required reviewers |
+
+### Manual deploy
 
 ```bash
 gh workflow run cd.yml
 ```
 
-## Features
+---
 
-- Website pages: `Home`, `About`, `Products`, `Contact`
-- Resume Builder app with editor and preview flow
-- Cover Letter Writer app with:
-  - guided form fields
-  - tone selection
-  - live generated draft preview
-  - save-to-PDF export button
-  - A4-style page preview for output consistency
-- Shared router/layout architecture across website and apps
+## Contributing
 
-## Routes
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the Git Flow process, commit format, and PR checklist.
 
-- `/` - Home page
-- `/about` - About page
-- `/products` - Products listing
-- `/contact` - Contact page
-- `/apps/resume-builder` - Resume Builder app
-- `/apps/resume-builder/templates` - Resume templates page
-- `/apps/resume-builder/preview` - Resume preview page
-- `/apps/cover-letter` - Cover Letter Writer app
-- `*` - Custom 404 page for unknown routes
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
-## SEO Setup
+See [ROADMAP.md](ROADMAP.md) for planned features.
 
-- Route-level SEO is configured in `src/routes/AppRoutes.jsx` via reusable `src/core/seo/Seo.jsx`
-- Each route now sets:
-  - page title
-  - meta description
-  - canonical URL
-  - Open Graph tags
-  - Twitter card tags
-  - JSON-LD structured data (where applicable)
-- Technical SEO files:
-  - `public/robots.txt`
-  - `public/sitemap.xml`
-  - `public/og-image.svg`
-- Site-level SEO constants:
-  - `src/core/config/seo.js`
+See [SECURITY.md](SECURITY.md) to report a vulnerability privately.
 
-## Project Structure
-
-```txt
-project-root/
-├── public/
-├── src/
-│   ├── core/
-│   │   ├── router/
-│   │   ├── layouts/
-│   │   └── config/
-│   ├── website/
-│   │   ├── pages/
-│   │   └── components/
-│   ├── apps/
-│   │   ├── resume-builder/
-│   │   │   └── pages/
-│   │   └── cover-letter/
-│   │       ├── pages/
-│   │       ├── components/
-│   │       └── services/
-│   ├── routes/
-│   │   └── AppRoutes.jsx
-│   ├── App.jsx
-│   └── main.jsx
-├── package.json
-└── README.md
-```
-
-## Help
-
-If dependencies fail to install, clear cache and reinstall:
-
-```bash
-npm cache verify
-npm install
-```
-
-## Authors
-
-- Axcel Blade
-
-## Version History
-
-- `0.5.6`
-  - Fixed Resume Builder reset to restore default data in-app without page reload, preventing 404 errors on nested routes
-- `0.5.5`
-  - Replaced starter resume and cover-letter defaults with fully filled fictional sample data across every supported section
-- `0.5.4`
-  - Added route-level lazy loading with React `lazy` + `Suspense` to reduce initial bundle weight and improve first-load performance
-- `0.5.3`
-  - Added a dedicated website 404 page and routed all unknown URLs to a proper Not Found experience
-- `0.5.2`
-  - Updated product page CTA button label from `Start Now` to `Get Started`
+---
 
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+MIT — see [LICENSE](LICENSE) for details.
