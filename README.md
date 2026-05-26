@@ -1,184 +1,89 @@
-# Vita Forge Platform
+# Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.6-blue)
-![Status](https://img.shields.io/badge/status-active-success)
+![Version](https://img.shields.io/badge/version-0.5.7-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Simple overview of use/purpose. Vita Forge is a modular career-tools platform with a main website and app modules for Resume Builder and Cover Letter Writer.
+A browser-based career-tools platform for building professional, ATS-friendly resumes and cover letters. No accounts, no server — all data stays in your browser.
 
-## Description
+## What it is
 
-This project combines a marketing website and app experiences in one React codebase. Users can browse the website pages, open Resume Builder, and now create targeted cover-letter drafts using guided inputs with live preview output.
+| Module | Description |
+|---|---|
+| **Website** | Home, About, Products, and Contact pages |
+| **Resume Builder** | Section editor with live A4 preview and PDF export |
+| **Cover Letter Writer** | Guided form with live draft preview and PDF export |
 
-## Getting Started
+## What it does
 
-### Dependencies
+**Resume Builder**
+- Edit profile, experience, education, skills, projects, certificates, achievements, volunteer work, interests, and references
+- Live A4-paginated preview that updates as you type
+- Modern and Basic layout templates with accent colour picker
+- Export to PDF or JSON; import a saved profile from JSON
 
-- Node.js 20+
-- npm 10+
-- Windows 10/11, macOS, or Linux
+**Cover Letter Writer**
+- Guided form with tone selection
+- Auto-populates name, email, and phone from a saved resume profile
+- Live A4 draft preview
+- Export to PDF or JSON; import a saved profile from JSON
 
-### Installing
+## Built with
+
+| Layer | Technology |
+|---|---|
+| UI framework | React 19 |
+| Language | TypeScript 5.8 |
+| Build tool | Vite 8 |
+| Styling | Tailwind CSS 4 |
+| Routing | Custom History API router |
+| PDF export | Browser `window.print()` + CSS `@media print` |
+| Runtime | Node.js 20+, npm 10+ |
+
+## How to run it
 
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
 npm install
-```
-
-### Executing program
-
-```bash
 npm run dev
 ```
 
-Build and preview:
+Opens at `http://localhost:5173`
+
+**Production build**
 
 ```bash
-npm run build
-npm run preview
+npm run build && npm run preview
 ```
 
-Default local URL: `http://localhost:5173`
+## Where the code lives
 
-## CI/CD
-
-### Pull request checks (`ci.yml`)
-
-Runs on `pull_request` and pushes to `main` / `master`:
-
-- `npm ci`
-- `npm run build`
-
-On pushes to `main`, the built `dist/` folder is uploaded as a short-lived workflow artifact.
-
-### Release deploy (`cd.yml`)
-
-Runs on:
-
-- GitHub Release `published`
-- version tags matching `v*` (for example `v0.5.7`)
-- manual `workflow_dispatch`
-
-Steps:
-
-- build production assets
-- copy `dist/index.html` to `dist/404.html` for SPA route fallback on static hosts
-- deploy to GitHub Pages (requires Pages enabled for this repository)
-
-### Required GitHub settings
-
-- **Branch protection (recommended):** require the `Build and Verify` check from CI before merge
-- **GitHub Pages:** Settings → Pages → Source: **GitHub Actions**
-- **Environment (optional):** `github-pages` with required reviewers for production deploys
-
-### Local validation
-
-```bash
-npm ci
-npm run build
 ```
-
-### Manual deploy trigger
-
-```bash
-gh workflow run cd.yml
-```
-
-## Features
-
-- Website pages: `Home`, `About`, `Products`, `Contact`
-- Resume Builder app with editor and preview flow
-- Cover Letter Writer app with:
-  - guided form fields
-  - tone selection
-  - live generated draft preview
-  - save-to-PDF export button
-  - A4-style page preview for output consistency
-- Shared router/layout architecture across website and apps
-
-## Routes
-
-- `/` - Home page
-- `/about` - About page
-- `/products` - Products listing
-- `/contact` - Contact page
-- `/apps/resume-builder` - Resume Builder app
-- `/apps/resume-builder/templates` - Resume templates page
-- `/apps/resume-builder/preview` - Resume preview page
-- `/apps/cover-letter` - Cover Letter Writer app
-- `*` - Custom 404 page for unknown routes
-
-## SEO Setup
-
-- Route-level SEO is configured in `src/routes/AppRoutes.jsx` via reusable `src/core/seo/Seo.jsx`
-- Each route now sets:
-  - page title
-  - meta description
-  - canonical URL
-  - Open Graph tags
-  - Twitter card tags
-  - JSON-LD structured data (where applicable)
-- Technical SEO files:
-  - `public/robots.txt`
-  - `public/sitemap.xml`
-  - `public/og-image.svg`
-- Site-level SEO constants:
-  - `src/core/config/seo.js`
-
-## Project Structure
-
-```txt
-project-root/
+vita-forge/
 ├── public/
+├── api/
 ├── src/
-│   ├── core/
-│   │   ├── router/
-│   │   ├── layouts/
-│   │   └── config/
-│   ├── website/
-│   │   ├── pages/
-│   │   └── components/
+│   ├── core/          # Router, layouts, SEO, config
+│   ├── website/       # Home, About, Products, Contact, NotFound
 │   ├── apps/
 │   │   ├── resume-builder/
-│   │   │   └── pages/
 │   │   └── cover-letter/
-│   │       ├── pages/
-│   │       ├── components/
-│   │       └── services/
-│   ├── routes/
-│   │   └── AppRoutes.jsx
-│   ├── App.jsx
-│   └── main.jsx
-├── package.json
-└── README.md
+│   ├── components/    # Shared UI: Toolbar, templates, editors, preview
+│   ├── data/
+│   └── routes/
+├── .github/
+└── package.json
 ```
 
-## Help
+## Contributing and support
 
-If dependencies fail to install, clear cache and reinstall:
-
-```bash
-npm cache verify
-npm install
-```
-
-## Authors
-
-- Axcel Blade
-
-## Version History
-
-- `0.5.6`
-  - Fixed Resume Builder reset to restore default data in-app without page reload, preventing 404 errors on nested routes
-- `0.5.5`
-  - Replaced starter resume and cover-letter defaults with fully filled fictional sample data across every supported section
-- `0.5.4`
-  - Added route-level lazy loading with React `lazy` + `Suspense` to reduce initial bundle weight and improve first-load performance
-- `0.5.3`
-  - Added a dedicated website 404 page and routed all unknown URLs to a proper Not Found experience
-- `0.5.2`
-  - Updated product page CTA button label from `Start Now` to `Get Started`
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Git Flow, commit format, PR checklist
+- [CHANGELOG.md](CHANGELOG.md) — version history
+- [ROADMAP.md](ROADMAP.md) — planned features
+- [SECURITY.md](SECURITY.md) — vulnerability reporting
+- [SUPPORT.md](SUPPORT.md) — how to get help
 
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+MIT — see [LICENSE](LICENSE) for details.
