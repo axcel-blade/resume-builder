@@ -9,6 +9,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.10] - 2026-08-26
+
+### Changed
+- Professional title, section headings, job titles, dates, and bullets all use 11pt so VMock no longer flags the Title as a mixed font size
+- Date ranges use a spaced ASCII hyphen (`Jun 2022 - Present`) and sit bold-italic on the right of each entry title line
+- Dated sections sort by end date first (`Present` first), then start date
+
+---
+
 ## [0.5.9] - 2026-08-26
 
 ### Added

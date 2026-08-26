@@ -12,9 +12,10 @@ import {
   CertificateBlock,
   InterestsBlock,
   ReferencesBlock,
-  sortByStartDesc,
+  sortByRecencyDesc,
   getSectionOrder,
   RESUME_FONT_STACK,
+  RESUME_TEXT_SIZE,
 } from "./TemplateSharedParts";
 
 /* Headings used both on the rendered resume and in the editor labels. */
@@ -36,12 +37,12 @@ export default function TemplateBasic({ data }) {
   const fontFamily = RESUME_FONT_STACK;
   const p = data.profile;
 
-  const experience   = sortByStartDesc(data.experience   || []);
-  const voluntary    = sortByStartDesc(data.voluntary    || []);
-  const projects     = sortByStartDesc(data.projects     || []);
-  const education    = sortByStartDesc(data.education    || []);
-  const certificates = sortByStartDesc(data.certificates || [], "year");
-  const achievements = sortByStartDesc(data.achievements || [], "year");
+  const experience   = sortByRecencyDesc(data.experience   || []);
+  const voluntary    = sortByRecencyDesc(data.voluntary    || []);
+  const projects     = sortByRecencyDesc(data.projects     || []);
+  const education    = sortByRecencyDesc(data.education    || []);
+  const certificates = sortByRecencyDesc(data.certificates || [], { startKey: "year", endKey: "expiry" });
+  const achievements = sortByRecencyDesc(data.achievements || [], { startKey: "year", endKey: "year" });
   const interests    = (data.interests || []).filter(Boolean);
 
   // Body sections, keyed by id so we can render them in user-defined order.
@@ -106,7 +107,7 @@ export default function TemplateBasic({ data }) {
     <div
       style={{
         fontFamily,
-        fontSize: "12px",
+        fontSize: RESUME_TEXT_SIZE,
         lineHeight: 1.45,
         color: "#1a1a1a",
         backgroundColor: "#ffffff",
@@ -119,23 +120,23 @@ export default function TemplateBasic({ data }) {
     >
       {/* ── NAME (centered) ── */}
       <div style={{ textAlign: "center", marginBottom: "8px" }}>
-        <div style={{ fontSize: "29px", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily }}>
+        <div style={{ fontSize: "16pt", fontWeight: "700", color: accent, lineHeight: 1.1, marginBottom: "4px", fontFamily }}>
           {p.fullName}
         </div>
 
         {p.title && (
-          <div style={{ fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginBottom: "4px" }}>
+          <div style={{ fontSize: RESUME_TEXT_SIZE, fontWeight: "400", color: "#3c3c3c", marginBottom: "4px" }}>
             {p.title}
           </div>
         )}
 
-        <div style={{ fontSize: "12px", color: "#505050", marginBottom: "4px" }}>
+        <div style={{ fontSize: RESUME_TEXT_SIZE, color: "#505050", marginBottom: "4px" }}>
           {[p.email, p.phone, p.location, p.website].filter(Boolean).join("   ")}
         </div>
 
         {/* Single centered row of clickable labels, separated by bullets */}
         {data.links?.length > 0 && (
-          <div style={{ fontSize: "12px", lineHeight: 1.6, marginBottom: "4px" }}>
+          <div style={{ fontSize: RESUME_TEXT_SIZE, lineHeight: 1.6, marginBottom: "4px" }}>
             {data.links.map((l, i) => (
               <React.Fragment key={l.id}>
                 {i > 0 && <span style={{ color: "#505050" }}>  •  </span>}
@@ -156,7 +157,7 @@ export default function TemplateBasic({ data }) {
       {/* Career Objective — always pinned to the top of the body */}
       {p.summary && (
         <Section title={HEADINGS.summary} accent={accent}>
-          <div style={{ fontSize: "12px", color: "#323232", lineHeight: 1.6, wordBreak: "break-word" }}>
+          <div style={{ fontSize: RESUME_TEXT_SIZE, color: "#323232", lineHeight: 1.6, wordBreak: "break-word" }}>
             {p.summary}
           </div>
         </Section>
