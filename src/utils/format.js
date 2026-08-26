@@ -116,6 +116,45 @@ export function sortByStartDesc(items, key = "start") {
   return sortByRecencyDesc(items, { startKey: key, endKey: "end" });
 }
 
+/**
+ * Title-case a university/college name for VMock: every school uses the same
+ * weight (bold, applied at render), no italics, and the same case rules.
+ * Short all-caps tokens (MIT, UCLA, UT) stay as acronyms; small words
+ * (of, at, the, and) stay lowercase unless they start the name.
+ */
+const SMALL_WORDS = new Set(["of", "at", "the", "and", "in", "for", "de", "la", "del", "van", "von", "da"]);
+
+function titleCaseToken(token, isFirst) {
+  if (!token) return token;
+  if (/^[A-Z0-9]{2,6}$/.test(token)) return token;
+  const lower = token.toLowerCase();
+  if (!isFirst && SMALL_WORDS.has(lower)) return lower;
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+export function formatInstitutionName(s) {
+  const raw = String(s || "").trim();
+  if (!raw) return "";
+  return raw
+    .split(/\s+/)
+    .map((word, i) => {
+      if (word.includes("-")) {
+        return word
+          .split("-")
+          .map((part, j) => titleCaseToken(part, i === 0 && j === 0))
+          .join("-");
+      }
+      if (word.includes("&")) {
+        return word
+          .split("&")
+          .map((part, j) => titleCaseToken(part.trim(), i === 0 && j === 0))
+          .join(" & ");
+      }
+      return titleCaseToken(word, i === 0);
+    })
+    .join(" ");
+}
+
 export function normalizeBullets(items, { period = true } = {}) {
   if (!Array.isArray(items)) return items;
   return items.map((b) => {

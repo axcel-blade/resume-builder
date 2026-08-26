@@ -7,6 +7,7 @@ import {
   formatDateRange,
   sortByRecencyDesc,
   normalizeBullets,
+  formatInstitutionName,
 } from "../utils/format";
 import { getSectionOrder } from "./TemplateSharedParts";
 import {
@@ -143,25 +144,72 @@ function drawParagraph(pdf, bullets, y, { period = true } = {}) {
 }
 
 // Title (and optional org) left, date range bold-italic right — same 11pt.
+// Left text is wrapped to CONTENT_W minus the measured date width so long
+// degrees/schools cannot overwrite the date.
 function drawEntryHeader(pdf, title, secondary, date, y) {
   pdf.setFontSize(FS.body);
   const dateStr = date || "";
+  const gapMm = 3.5;
+  const lineH = 4.5;
+
+  pdf.setFont(BODY_FONT, "bolditalic");
+  const dateW = dateStr ? pdf.getTextWidth(dateStr) : 0;
+  const leftW = Math.max(20, CONTENT_W - (dateW ? dateW + gapMm : 0));
+
+  const titleStr = title || "";
+  const secondaryStr = secondary ? ` | ${secondary}` : "";
 
   pdf.setFont(BODY_FONT, "bold");
-  pdf.setTextColor(30, 30, 30);
-  pdf.text(title || "", ML, y);
-  if (secondary) {
-    const w = pdf.getTextWidth(title || "");
-    pdf.setFont(BODY_FONT, "normal");
-    pdf.setTextColor(90, 90, 90);
-    pdf.text(` | ${secondary}`, ML + w, y);
-  }
-  if (dateStr) {
+  const titleW = pdf.getTextWidth(titleStr);
+  pdf.setFont(BODY_FONT, "normal");
+  const secW = secondaryStr ? pdf.getTextWidth(secondaryStr) : 0;
+  const fitsOneLine = titleW + secW <= leftW;
+
+  const drawDate = (atY) => {
+    if (!dateStr) return;
     pdf.setFont(BODY_FONT, "bolditalic");
     pdf.setTextColor(30, 30, 30);
-    pdf.text(dateStr, ML + CONTENT_W, y, { align: "right" });
+    pdf.text(dateStr, ML + CONTENT_W, atY, { align: "right" });
+  };
+
+  if (fitsOneLine) {
+    y = ensureSpace(pdf, y, lineH + 1);
+    pdf.setFont(BODY_FONT, "bold");
+    pdf.setTextColor(30, 30, 30);
+    pdf.text(titleStr, ML, y);
+    if (secondaryStr) {
+      pdf.setFont(BODY_FONT, "normal");
+      pdf.setTextColor(90, 90, 90);
+      pdf.text(secondaryStr, ML + titleW, y);
+    }
+    drawDate(y);
+    return y + lineH;
   }
-  return y + 4.5;
+
+  // Wrap title (bold) and secondary (regular) separately so school/company
+  // names never switch from regular to bold when a line wraps.
+  let first = true;
+  const emitLines = (lines, bold) => {
+    lines.forEach((line) => {
+      y = ensureSpace(pdf, y, lineH + 1);
+      pdf.setFont(BODY_FONT, bold ? "bold" : "normal");
+      pdf.setTextColor(bold ? 30 : 90, bold ? 30 : 90, bold ? 30 : 90);
+      pdf.text(line, ML, y);
+      if (first) {
+        drawDate(y);
+        first = false;
+      }
+      y += lineH;
+    });
+  };
+
+  pdf.setFont(BODY_FONT, "bold");
+  emitLines(titleStr ? pdf.splitTextToSize(titleStr, leftW) : [], true);
+  if (secondary) {
+    pdf.setFont(BODY_FONT, "normal");
+    emitLines(pdf.splitTextToSize(String(secondary), leftW), false);
+  }
+  return y;
 }
 
 function drawMetaLine(pdf, text, y) {
@@ -169,8 +217,14 @@ function drawMetaLine(pdf, text, y) {
   pdf.setFontSize(FS.body);
   pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(80, 80, 80);
-  pdf.text(text, ML, y);
-  return y + 4;
+  const lineH = 4.2;
+  const lines = pdf.splitTextToSize(String(text), CONTENT_W);
+  lines.forEach((line) => {
+    y = ensureSpace(pdf, y, lineH + 1);
+    pdf.text(line, ML, y);
+    y += lineH;
+  });
+  return y;
 }
 
 // Renders all profile links on a single row of clickable labels separated by
@@ -373,7 +427,8 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.education, y, accent);
     ctx.education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, e.degree, e.school, formatDateRange(e.start, e.end), y);
+      y = drawEntryHeader(pdf, formatInstitutionName(e.school), null, formatDateRange(e.start, e.end), y);
+      y = drawMetaLine(pdf, e.degree, y);
       y = drawMetaLine(pdf, e.location, y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;

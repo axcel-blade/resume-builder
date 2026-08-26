@@ -9,6 +9,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.11] - 2026-08-26
+
+### Fixed
+- Long degree and school names wrap in the PDF instead of drawing over the date column
+- Education school names use one style: bold, not italic, Title Case, with the degree on the following line
+
+---
+
 ## [0.5.10] - 2026-08-26
 
 ### Changed
