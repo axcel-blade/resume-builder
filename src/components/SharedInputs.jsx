@@ -38,11 +38,13 @@ export function TextArea({ id, value, onChange, placeholder, rows = 4 }) {
     );
 }
 
-export function IconButton({ title, onClick, children }) {
+export function IconButton({ title, onClick, children, disabled = false }) {
     return (
         <button
+        type="button"
         title={title}
-        className="rounded-xl border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+        disabled={disabled}
+        className="rounded-xl border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
         onClick={onClick}
         >
         {children}

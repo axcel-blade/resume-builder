@@ -59,7 +59,7 @@ Use the conventional commit format:
 ```
 feat: add dark-mode accent picker to resume editor
 fix: prevent cover letter PDF export from silently failing
-docs: update CHANGELOG for v0.5.8
+docs: update CHANGELOG for v0.5.9
 ```
 
 Rules:
