@@ -14,9 +14,9 @@ const A4PaginatedPreview = forwardRef(function A4PaginatedPreview(
   // A4 Constants at 96 DPI
   const A4_WIDTH_PX  = 794;   // 210mm
   const A4_HEIGHT_PX = 1123;  // 297mm
-  // 20mm ≈ 75.6px → 76px. Matches Toolbar.jsx so the preview shows the
-  // exact margins the PDF will export with (community requirement: 0.75"–1").
-  const MARGIN_PX = 76;
+  // 0.90" at 96 DPI = 86px. Matches Toolbar.jsx visual page margins
+  // (community requirement: 0.75"–1" on all sides).
+  const MARGIN_PX = 86;
   const CONTENT_HEIGHT = A4_HEIGHT_PX - MARGIN_PX * 2;
 
   useImperativeHandle(ref, () => contentRef.current, []);

@@ -17,13 +17,17 @@ import {
 } from "../apps/shared/services/profileBundle";
 import { defaultCoverLetterData, defaultData } from "../data/defaultData";
 
-// ─── Layout (mm) — 20mm margins ≈ 0.787" (community 0.75–1" range) ──────────
+// ─── Layout (mm) ────────────────────────────────────────────────────────────
+// Community checkers measure *visual* whitespace to the glyph, not the jsPDF
+// text baseline. 0.9" (22.86mm) left/right/bottom sits in the 0.75–1" band.
+// Top uses extra offset so the 22pt name cap-height still clears 0.75".
 const PAGE_W    = 210;
 const PAGE_H    = 297;
-const ML        = 20;
-const MR        = 20;
-const MT        = 20;
-const MB        = 20;
+const SIDE_MM   = 22.86;          // 0.90 inch
+const ML        = SIDE_MM;
+const MR        = SIDE_MM;
+const MB        = SIDE_MM;
+const MT        = 29.5;           // 0.90" visual + ~6.6mm name ascent
 const CONTENT_W = PAGE_W - ML - MR;
 const BULLET_INDENT = 6;
 const BULLET_HANG   = 4;
@@ -31,12 +35,9 @@ const BULLET_HANG   = 4;
 const FS = {
   name:        22,
   title:       11,
-  contact:      9,
-  sectionHead:  8.5,
-  entryTitle:  10,
-  entryMeta:    8.5,
-  bullet:       9.5,
-  summary:      9.5,
+  contact:     10,
+  sectionHead: 10,
+  body:        10,
 };
 
 // Headings + section order match the on-screen templates exactly so the PDF
@@ -113,7 +114,7 @@ function drawBullet(pdf, text, y) {
 function drawBullets(pdf, bullets, y, { period = true } = {}) {
   if (!bullets?.length) return y;
   const items = normalizeBullets(bullets, { period });
-  pdf.setFontSize(FS.bullet);
+  pdf.setFontSize(FS.body);
   pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(50, 50, 50);
   items.forEach((b) => { y = drawBullet(pdf, b, y); });
@@ -127,7 +128,7 @@ function drawParagraph(pdf, bullets, y, { period = true } = {}) {
   if (!items.length) return y;
   const paragraph = normalizeBullets(items, { period }).join(" ");
 
-  pdf.setFontSize(FS.bullet);
+  pdf.setFontSize(FS.body);
   pdf.setFont(BODY_FONT, "normal");
   pdf.setTextColor(50, 50, 50);
 
@@ -143,7 +144,7 @@ function drawParagraph(pdf, bullets, y, { period = true } = {}) {
 
 // "Title  | secondary" entry header — bold title + grey secondary on same line
 function drawEntryHeader(pdf, title, secondary, y) {
-  pdf.setFontSize(FS.entryTitle);
+  pdf.setFontSize(FS.body);
   pdf.setFont(BODY_FONT, "bold");
   pdf.setTextColor(30, 30, 30);
   pdf.text(title || "", ML, y);
@@ -156,12 +157,28 @@ function drawEntryHeader(pdf, title, secondary, y) {
   return y + 4.5;
 }
 
-function drawMetaLine(pdf, text, y) {
-  if (!text) return y;
-  pdf.setFontSize(FS.entryMeta);
-  pdf.setFont(BODY_FONT, "normal");
-  pdf.setTextColor(120, 120, 120);
-  pdf.text(text, ML, y);
+function drawMetaLine(pdf, date, extra, y) {
+  if (!date && !extra) return y;
+  pdf.setFontSize(FS.body);
+  let x = ML;
+  if (date) {
+    pdf.setFont(BODY_FONT, "bolditalic");
+    pdf.setTextColor(30, 30, 30);
+    pdf.text(date, x, y);
+    x += pdf.getTextWidth(date);
+  }
+  if (date && extra) {
+    pdf.setFont(BODY_FONT, "normal");
+    pdf.setTextColor(120, 120, 120);
+    const sep = "   |   ";
+    pdf.text(sep, x, y);
+    x += pdf.getTextWidth(sep);
+  }
+  if (extra) {
+    pdf.setFont(BODY_FONT, "normal");
+    pdf.setTextColor(120, 120, 120);
+    pdf.text(extra, x, y);
+  }
   return y + 4;
 }
 
@@ -240,7 +257,7 @@ function drawLinksInline(pdf, links, y, accentRgb, align = "left") {
 function drawReferee(pdf, r, y) {
   if (r.name) {
     y = ensureSpace(pdf, y, 6);
-    pdf.setFontSize(FS.entryTitle);
+    pdf.setFontSize(FS.body);
     pdf.setFont(BODY_FONT, "bold");
     pdf.setTextColor(30, 30, 30);
     pdf.text(r.name, ML, y);
@@ -250,7 +267,7 @@ function drawReferee(pdf, r, y) {
   const lineH = 4.2;
   const drawRow = (label, value) => {
     y = ensureSpace(pdf, y, lineH + 1);
-    pdf.setFontSize(FS.bullet);
+    pdf.setFontSize(FS.body);
     pdf.setFont(BODY_FONT, "normal");
     if (label) {
       pdf.setTextColor(120, 120, 120);
@@ -352,7 +369,7 @@ const SECTION_DRAWERS = {
     ctx.experience.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, e.role, e.company, y);
-      y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
+      y = drawMetaLine(pdf, formatDateRange(e.start, e.end), e.location, y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
@@ -366,7 +383,7 @@ const SECTION_DRAWERS = {
     ctx.education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, e.degree, e.school, y);
-      y = drawMetaLine(pdf, [formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   "), y);
+      y = drawMetaLine(pdf, formatDateRange(e.start, e.end), e.location, y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
@@ -381,7 +398,7 @@ const SECTION_DRAWERS = {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, p.title, null, y);
       const range = formatDateRange(p.start, p.end);
-      y = drawMetaLine(pdf, [p.organization, range].filter(Boolean).join("   |   "), y);
+      y = drawMetaLine(pdf, range, p.organization, y);
       y = drawBullets(pdf, p.bullets, y, { period: true });
       y += 3;
     });
@@ -401,14 +418,14 @@ const SECTION_DRAWERS = {
     return y;
   },
 
-  achievements(pdf, data, y, accent /*, ctx */) {
-    if (!data.achievements?.length) return y;
+  achievements(pdf, data, y, accent, ctx) {
+    if (!ctx.achievements.length) return y;
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.achievements, y, accent);
-    data.achievements.forEach((a) => {
+    ctx.achievements.forEach((a) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, a.title, a.organization, y);
-      if (a.year) y = drawMetaLine(pdf, a.year, y);
+      if (a.year) y = drawMetaLine(pdf, formatDate(a.year), "", y);
       y = drawBullets(pdf, a.bullets, y, { period: true });
       y += 3;
     });
@@ -422,7 +439,7 @@ const SECTION_DRAWERS = {
     ctx.voluntary.forEach((v) => {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, v.role, v.organization, y);
-      y = drawMetaLine(pdf, [formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   "), y);
+      y = drawMetaLine(pdf, formatDateRange(v.start, v.end), v.location, y);
       y = drawBullets(pdf, v.bullets, y, { period: true });
       y += 3;
     });
@@ -437,16 +454,9 @@ const SECTION_DRAWERS = {
       y = ensureSpace(pdf, y, 10);
       y = drawEntryHeader(pdf, c.title, c.issuer, y);
 
-      const metaParts = [];
-      if (c.year) {
-        metaParts.push(c.expiry
-          ? `Issued ${formatDate(c.year)} · Expires ${formatDate(c.expiry)}`
-          : `Issued ${formatDate(c.year)}`);
-      } else if (c.expiry) {
-        metaParts.push(`Expires ${formatDate(c.expiry)}`);
-      }
-      if (c.credentialId) metaParts.push(`Credential ID: ${c.credentialId}`);
-      y = drawMetaLine(pdf, metaParts.join("   |   "), y);
+      const range = formatDateRange(c.year, c.expiry, { presentIfEmpty: false });
+      const extra = c.credentialId ? `Credential ID: ${c.credentialId}` : "";
+      y = drawMetaLine(pdf, range, extra, y);
 
       y = drawBullets(pdf, c.bullets, y, { period: true });
       y += 3;
@@ -458,7 +468,7 @@ const SECTION_DRAWERS = {
     if (!ctx.interests.length) return y;
     y = ensureSpace(pdf, y, 12);
     y = drawSectionHead(pdf, HEADINGS.interests, y, accent);
-    pdf.setFontSize(FS.bullet);
+    pdf.setFontSize(FS.body);
     pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
     const line = ctx.interests.join("  •  ");
@@ -485,6 +495,7 @@ function drawBody(pdf, data, y, accent) {
     projects:     sortByStartDesc(data.projects     || []),
     education:    sortByStartDesc(data.education    || []),
     certificates: sortByStartDesc(data.certificates || [], "year"),
+    achievements: sortByStartDesc(data.achievements || [], "year"),
     interests:    (data.interests || []).filter((s) => String(s).trim()),
   };
 
@@ -492,7 +503,7 @@ function drawBody(pdf, data, y, accent) {
   if (data.profile?.summary) {
     y = ensureSpace(pdf, y, 14);
     y = drawSectionHead(pdf, HEADINGS.summary, y, accent);
-    pdf.setFontSize(FS.summary);
+    pdf.setFontSize(FS.body);
     pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
     const lines = pdf.splitTextToSize(data.profile.summary, CONTENT_W);
@@ -517,7 +528,7 @@ function drawBody(pdf, data, y, accent) {
   const refs = (data.references || []).filter((r) => r && (r.name || r.title));
 
   if (!refs.length) {
-    pdf.setFontSize(FS.bullet);
+    pdf.setFontSize(FS.body);
     pdf.setFont(BODY_FONT, "normal");
     pdf.setTextColor(50, 50, 50);
     pdf.text("References available on request.", ML, y);

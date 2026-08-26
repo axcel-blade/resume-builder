@@ -6,8 +6,7 @@ This document outlines planned features and improvements for Vita Forge. Items a
 
 ## In Progress
 
-- Custom browser-native router (replacing `react-router-dom`)
-- Native browser print PDF export (replacing `jspdf`)
+_None at this time._
 
 ---
 
@@ -49,6 +48,7 @@ This document outlines planned features and improvements for Vita Forge. Items a
 
 | Version | Feature |
 |---------|---------|
+| 0.5.8 | Community format: consistent dates, type sizes, and 0.75–1 inch margins |
 | 0.5.7 | Removed all third-party runtime libraries; custom router and native print PDF |
 | 0.5.6 | In-app reset without page reload to prevent 404 on static hosts |
 | 0.5.5 | Fully filled fictional sample data for onboarding |

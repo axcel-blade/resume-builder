@@ -41,6 +41,7 @@ export default function TemplateModern({ data }) {
   const projects     = sortByStartDesc(data.projects     || []);
   const education    = sortByStartDesc(data.education    || []);
   const certificates = sortByStartDesc(data.certificates || [], "year");
+  const achievements = sortByStartDesc(data.achievements || [], "year");
   const interests    = (data.interests || []).filter(Boolean);
 
   // ── Body sections, keyed by id so we can render them in user-defined order ──
@@ -71,9 +72,9 @@ export default function TemplateModern({ data }) {
           </Section>
         );
       case "achievements":
-        return data.achievements?.length > 0 && (
+        return achievements.length > 0 && (
           <Section title={HEADINGS.achievements} accent={accent}>
-            {data.achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
+            {achievements.map((a) => <AchievementsBlock key={a.id} a={a} />)}
           </Section>
         );
       case "voluntary":

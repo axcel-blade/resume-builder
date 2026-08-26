@@ -11,30 +11,61 @@
  *   • Trailing-period consistency inside any given section
  */
 
+export const DATE_RANGE_SEP = " – ";
+
 const MONTHS_SHORT = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
+const MONTHS_LONG = [
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december",
+];
+
+function monthIndexFromName(name) {
+  const n = String(name).replace(/\./g, "").toLowerCase();
+  const long = MONTHS_LONG.indexOf(n);
+  if (long >= 0) return long;
+  const short = MONTHS_SHORT.findIndex((m) => m.toLowerCase() === n);
+  return short;
+}
+
 /**
- * Convert "YYYY-MM" / "YYYY" / "Present" / "" to a display string.
- *  - "2022-06"  -> "Jun 2022"
+ * Convert common date inputs to a display string.
+ *  - "2022-06" / "2022-6" / "2022-06-15" -> "Jun 2022"
+ *  - "June 2022" / "Jun 2022" / "Jun. 2022" -> "Jun 2022"
+ *  - "06/2022" / "6/2022" -> "Jun 2022"
  *  - "2022"     -> "2022"
  *  - "Present"  -> "Present"
  *  - ""         -> ""
- *  - any other free-form input is returned unchanged.
  */
 export function formatDate(s) {
   if (!s) return "";
   const v = String(s).trim();
   if (!v) return "";
-  if (/^present$/i.test(v)) return "Present";
+  if (/^present$/i.test(v) || /^current$/i.test(v) || /^now$/i.test(v)) {
+    return "Present";
+  }
 
-  const m = /^(\d{4})-(\d{1,2})$/.exec(v);
-  if (m) {
-    const year = m[1];
-    const idx = parseInt(m[2], 10) - 1;
+  const iso = /^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/.exec(v);
+  if (iso) {
+    const year = iso[1];
+    const idx = parseInt(iso[2], 10) - 1;
     if (idx >= 0 && idx < 12) return `${MONTHS_SHORT[idx]} ${year}`;
+  }
+
+  const named = /^(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\.?[\s,]+(\d{4})$/i.exec(v);
+  if (named) {
+    let idx = monthIndexFromName(named[1]);
+    if (named[1].toLowerCase() === "sept") idx = 8;
+    if (idx >= 0) return `${MONTHS_SHORT[idx]} ${named[2]}`;
+  }
+
+  const slash = /^(\d{1,2})[/-](\d{4})$/.exec(v);
+  if (slash) {
+    const idx = parseInt(slash[1], 10) - 1;
+    if (idx >= 0 && idx < 12) return `${MONTHS_SHORT[idx]} ${slash[2]}`;
   }
 
   if (/^\d{4}$/.test(v)) return v;
@@ -43,20 +74,22 @@ export function formatDate(s) {
 
 /**
  * "Jun 2022 – Present" — single en-dash, single space either side.
- * If `end` is empty the range becomes "<start> – Present".
+ * Job-like ranges default empty `end` to Present. Pass presentIfEmpty: false
+ * for certificates so a missing expiry does not become "Present".
  */
-export function formatDateRange(start, end) {
+export function formatDateRange(start, end, { presentIfEmpty = true } = {}) {
   const s = formatDate(start);
-  const e = end ? formatDate(end) : "Present";
-  if (!s && (!e || e === "Present")) return "";
+  const e = end ? formatDate(end) : (presentIfEmpty ? "Present" : "");
+  if (!s && !e) return "";
   if (!s) return e;
-  return `${s} – ${e}`;
+  if (!e) return s;
+  return `${s}${DATE_RANGE_SEP}${e}`;
 }
 
 /**
- * Sort an array of items reverse-chronologically by their `start` field.
- * Lexicographic compare on "YYYY-MM" works because the format is fixed.
- * Items lacking a start date sink to the bottom.
+ * Sort an array of items reverse-chronologically by their date field.
+ * Lexicographic compare on "YYYY-MM" / "YYYY" works because the format is fixed.
+ * Items lacking a date sink to the bottom.
  */
 export function sortByStartDesc(items, key = "start") {
   if (!Array.isArray(items)) return items;

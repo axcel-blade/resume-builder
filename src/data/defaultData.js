@@ -70,6 +70,18 @@ export const defaultData = {
 
   education: [
     {
+      id: "edu2",
+      degree: "Full-Stack Web Development Certificate",
+      school: "Austin Code Academy",
+      location: "Austin, TX",
+      start: "2019-01",
+      end: "2019-09",
+      bullets: [
+        "Completed project-based training in React, Node.js, and PostgreSQL.",
+        "Built three portfolio-ready applications using agile iteration cycles.",
+      ],
+    },
+    {
       id: "edu1",
       degree: "B.Sc. in Software Engineering",
       school: "University of Texas at Dallas",
@@ -80,18 +92,6 @@ export const defaultData = {
         "Focused on web systems, software architecture, and database engineering.",
         "Completed capstone project on scalable scheduling systems.",
         "Graduated with honors and served as peer tutor for programming fundamentals.",
-      ],
-    },
-    {
-      id: "edu2",
-      degree: "Full-Stack Web Development Certificate",
-      school: "Austin Code Academy",
-      location: "Austin, TX",
-      start: "2019-01",
-      end: "2019-09",
-      bullets: [
-        "Completed project-based training in React, Node.js, and PostgreSQL.",
-        "Built three portfolio-ready applications using agile iteration cycles.",
       ],
     },
   ],
@@ -164,7 +164,7 @@ export const defaultData = {
       id: "ach1",
       title: "Engineering Excellence Award",
       organization: "Northstar Digital Labs",
-      year: "2025",
+      year: "2025-03",
       bullets: [
         "Recognized for delivering high-impact performance improvements across customer-facing systems.",
         "Acknowledged for mentorship and consistent cross-team collaboration.",
@@ -174,7 +174,7 @@ export const defaultData = {
       id: "ach2",
       title: "Hackathon Finalist",
       organization: "Texas Dev Summit",
-      year: "2023",
+      year: "2023-06",
       bullets: [
         "Built a rapid prototype for a civic services platform in a 24-hour team challenge.",
       ],
