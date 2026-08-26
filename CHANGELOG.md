@@ -9,6 +9,13 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.9] - 2026-08-26
+
+### Added
+- Up/down controls on bullet lists so experience, education, projects, skills, awards, volunteer work, certificates, and interests can be reordered without deleting and re-adding lines
+
+---
+
 ## [0.5.8] - 2026-08-26
 
 ### Changed
