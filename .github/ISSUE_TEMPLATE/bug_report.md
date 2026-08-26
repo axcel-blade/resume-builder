@@ -32,7 +32,7 @@ assignees: ''
 
 - OS: <!-- e.g. Windows 11, macOS 14 -->
 - Browser: <!-- e.g. Chrome 124, Firefox 126 -->
-- Version: <!-- e.g. 0.5.10 — check the version badge in README.md -->
+- Version: <!-- e.g. 0.5.11 — check the version badge in README.md -->
 
 ## Console errors
 

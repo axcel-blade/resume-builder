@@ -48,6 +48,7 @@ _None at this time._
 
 | Version | Feature |
 |---------|---------|
+| 0.5.11 | PDF title wrap; consistent bold Title Case university names |
 | 0.5.10 | VMock: 11pt title/body, hyphen date ranges, recency sort |
 | 0.5.9 | Reorder bullet points within resume entries |
 | 0.5.8 | Community format: consistent dates, type sizes, and 0.75–1 inch margins |

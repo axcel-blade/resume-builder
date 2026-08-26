@@ -1,6 +1,6 @@
 # Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.10-blue)
+![Version](https://img.shields.io/badge/version-0.5.11-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -21,6 +21,7 @@ A browser-based career-tools platform for building professional, ATS-friendly re
 - Reorder bullet points inside each entry with up/down controls; the live preview follows that order
 - Live A4-paginated preview that updates as you type
 - Community format styling: 11pt body including the professional title, abbreviated dates with spaced hyphens (`Jun 2022 - Present`), bold-italic dates on the title line, reverse-chronological sections, and 0.75–1 inch page margins
+- Education lists each school in bold Title Case (not italic) so university names stay consistent; long titles wrap beside the date instead of overlapping it
 - Modern and Basic layout templates with accent colour picker
 - Export to PDF or JSON; import a saved profile from JSON
 

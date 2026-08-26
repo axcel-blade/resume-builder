@@ -1,7 +1,7 @@
 /* src/components/TemplateSharedParts.jsx */
 
 import React from "react";
-import { formatDate, formatDateRange, sortByRecencyDesc, normalizeBullets } from "../utils/format";
+import { formatDate, formatDateRange, sortByRecencyDesc, normalizeBullets, formatInstitutionName } from "../utils/format";
 
 // ─── Font ────────────────────────────────────────────────────────────────────
 // Single hardcoded sans-serif stack. The Curtin Resume Workbook (p.24)
@@ -95,14 +95,16 @@ function BulletList({ items, period = true }) {
 }
 
 // Title/org on the left, date range bold-italic on the right — same 11pt.
+// Left copy wraps inside the remaining width so long degrees/schools never
+// paint over the date column.
 function EntryHeading({ title, secondary, date }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "12px" }}>
-      <div style={{ minWidth: 0 }}>
+    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+      <div style={{ flex: 1, minWidth: 0, overflowWrap: "anywhere", wordBreak: "break-word" }}>
         <span style={C.eTitle}>{title}</span>
         {secondary && <span style={C.eComp}>&nbsp;| {secondary}</span>}
       </div>
-      {date && <span style={C.date}>{date}</span>}
+      {date && <span style={{ ...C.date, flexShrink: 0, maxWidth: "42%" }}>{date}</span>}
     </div>
   );
 }
@@ -125,9 +127,12 @@ export function ExperienceBlock({ e }) {
 }
 
 export function EducationBlock({ e }) {
+  // School is always bold, never italic, Title Case. Degree sits on the next
+  // line in regular weight so every university name matches VMock styling.
   return (
     <div style={{ marginBottom: "10px" }}>
-      <EntryHeading title={e.degree} secondary={e.school} date={formatDateRange(e.start, e.end)} />
+      <EntryHeading title={formatInstitutionName(e.school)} date={formatDateRange(e.start, e.end)} />
+      <MetaLine text={e.degree} />
       <MetaLine text={e.location} />
       <BulletList items={e.bullets} period />
     </div>
