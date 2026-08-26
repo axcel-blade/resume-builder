@@ -1,17 +1,15 @@
 /* src/utils/format.js
  *
  * Shared formatting helpers used by both the on-screen template (React)
- * and the PDF builder (jsPDF). Centralising these guarantees the preview
- * and the exported PDF stay in lock-step on the things the resume-format
- * checker is grading us on:
+ * and the PDF builder (jsPDF). VMock community checks require:
  *
- *   • Dates rendered as "Jun 2022" (abbreviated month + 4-digit year)
- *   • Consistent " – " separator (en-dash, single space each side)
- *   • Reverse-chronological ordering on date-bearing sections
- *   • Trailing-period consistency inside any given section
+ *   • Abbreviated months, no period ("Jun 2022")
+ *   • Date ranges with a spaced hyphen: "Jun 2022 - Present"
+ *   • Dates bold + italic, same type size as the rest of the section
+ *   • Reverse-chronological order (current / latest end date first)
  */
 
-export const DATE_RANGE_SEP = " – ";
+export const DATE_RANGE_SEP = " - ";
 
 const MONTHS_SHORT = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -33,12 +31,7 @@ function monthIndexFromName(name) {
 
 /**
  * Convert common date inputs to a display string.
- *  - "2022-06" / "2022-6" / "2022-06-15" -> "Jun 2022"
- *  - "June 2022" / "Jun 2022" / "Jun. 2022" -> "Jun 2022"
- *  - "06/2022" / "6/2022" -> "Jun 2022"
- *  - "2022"     -> "2022"
- *  - "Present"  -> "Present"
- *  - ""         -> ""
+ * Year-only values become "Jan YYYY" so every date includes an abbreviated month.
  */
 export function formatDate(s) {
   if (!s) return "";
@@ -68,14 +61,12 @@ export function formatDate(s) {
     if (idx >= 0 && idx < 12) return `${MONTHS_SHORT[idx]} ${slash[2]}`;
   }
 
-  if (/^\d{4}$/.test(v)) return v;
+  if (/^\d{4}$/.test(v)) return `Jan ${v}`;
   return v;
 }
 
 /**
- * "Jun 2022 – Present" — single en-dash, single space either side.
- * Job-like ranges default empty `end` to Present. Pass presentIfEmpty: false
- * for certificates so a missing expiry does not become "Present".
+ * "Jun 2022 - Present" — ASCII hyphen, one space either side (VMock space-dash-space).
  */
 export function formatDateRange(start, end, { presentIfEmpty = true } = {}) {
   const s = formatDate(start);
@@ -86,34 +77,45 @@ export function formatDateRange(start, end, { presentIfEmpty = true } = {}) {
   return `${s}${DATE_RANGE_SEP}${e}`;
 }
 
-/**
- * Sort an array of items reverse-chronologically by their date field.
- * Lexicographic compare on "YYYY-MM" / "YYYY" works because the format is fixed.
- * Items lacking a date sink to the bottom.
- */
-export function sortByStartDesc(items, key = "start") {
-  if (!Array.isArray(items)) return items;
-  return [...items].sort((a, b) => {
-    const A = (a?.[key] || "").trim();
-    const B = (b?.[key] || "").trim();
-    if (!A && !B) return 0;
-    if (!A) return 1;
-    if (!B) return -1;
-    return B.localeCompare(A);
-  });
+/** Sort key YYYY-MM. Present / empty end sorts as still current. */
+export function toYearMonth(s) {
+  const v = String(s || "").trim();
+  if (!v || /^present$/i.test(v) || /^current$/i.test(v) || /^now$/i.test(v)) {
+    return "9999-12";
+  }
+  const iso = /^(\d{4})-(\d{1,2})/.exec(v);
+  if (iso) return `${iso[1]}-${String(parseInt(iso[2], 10)).padStart(2, "0")}`;
+  if (/^\d{4}$/.test(v)) return `${v}-12`;
+  const named = formatDate(v);
+  const m = /^([A-Z][a-z]{2}) (\d{4})$/.exec(named);
+  if (m) {
+    const idx = MONTHS_SHORT.indexOf(m[1]);
+    if (idx >= 0) return `${m[2]}-${String(idx + 1).padStart(2, "0")}`;
+  }
+  return "0000-00";
 }
 
 /**
- * Section-level bullet normaliser.
- *
- * The community style guide says "all bullets end with a period OR none
- * of them do" — but applied per-section. Skill rows are noun phrases
- * ("React.js", "PostgreSQL") so periods would look wrong. Everywhere
- * else (Experience, Projects, Education, Achievements) we want trailing
- * periods on every bullet.
- *
- * Pass { period: true } for prose sections, { period: false } for skills.
+ * Reverse chronological: later end date first (Present first), then later start.
  */
+export function sortByRecencyDesc(items, { startKey = "start", endKey = "end" } = {}) {
+  if (!Array.isArray(items)) return items;
+  return [...items].sort((a, b) => {
+    const aEnd = toYearMonth(a?.[endKey] || a?.[startKey]);
+    const bEnd = toYearMonth(b?.[endKey] || b?.[startKey]);
+    if (aEnd !== bEnd) return bEnd.localeCompare(aEnd);
+    return toYearMonth(b?.[startKey]).localeCompare(toYearMonth(a?.[startKey]));
+  });
+}
+
+/** @deprecated prefer sortByRecencyDesc */
+export function sortByStartDesc(items, key = "start") {
+  if (key === "year") {
+    return sortByRecencyDesc(items, { startKey: "year", endKey: "year" });
+  }
+  return sortByRecencyDesc(items, { startKey: key, endKey: "end" });
+}
+
 export function normalizeBullets(items, { period = true } = {}) {
   if (!Array.isArray(items)) return items;
   return items.map((b) => {

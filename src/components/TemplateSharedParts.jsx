@@ -1,7 +1,7 @@
 /* src/components/TemplateSharedParts.jsx */
 
 import React from "react";
-import { formatDate, formatDateRange, sortByStartDesc, normalizeBullets } from "../utils/format";
+import { formatDate, formatDateRange, sortByRecencyDesc, normalizeBullets } from "../utils/format";
 
 // ─── Font ────────────────────────────────────────────────────────────────────
 // Single hardcoded sans-serif stack. The Curtin Resume Workbook (p.24)
@@ -39,23 +39,23 @@ export function getSectionOrder(meta) {
   return [...filtered, ...missing];
 }
 
-// ─── Layout / typography constants — match jsPDF output ──────────────────────
-// Section headings share one size. All in-section copy (titles, dates, bullets)
-// shares one body size so the format checker sees consistent type.
-const BODY = "12px";
+// ─── Layout / typography constants — match jsPDF (11pt) ──────────────────────
+// VMock flags mixed sizes. The professional Title, section headings, job
+// titles, dates, and bullets all use the same 11pt. Only the name is larger.
+export const RESUME_TEXT_SIZE = "11pt";
 const C = {
-  name:    { fontSize: "29px",   fontWeight: "700", lineHeight: 1.1 },
-  title:   { fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginTop: "4px" },
-  contact: { fontSize: "12px",   color: "#505050",  marginTop: "5px" },
-  linkRow: { fontSize: "12px",   marginTop: "3px" },
-  secHead: { fontSize: BODY,     fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase" },
+  name:    { fontSize: "16pt", fontWeight: "700", lineHeight: 1.1 },
+  title:   { fontSize: RESUME_TEXT_SIZE, fontWeight: "400", color: "#3c3c3c", marginTop: "4px" },
+  contact: { fontSize: RESUME_TEXT_SIZE, color: "#505050",  marginTop: "5px" },
+  linkRow: { fontSize: RESUME_TEXT_SIZE, marginTop: "3px" },
+  secHead: { fontSize: RESUME_TEXT_SIZE, fontWeight: "700", textTransform: "uppercase" },
   rule:    { height: "0.75px",   marginTop: "2px", marginBottom: "5px" },
-  eTitle:  { fontSize: BODY,     fontWeight: "700", color: "#1e1e1e" },
-  eComp:   { fontSize: BODY,     fontWeight: "400", color: "#5a5a5a" },
-  eMeta:   { fontSize: BODY,     color: "#787878",  marginTop: "1px", marginBottom: "3px" },
-  date:    { fontSize: BODY,     fontWeight: "700", fontStyle: "italic", color: "#1e1e1e" },
-  bullet:  { fontSize: BODY,     color: "#323232",  lineHeight: 1.55 },
-  summary: { fontSize: BODY,     color: "#323232",  lineHeight: 1.6  },
+  eTitle:  { fontSize: RESUME_TEXT_SIZE, fontWeight: "700", color: "#1e1e1e" },
+  eComp:   { fontSize: RESUME_TEXT_SIZE, fontWeight: "400", color: "#5a5a5a" },
+  eMeta:   { fontSize: RESUME_TEXT_SIZE, color: "#505050",  marginTop: "1px", marginBottom: "3px" },
+  date:    { fontSize: RESUME_TEXT_SIZE, fontWeight: "700", fontStyle: "italic", color: "#1e1e1e", whiteSpace: "nowrap" },
+  bullet:  { fontSize: RESUME_TEXT_SIZE, color: "#323232",  lineHeight: 1.55 },
+  summary: { fontSize: RESUME_TEXT_SIZE, color: "#323232",  lineHeight: 1.6  },
 };
 
 // ─── Section heading ─────────────────────────────────────────────────────────
@@ -94,16 +94,22 @@ function BulletList({ items, period = true }) {
   );
 }
 
-// Date range is always bold + italic; other meta (location, org) is regular.
-function DateMetaLine({ date, extra }) {
-  if (!date && !extra) return null;
+// Title/org on the left, date range bold-italic on the right — same 11pt.
+function EntryHeading({ title, secondary, date }) {
   return (
-    <div style={C.eMeta}>
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "12px" }}>
+      <div style={{ minWidth: 0 }}>
+        <span style={C.eTitle}>{title}</span>
+        {secondary && <span style={C.eComp}>&nbsp;| {secondary}</span>}
+      </div>
       {date && <span style={C.date}>{date}</span>}
-      {date && extra && <span>{"   |   "}</span>}
-      {extra && <span>{extra}</span>}
     </div>
   );
+}
+
+function MetaLine({ text }) {
+  if (!text) return null;
+  return <div style={C.eMeta}>{text}</div>;
 }
 
 // ─── Entry blocks ────────────────────────────────────────────────────────────
@@ -111,11 +117,8 @@ function DateMetaLine({ date, extra }) {
 export function ExperienceBlock({ e }) {
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-        <span style={C.eTitle}>{e.role}</span>
-        {e.company && <span style={C.eComp}>&nbsp;| {e.company}</span>}
-      </div>
-      <DateMetaLine date={formatDateRange(e.start, e.end)} extra={e.location} />
+      <EntryHeading title={e.role} secondary={e.company} date={formatDateRange(e.start, e.end)} />
+      <MetaLine text={e.location} />
       <BulletList items={e.bullets} period />
     </div>
   );
@@ -124,22 +127,18 @@ export function ExperienceBlock({ e }) {
 export function EducationBlock({ e }) {
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-        <span style={C.eTitle}>{e.degree}</span>
-        {e.school && <span style={C.eComp}>&nbsp;| {e.school}</span>}
-      </div>
-      <DateMetaLine date={formatDateRange(e.start, e.end)} extra={e.location} />
+      <EntryHeading title={e.degree} secondary={e.school} date={formatDateRange(e.start, e.end)} />
+      <MetaLine text={e.location} />
       <BulletList items={e.bullets} period />
     </div>
   );
 }
 
 export function ProjectsBlock({ p }) {
-  const range = formatDateRange(p.start, p.end);
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={C.eTitle}>{p.title}</div>
-      <DateMetaLine date={range} extra={p.organization} />
+      <EntryHeading title={p.title} date={formatDateRange(p.start, p.end)} />
+      <MetaLine text={p.organization} />
       <BulletList items={p.bullets} period />
     </div>
   );
@@ -148,11 +147,7 @@ export function ProjectsBlock({ p }) {
 export function AchievementsBlock({ a }) {
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-        <span style={C.eTitle}>{a.title}</span>
-        {a.organization && <span style={C.eComp}>&nbsp;| {a.organization}</span>}
-      </div>
-      <DateMetaLine date={formatDate(a.year)} />
+      <EntryHeading title={a.title} secondary={a.organization} date={formatDate(a.year)} />
       <BulletList items={a.bullets} period />
     </div>
   );
@@ -180,11 +175,8 @@ export function SkillsBlock({ group }) {
 export function VoluntaryBlock({ v }) {
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-        <span style={C.eTitle}>{v.role}</span>
-        {v.organization && <span style={C.eComp}>&nbsp;| {v.organization}</span>}
-      </div>
-      <DateMetaLine date={formatDateRange(v.start, v.end)} extra={v.location} />
+      <EntryHeading title={v.role} secondary={v.organization} date={formatDateRange(v.start, v.end)} />
+      <MetaLine text={v.location} />
       <BulletList items={v.bullets} period />
     </div>
   );
@@ -192,14 +184,10 @@ export function VoluntaryBlock({ v }) {
 
 export function CertificateBlock({ c }) {
   const range = formatDateRange(c.year, c.expiry, { presentIfEmpty: false });
-  const extra = c.credentialId ? `Credential ID: ${c.credentialId}` : "";
   return (
     <div style={{ marginBottom: "10px" }}>
-      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-        <span style={C.eTitle}>{c.title}</span>
-        {c.issuer && <span style={C.eComp}>&nbsp;| {c.issuer}</span>}
-      </div>
-      <DateMetaLine date={range} extra={extra} />
+      <EntryHeading title={c.title} secondary={c.issuer} date={range} />
+      <MetaLine text={c.credentialId ? `Credential ID: ${c.credentialId}` : ""} />
       <BulletList items={c.bullets} period />
     </div>
   );
@@ -252,4 +240,4 @@ export function ReferencesBlock({ references }) {
   );
 }
 
-export { sortByStartDesc };
+export { sortByRecencyDesc, sortByRecencyDesc as sortByStartDesc };

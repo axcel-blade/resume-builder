@@ -5,7 +5,7 @@ import jsPDF from "jspdf";
 import {
   formatDate,
   formatDateRange,
-  sortByStartDesc,
+  sortByRecencyDesc,
   normalizeBullets,
 } from "../utils/format";
 import { getSectionOrder } from "./TemplateSharedParts";
@@ -33,11 +33,11 @@ const BULLET_INDENT = 6;
 const BULLET_HANG   = 4;
 
 const FS = {
-  name:        22,
+  name:        16,
   title:       11,
-  contact:     10,
-  sectionHead: 10,
-  body:        10,
+  contact:     11,
+  sectionHead: 11,
+  body:        11,
 };
 
 // Headings + section order match the on-screen templates exactly so the PDF
@@ -142,9 +142,11 @@ function drawParagraph(pdf, bullets, y, { period = true } = {}) {
   return y;
 }
 
-// "Title  | secondary" entry header — bold title + grey secondary on same line
-function drawEntryHeader(pdf, title, secondary, y) {
+// Title (and optional org) left, date range bold-italic right — same 11pt.
+function drawEntryHeader(pdf, title, secondary, date, y) {
   pdf.setFontSize(FS.body);
+  const dateStr = date || "";
+
   pdf.setFont(BODY_FONT, "bold");
   pdf.setTextColor(30, 30, 30);
   pdf.text(title || "", ML, y);
@@ -154,31 +156,20 @@ function drawEntryHeader(pdf, title, secondary, y) {
     pdf.setTextColor(90, 90, 90);
     pdf.text(` | ${secondary}`, ML + w, y);
   }
+  if (dateStr) {
+    pdf.setFont(BODY_FONT, "bolditalic");
+    pdf.setTextColor(30, 30, 30);
+    pdf.text(dateStr, ML + CONTENT_W, y, { align: "right" });
+  }
   return y + 4.5;
 }
 
-function drawMetaLine(pdf, date, extra, y) {
-  if (!date && !extra) return y;
+function drawMetaLine(pdf, text, y) {
+  if (!text) return y;
   pdf.setFontSize(FS.body);
-  let x = ML;
-  if (date) {
-    pdf.setFont(BODY_FONT, "bolditalic");
-    pdf.setTextColor(30, 30, 30);
-    pdf.text(date, x, y);
-    x += pdf.getTextWidth(date);
-  }
-  if (date && extra) {
-    pdf.setFont(BODY_FONT, "normal");
-    pdf.setTextColor(120, 120, 120);
-    const sep = "   |   ";
-    pdf.text(sep, x, y);
-    x += pdf.getTextWidth(sep);
-  }
-  if (extra) {
-    pdf.setFont(BODY_FONT, "normal");
-    pdf.setTextColor(120, 120, 120);
-    pdf.text(extra, x, y);
-  }
+  pdf.setFont(BODY_FONT, "normal");
+  pdf.setTextColor(80, 80, 80);
+  pdf.text(text, ML, y);
   return y + 4;
 }
 
@@ -368,8 +359,8 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.experience, y, accent);
     ctx.experience.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, e.role, e.company, y);
-      y = drawMetaLine(pdf, formatDateRange(e.start, e.end), e.location, y);
+      y = drawEntryHeader(pdf, e.role, e.company, formatDateRange(e.start, e.end), y);
+      y = drawMetaLine(pdf, e.location, y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
@@ -382,8 +373,8 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.education, y, accent);
     ctx.education.forEach((e) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, e.degree, e.school, y);
-      y = drawMetaLine(pdf, formatDateRange(e.start, e.end), e.location, y);
+      y = drawEntryHeader(pdf, e.degree, e.school, formatDateRange(e.start, e.end), y);
+      y = drawMetaLine(pdf, e.location, y);
       y = drawBullets(pdf, e.bullets, y, { period: true });
       y += 3;
     });
@@ -396,9 +387,8 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.projects, y, accent);
     ctx.projects.forEach((p) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, p.title, null, y);
-      const range = formatDateRange(p.start, p.end);
-      y = drawMetaLine(pdf, range, p.organization, y);
+      y = drawEntryHeader(pdf, p.title, null, formatDateRange(p.start, p.end), y);
+      y = drawMetaLine(pdf, p.organization, y);
       y = drawBullets(pdf, p.bullets, y, { period: true });
       y += 3;
     });
@@ -411,7 +401,7 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.skills, y, accent);
     data.skillGroups.forEach((g) => {
       y = ensureSpace(pdf, y, 8);
-      y = drawEntryHeader(pdf, g.title, null, y);
+      y = drawEntryHeader(pdf, g.title, null, "", y);
       y = drawParagraph(pdf, g.bullets, y, { period: true });
       y += 3;
     });
@@ -424,8 +414,7 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.achievements, y, accent);
     ctx.achievements.forEach((a) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, a.title, a.organization, y);
-      if (a.year) y = drawMetaLine(pdf, formatDate(a.year), "", y);
+      y = drawEntryHeader(pdf, a.title, a.organization, formatDate(a.year), y);
       y = drawBullets(pdf, a.bullets, y, { period: true });
       y += 3;
     });
@@ -438,8 +427,8 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.voluntary, y, accent);
     ctx.voluntary.forEach((v) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, v.role, v.organization, y);
-      y = drawMetaLine(pdf, formatDateRange(v.start, v.end), v.location, y);
+      y = drawEntryHeader(pdf, v.role, v.organization, formatDateRange(v.start, v.end), y);
+      y = drawMetaLine(pdf, v.location, y);
       y = drawBullets(pdf, v.bullets, y, { period: true });
       y += 3;
     });
@@ -452,11 +441,8 @@ const SECTION_DRAWERS = {
     y = drawSectionHead(pdf, HEADINGS.certificates, y, accent);
     ctx.certificates.forEach((c) => {
       y = ensureSpace(pdf, y, 10);
-      y = drawEntryHeader(pdf, c.title, c.issuer, y);
-
-      const range = formatDateRange(c.year, c.expiry, { presentIfEmpty: false });
-      const extra = c.credentialId ? `Credential ID: ${c.credentialId}` : "";
-      y = drawMetaLine(pdf, range, extra, y);
+      y = drawEntryHeader(pdf, c.title, c.issuer, formatDateRange(c.year, c.expiry, { presentIfEmpty: false }), y);
+      y = drawMetaLine(pdf, c.credentialId ? `Credential ID: ${c.credentialId}` : "", y);
 
       y = drawBullets(pdf, c.bullets, y, { period: true });
       y += 3;
@@ -490,12 +476,12 @@ function drawBody(pdf, data, y, accent) {
   // data.meta.sectionOrder so the PDF matches the on-screen preview.
 
   const ctx = {
-    experience:   sortByStartDesc(data.experience   || []),
-    voluntary:    sortByStartDesc(data.voluntary    || []),
-    projects:     sortByStartDesc(data.projects     || []),
-    education:    sortByStartDesc(data.education    || []),
-    certificates: sortByStartDesc(data.certificates || [], "year"),
-    achievements: sortByStartDesc(data.achievements || [], "year"),
+    experience:   sortByRecencyDesc(data.experience   || []),
+    voluntary:    sortByRecencyDesc(data.voluntary    || []),
+    projects:     sortByRecencyDesc(data.projects     || []),
+    education:    sortByRecencyDesc(data.education    || []),
+    certificates: sortByRecencyDesc(data.certificates || [], { startKey: "year", endKey: "expiry" }),
+    achievements: sortByRecencyDesc(data.achievements || [], { startKey: "year", endKey: "year" }),
     interests:    (data.interests || []).filter((s) => String(s).trim()),
   };
 
