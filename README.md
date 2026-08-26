@@ -1,6 +1,6 @@
 # Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.7-blue)
+![Version](https://img.shields.io/badge/version-0.5.8-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -19,6 +19,7 @@ A browser-based career-tools platform for building professional, ATS-friendly re
 **Resume Builder**
 - Edit profile, experience, education, skills, projects, certificates, achievements, volunteer work, interests, and references
 - Live A4-paginated preview that updates as you type
+- Community format styling: abbreviated dates (`Jun 2022 – Present`), bold-italic date ranges, reverse-chronological sections, consistent type sizes, and 0.75–1 inch page margins
 - Modern and Basic layout templates with accent colour picker
 - Export to PDF or JSON; import a saved profile from JSON
 
@@ -36,8 +37,8 @@ A browser-based career-tools platform for building professional, ATS-friendly re
 | Language | TypeScript 5.8 |
 | Build tool | Vite 8 |
 | Styling | Tailwind CSS 4 |
-| Routing | Custom History API router |
-| PDF export | Browser `window.print()` + CSS `@media print` |
+| Routing | React Router 7 |
+| PDF export | jsPDF (A4, matching on-screen preview) |
 | Runtime | Node.js 20+, npm 10+ |
 
 ## How to run it

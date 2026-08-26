@@ -40,19 +40,22 @@ export function getSectionOrder(meta) {
 }
 
 // ─── Layout / typography constants — match jsPDF output ──────────────────────
+// Section headings share one size. All in-section copy (titles, dates, bullets)
+// shares one body size so the format checker sees consistent type.
+const BODY = "12px";
 const C = {
   name:    { fontSize: "29px",   fontWeight: "700", lineHeight: 1.1 },
   title:   { fontSize: "14.5px", fontWeight: "400", color: "#3c3c3c", marginTop: "4px" },
   contact: { fontSize: "12px",   color: "#505050",  marginTop: "5px" },
   linkRow: { fontSize: "12px",   marginTop: "3px" },
-  secHead: { fontSize: "11px",   fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase" },
+  secHead: { fontSize: BODY,     fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase" },
   rule:    { height: "0.75px",   marginTop: "2px", marginBottom: "5px" },
-  eTitle:  { fontSize: "13px",   fontWeight: "700", color: "#1e1e1e" },
-  eComp:   { fontSize: "13px",   fontWeight: "400", color: "#5a5a5a" },
-  eMeta:   { fontSize: "11px",   color: "#787878",  marginTop: "1px", marginBottom: "3px",
-             fontStyle: "normal", fontWeight: "400" },
-  bullet:  { fontSize: "12px",   color: "#323232",  lineHeight: 1.55 },
-  summary: { fontSize: "12px",   color: "#323232",  lineHeight: 1.6  },
+  eTitle:  { fontSize: BODY,     fontWeight: "700", color: "#1e1e1e" },
+  eComp:   { fontSize: BODY,     fontWeight: "400", color: "#5a5a5a" },
+  eMeta:   { fontSize: BODY,     color: "#787878",  marginTop: "1px", marginBottom: "3px" },
+  date:    { fontSize: BODY,     fontWeight: "700", fontStyle: "italic", color: "#1e1e1e" },
+  bullet:  { fontSize: BODY,     color: "#323232",  lineHeight: 1.55 },
+  summary: { fontSize: BODY,     color: "#323232",  lineHeight: 1.6  },
 };
 
 // ─── Section heading ─────────────────────────────────────────────────────────
@@ -91,6 +94,18 @@ function BulletList({ items, period = true }) {
   );
 }
 
+// Date range is always bold + italic; other meta (location, org) is regular.
+function DateMetaLine({ date, extra }) {
+  if (!date && !extra) return null;
+  return (
+    <div style={C.eMeta}>
+      {date && <span style={C.date}>{date}</span>}
+      {date && extra && <span>{"   |   "}</span>}
+      {extra && <span>{extra}</span>}
+    </div>
+  );
+}
+
 // ─── Entry blocks ────────────────────────────────────────────────────────────
 
 export function ExperienceBlock({ e }) {
@@ -100,9 +115,7 @@ export function ExperienceBlock({ e }) {
         <span style={C.eTitle}>{e.role}</span>
         {e.company && <span style={C.eComp}>&nbsp;| {e.company}</span>}
       </div>
-      <div style={C.eMeta}>
-        {[formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   ")}
-      </div>
+      <DateMetaLine date={formatDateRange(e.start, e.end)} extra={e.location} />
       <BulletList items={e.bullets} period />
     </div>
   );
@@ -115,9 +128,7 @@ export function EducationBlock({ e }) {
         <span style={C.eTitle}>{e.degree}</span>
         {e.school && <span style={C.eComp}>&nbsp;| {e.school}</span>}
       </div>
-      <div style={C.eMeta}>
-        {[formatDateRange(e.start, e.end), e.location].filter(Boolean).join("   |   ")}
-      </div>
+      <DateMetaLine date={formatDateRange(e.start, e.end)} extra={e.location} />
       <BulletList items={e.bullets} period />
     </div>
   );
@@ -128,11 +139,7 @@ export function ProjectsBlock({ p }) {
   return (
     <div style={{ marginBottom: "10px" }}>
       <div style={C.eTitle}>{p.title}</div>
-      {(p.organization || range) && (
-        <div style={C.eMeta}>
-          {[p.organization, range].filter(Boolean).join("   |   ")}
-        </div>
-      )}
+      <DateMetaLine date={range} extra={p.organization} />
       <BulletList items={p.bullets} period />
     </div>
   );
@@ -145,7 +152,7 @@ export function AchievementsBlock({ a }) {
         <span style={C.eTitle}>{a.title}</span>
         {a.organization && <span style={C.eComp}>&nbsp;| {a.organization}</span>}
       </div>
-      {a.year && <div style={C.eMeta}>{a.year}</div>}
+      <DateMetaLine date={formatDate(a.year)} />
       <BulletList items={a.bullets} period />
     </div>
   );
@@ -177,33 +184,22 @@ export function VoluntaryBlock({ v }) {
         <span style={C.eTitle}>{v.role}</span>
         {v.organization && <span style={C.eComp}>&nbsp;| {v.organization}</span>}
       </div>
-      <div style={C.eMeta}>
-        {[formatDateRange(v.start, v.end), v.location].filter(Boolean).join("   |   ")}
-      </div>
+      <DateMetaLine date={formatDateRange(v.start, v.end)} extra={v.location} />
       <BulletList items={v.bullets} period />
     </div>
   );
 }
 
 export function CertificateBlock({ c }) {
-  const metaParts = [];
-  if (c.year) {
-    metaParts.push(c.expiry ? `Issued ${formatDate(c.year)} · Expires ${formatDate(c.expiry)}`
-                            : `Issued ${formatDate(c.year)}`);
-  } else if (c.expiry) {
-    metaParts.push(`Expires ${formatDate(c.expiry)}`);
-  }
-  if (c.credentialId) metaParts.push(`Credential ID: ${c.credentialId}`);
-
+  const range = formatDateRange(c.year, c.expiry, { presentIfEmpty: false });
+  const extra = c.credentialId ? `Credential ID: ${c.credentialId}` : "";
   return (
     <div style={{ marginBottom: "10px" }}>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
         <span style={C.eTitle}>{c.title}</span>
         {c.issuer && <span style={C.eComp}>&nbsp;| {c.issuer}</span>}
       </div>
-      {metaParts.length > 0 && (
-        <div style={C.eMeta}>{metaParts.join("   |   ")}</div>
-      )}
+      <DateMetaLine date={range} extra={extra} />
       <BulletList items={c.bullets} period />
     </div>
   );

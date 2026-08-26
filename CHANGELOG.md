@@ -9,6 +9,19 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.8] - 2026-08-26
+
+### Changed
+- Resume dates now render as abbreviated months with a spaced en-dash (`Jun 2022 – Present`) and bold-italic styling in both the A4 preview and the PDF export
+- Date-bearing sections (experience, education, projects, volunteer work, certificates, awards) sort reverse-chronologically
+- Section headings share one type size; titles, dates, and bullets inside sections share one body size
+- Page margins sit in the 0.75–1 inch band (0.9 inch sides; extra PDF top offset so the name cap-height still clears 0.75 inch)
+
+### Fixed
+- Mixed date formats (full month names, `Issued …` certificate lines, year-only awards) that failed community format checks
+
+---
+
 ## [0.5.7] - 2026-05-26
 
 ### Removed

@@ -58,7 +58,7 @@ export default function AchievementsEditor({ data, set }) {
               <Text
                 value={a.year}
                 onChange={(v) => upd(i, { year: v })}
-                placeholder="Year"
+                placeholder="Date (YYYY-MM)"
               />
             </div>
             <div className="mt-2">

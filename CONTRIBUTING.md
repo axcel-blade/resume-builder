@@ -27,11 +27,11 @@ This project uses Git Flow. All contributions must follow the branch model defin
 
 | Branch | Purpose |
 |---|---|
-| `master` | Production-ready code only |
+| `main` | Production-ready code only |
 | `develop` | Integration branch for the next release |
 | `feature/*` | New features, branched from `develop` |
 | `release/*` | Release preparation, branched from `develop` |
-| `hotfix/*` | Critical production fixes, branched from `master` |
+| `hotfix/*` | Critical production fixes, branched from `main` |
 
 ### Steps
 
@@ -59,7 +59,7 @@ Use the conventional commit format:
 ```
 feat: add dark-mode accent picker to resume editor
 fix: prevent cover letter PDF export from silently failing
-docs: update CHANGELOG for v0.5.7
+docs: update CHANGELOG for v0.5.8
 ```
 
 Rules:
@@ -89,7 +89,7 @@ Before submitting a PR, confirm the following:
 - [ ] `npm run build` passes without errors
 - [ ] Relevant markdown files (`README.md`, `CHANGELOG.md`) are updated
 - [ ] No new runtime libraries added to `dependencies`
-- [ ] Branch targets `develop`, not `main` or `master`
+- [ ] Branch targets `develop`, not `main`
 - [ ] Commit messages follow the format above
 
 ---
