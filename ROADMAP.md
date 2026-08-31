@@ -48,6 +48,7 @@ _None at this time._
 
 | Version | Feature |
 |---------|---------|
+| 0.5.12 | Repo cleanup: Vite app moved into `frontend/`, onboarding docs updated |
 | 0.5.11 | PDF title wrap; consistent bold Title Case university names |
 | 0.5.10 | VMock: 11pt title/body, hyphen date ranges, recency sort |
 | 0.5.9 | Reorder bullet points within resume entries |

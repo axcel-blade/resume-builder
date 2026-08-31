@@ -1,10 +1,12 @@
 # Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.11-blue)
+![Version](https://img.shields.io/badge/version-0.5.12-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 A browser-based career-tools platform for building professional, ATS-friendly resumes and cover letters. No accounts, no server — all data stays in your browser.
+
+The Vite application now lives in the `frontend/` directory so the repository root stays focused on project documentation and automation.
 
 ## What it is
 
@@ -48,6 +50,7 @@ A browser-based career-tools platform for building professional, ATS-friendly re
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
+cd frontend
 npm install
 npm run dev
 ```
@@ -57,6 +60,7 @@ Opens at `http://localhost:5173`
 **Production build**
 
 ```bash
+cd frontend
 npm run build && npm run preview
 ```
 
@@ -64,19 +68,30 @@ npm run build && npm run preview
 
 ```
 vita-forge/
-├── public/
-├── api/
-├── src/
-│   ├── core/          # Router, layouts, SEO, config
-│   ├── website/       # Home, About, Products, Contact, NotFound
-│   ├── apps/
-│   │   ├── resume-builder/
-│   │   └── cover-letter/
-│   ├── components/    # Shared UI: Toolbar, templates, editors, preview
-│   ├── data/
-│   └── routes/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── core/          # Router, layouts, SEO, config
+│   │   ├── website/       # Home, About, Products, Contact, NotFound
+│   │   ├── apps/
+│   │   │   ├── resume-builder/
+│   │   │   └── cover-letter/
+│   │   ├── components/    # Shared UI: Toolbar, templates, editors, preview
+│   │   ├── data/
+│   │   └── routes/
+│   ├── .gitignore
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── index.html
 ├── .github/
-└── package.json
+├── README.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── ROADMAP.md
+├── SECURITY.md
+├── SUPPORT.md
+├── LICENSE
+└── api/
 ```
 
 ## Contributing and support

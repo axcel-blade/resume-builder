@@ -9,6 +9,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.12] - 2026-08-31
+
+### Changed
+- Moved the Vite application into a dedicated `frontend/` folder to keep the repository root focused on project docs and automation
+- Updated run instructions to install and launch the app from the new frontend directory
+- Refreshed markdown references and version metadata to match the new repository structure
+
+---
+
 ## [0.5.11] - 2026-08-26
 
 ### Fixed
