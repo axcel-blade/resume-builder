@@ -24,6 +24,8 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://vitaforge:vitaforge@postgres:5432/vitaforge?schema=public
       REDIS_URL: redis://redis:6379
+      JWT_SECRET: change-me-in-production
+      JWT_EXPIRES_IN: 86400
     depends_on:
       postgres:
         condition: service_healthy

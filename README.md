@@ -28,15 +28,22 @@ vita-forge/
 ├── docker-compose.yml     # full-stack local orchestration
 ├── package.json           # workspace scripts
 ├── README.md              # overall project overview
-├── CHANGELOG.md           # monorepo changelog
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
-├── TODO.md
-├── ROADMAP.md
-├── SECURITY.md
 ├── SUPPORT.md
 ├── LICENSE.md
-└── LICENSE
+├── LICENSE
+├── frontend/README.md
+├── frontend/CHANGELOG.md
+├── frontend/ROADMAP.md
+├── frontend/TODO.md
+├── frontend/SECURITY.md
+├── backend/README.md
+├── backend/CHANGELOG.md
+├── backend/ROADMAP.md
+├── backend/TODO.md
+├── backend/SECURITY.md
+└── .env.example
 ```
 
 ## App entry points
@@ -45,9 +52,12 @@ vita-forge/
 - Backend API: [backend/README.md](backend/README.md)
 - Frontend changelog: [frontend/CHANGELOG.md](frontend/CHANGELOG.md)
 - Backend changelog: [backend/CHANGELOG.md](backend/CHANGELOG.md)
-- Product roadmap: [ROADMAP.md](ROADMAP.md)
-- Task tracking: [TODO.md](TODO.md)
-- Security policy: [SECURITY.md](SECURITY.md)
+- Frontend roadmap: [frontend/ROADMAP.md](frontend/ROADMAP.md)
+- Backend roadmap: [backend/ROADMAP.md](backend/ROADMAP.md)
+- Frontend task tracking: [frontend/TODO.md](frontend/TODO.md)
+- Backend task tracking: [backend/TODO.md](backend/TODO.md)
+- Frontend security policy: [frontend/SECURITY.md](frontend/SECURITY.md)
+- Backend security policy: [backend/SECURITY.md](backend/SECURITY.md)
 
 ## Quick start
 
@@ -113,13 +123,15 @@ npm run test:backend
 
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- [CHANGELOG.md](CHANGELOG.md)
-- [TODO.md](TODO.md)
+- [frontend/CHANGELOG.md](frontend/CHANGELOG.md)
+- [backend/CHANGELOG.md](backend/CHANGELOG.md)
 - [Documentation](docs/index.md)
-- [ROADMAP.md](ROADMAP.md)
-- [SECURITY.md](SECURITY.md)
+- [frontend/ROADMAP.md](frontend/ROADMAP.md)
+- [backend/ROADMAP.md](backend/ROADMAP.md)
+- [frontend/SECURITY.md](frontend/SECURITY.md)
+- [backend/SECURITY.md](backend/SECURITY.md)
 - [SUPPORT.md](SUPPORT.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE) or [LICENSE.md](LICENSE.md)
+MIT — see [LICENSE.md](LICENSE.md)

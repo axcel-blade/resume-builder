@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterDto {
   @ApiProperty({ example: 'alex@example.com' })
   @IsEmail()
   email: string;
@@ -35,28 +35,12 @@ export class CreateUserDto {
   role?: 'user' | 'admin';
 }
 
-export class UpdateUserDto {
-  @ApiPropertyOptional({ example: 'alex@example.com' })
-  @IsOptional()
+export class LoginDto {
+  @ApiProperty({ example: 'alex@example.com' })
   @IsEmail()
-  email?: string;
+  email: string;
 
-  @ApiPropertyOptional({ example: 'Alex Morgan' })
-  @IsOptional()
+  @ApiProperty({ example: 'Azure123!' })
   @IsString()
-  @MinLength(2)
-  name?: string;
-
-  @ApiPropertyOptional({ example: 'Azure123!' })
-  @IsOptional()
-  @IsString()
-  @MinLength(8)
-  @IsStrongPassword({
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
-  })
-  password?: string;
+  password: string;
 }
