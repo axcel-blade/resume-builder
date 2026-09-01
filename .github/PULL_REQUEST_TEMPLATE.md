@@ -21,7 +21,9 @@ Closes #
 
 ## Checklist
 
-- [ ] `npm run build` passes without errors
+- [ ] `npm run build:frontend` passes without errors
+- [ ] `npm run build:backend` passes without errors
+- [ ] `npm run test:backend` passes without errors
 - [ ] No new runtime libraries added to `dependencies`
 - [ ] Relevant markdown files updated (`README.md`, `CHANGELOG.md`)
 - [ ] Branch targets `develop` (not `main`)

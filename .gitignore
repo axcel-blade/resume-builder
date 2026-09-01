@@ -1,3 +1,8 @@
+# Root-level project files
+.env
+.env.*
+!.env.example
+
 # Logs
 logs
 *.log
@@ -7,22 +12,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependency directories
+node_modules/
+apps/*/node_modules/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Build output
+apps/*/dist/
+apps/*/.vite/
+
+# OS/editor files
+.vscode/
+.idea/
 .DS_Store
+*.swp
+*.swo
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
 
-# CLAUDE AI
+# Local project files
 .claude/
 CLAUDE.md

@@ -83,7 +83,16 @@ async function generateSummary(data, existingSummary) {
 
     const handleAiSummary = async () => {
         setAiError("");
-        alert("Rewrite with AI is coming soon.");
+        setAiLoading(true);
+        try {
+            const summary = await generateSummary(data, p.summary);
+            if (!summary) throw new Error("The AI service returned an empty summary.");
+            set({ profile: { ...p, summary } });
+        } catch (error) {
+            setAiError(error.message || "Unable to generate a summary.");
+        } finally {
+            setAiLoading(false);
+        }
     };
 
     const hasSummary = p.summary && p.summary.trim().length > 0;
@@ -110,36 +119,43 @@ async function generateSummary(data, existingSummary) {
         <SectionCard title="Profile">
         <div className="grid grid-cols-2 gap-3">
             <div>
-            <Label>Full Name</Label>
-            <Text value={p.fullName} onChange={(v) => set({ profile: { ...p, fullName: v } })} />
+            <Label htmlFor="profile-full-name">Full Name</Label>
+            <Text id="profile-full-name" value={p.fullName} onChange={(v) => set({ profile: { ...p, fullName: v } })} />
             </div>
             <div>
-            <Label>Title</Label>
-            <Text value={p.title} onChange={(v) => set({ profile: { ...p, title: v } })} />
+            <Label htmlFor="profile-title">Title</Label>
+            <Text id="profile-title" value={p.title} onChange={(v) => set({ profile: { ...p, title: v } })} />
             </div>
             <div>
-            <Label>Email</Label>
-            <Text value={p.email} onChange={(v) => set({ profile: { ...p, email: v } })} />
+            <Label htmlFor="profile-email">Email</Label>
+            <Text id="profile-email" value={p.email} onChange={(v) => set({ profile: { ...p, email: v } })} />
             </div>
             <div>
-            <Label>Phone</Label>
-            <Text value={p.phone} onChange={(v) => set({ profile: { ...p, phone: v } })} />
+            <Label htmlFor="profile-phone">Phone</Label>
+            <Text id="profile-phone" value={p.phone} onChange={(v) => set({ profile: { ...p, phone: v } })} />
             </div>
             <div>
-            <Label>Location</Label>
-            <Text value={p.location} onChange={(v) => set({ profile: { ...p, location: v } })} />
+            <Label htmlFor="profile-location">Location</Label>
+            <Text id="profile-location" value={p.location} onChange={(v) => set({ profile: { ...p, location: v } })} />
             </div>
             <div>
-            <Label>Website</Label>
-            <Text value={p.website} onChange={(v) => set({ profile: { ...p, website: v } })} />
+            <Label htmlFor="profile-website">Website</Label>
+            <Text id="profile-website" value={p.website} onChange={(v) => set({ profile: { ...p, website: v } })} />
             </div>
         </div>
 
         {/* Summary with AI */}
         <div className="mt-3">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
-            <Label>Summary</Label>
-            <button onClick={handleAiSummary} disabled={aiLoading} style={btnStyle}>
+            <Label htmlFor="profile-summary">Summary</Label>
+            <button
+                type="button"
+                onClick={handleAiSummary}
+                disabled={aiLoading}
+                aria-busy={aiLoading}
+                aria-describedby="ai-summary-status"
+                style={btnStyle}
+            >
                 {aiLoading ? (
                 <>
                     <svg style={{ width: 12, height: 12, animation: "spin 1s linear infinite" }} viewBox="0 0 24 24" fill="none">
@@ -155,6 +171,7 @@ async function generateSummary(data, existingSummary) {
             </div>
 
             <TextArea
+            id="profile-summary"
             value={p.summary}
             onChange={(v) => set({ profile: { ...p, summary: v } })}
             placeholder="Write a professional summary, or use AI to generate one from your resume data…"
@@ -162,10 +179,14 @@ async function generateSummary(data, existingSummary) {
             />
 
             {aiError && (
-            <p style={{ marginTop: "6px", fontSize: "12px", color: "#ef4444" }}>⚠ {aiError}</p>
+            <p id="ai-summary-status" role="alert" aria-live="assertive" style={{ marginTop: "6px", fontSize: "12px", color: "#ef4444" }}>
+                {aiError}
+            </p>
             )}
             {aiLoading && (
-            <p style={{ marginTop: "6px", fontSize: "12px", color: "#0284c7" }}>✦ AI is writing your summary…</p>
+            <p id="ai-summary-status" role="status" aria-live="polite" style={{ marginTop: "6px", fontSize: "12px", color: "#0284c7" }}>
+                AI is writing your summary...
+            </p>
             )}
         </div>
 

@@ -30,7 +30,7 @@ export function buildProfileExport({ resume, coverLetter }) {
   const { applicationSource, referenceNumber, ...exportCoverLetter } = safeCoverLetter;
 
   return {
-    version: "1.0.0",
+    version: "0.6.0",
     resume: resume || {},
     coverLetter: exportCoverLetter,
   };

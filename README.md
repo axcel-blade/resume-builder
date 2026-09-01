@@ -1,107 +1,117 @@
-# Vita Forge
+# VitaForge
 
-![Version](https://img.shields.io/badge/version-0.5.12-blue)
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-green)
+A full-stack resume and career-tools platform built as a modern monorepo.
 
-A browser-based career-tools platform for building professional, ATS-friendly resumes and cover letters. No accounts, no server — all data stays in your browser.
+Current version: `0.6.0`
 
-The Vite application now lives in the `frontend/` directory so the repository root stays focused on project documentation and automation.
+## Overview
 
-## What it is
+- Frontend: Vite + React + TypeScript
+- Backend: NestJS + TypeScript
+- Database: PostgreSQL via Prisma
+- Cache: Redis
+- API docs: Swagger/OpenAPI
+- Deployment: Docker + Docker Compose
+- Health check: `GET /api/health`
 
-| Module | Description |
-|---|---|
-| **Website** | Home, About, Products, and Contact pages |
-| **Resume Builder** | Section editor with live A4 preview and PDF export |
-| **Cover Letter Writer** | Guided form with live draft preview and PDF export |
+## Repository structure
 
-## What it does
+```text
+vita-forge/
+├── frontend/              # Vite React client
+├── backend/               # NestJS API service
+├── .github/
+├── .gitignore
+├── .dockerignore
+├── docker-compose.yml     # local full-stack orchestration
+├── package.json           # workspace-level scripts and setup
+├── README.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── TODO.md
+├── ROADMAP.md
+├── SECURITY.md
+├── SUPPORT.md
+├── LICENSE.md
+├── docs/
+├── wiki/
+└── LICENSE
+```
 
-**Resume Builder**
-- Edit profile, experience, education, skills, projects, certificates, achievements, volunteer work, interests, and references
-- Reorder bullet points inside each entry with up/down controls; the live preview follows that order
-- Live A4-paginated preview that updates as you type
-- Community format styling: 11pt body including the professional title, abbreviated dates with spaced hyphens (`Jun 2022 - Present`), bold-italic dates on the title line, reverse-chronological sections, and 0.75–1 inch page margins
-- Education lists each school in bold Title Case (not italic) so university names stay consistent; long titles wrap beside the date instead of overlapping it
-- Modern and Basic layout templates with accent colour picker
-- Export to PDF or JSON; import a saved profile from JSON
+## Quick start
 
-**Cover Letter Writer**
-- Guided form with tone selection
-- Auto-populates name, email, and phone from a saved resume profile
-- Live A4 draft preview
-- Export to PDF or JSON; import a saved profile from JSON
-
-## Built with
-
-| Layer | Technology |
-|---|---|
-| UI framework | React 19 |
-| Language | TypeScript 5.8 |
-| Build tool | Vite 8 |
-| Styling | Tailwind CSS 4 |
-| Routing | React Router 7 |
-| PDF export | jsPDF (A4, matching on-screen preview) |
-| Runtime | Node.js 20+, npm 10+ |
-
-## How to run it
+### Frontend only
 
 ```bash
-git clone https://github.com/axcel-blade/vita-forge.git
-cd vita-forge
 cd frontend
 npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173`
+Open: http://localhost:5173
 
-**Production build**
+### Backend only
 
 ```bash
-cd frontend
-npm run build && npm run preview
+cd backend
+cp .env.example .env
+npm install
+npx prisma generate
+npx prisma migrate dev --name init
+npm run start:dev
 ```
 
-## Where the code lives
+Open:
+- API: http://localhost:3000/api
+- Health: http://localhost:3000/api/health
+- Swagger: http://localhost:3000/docs
 
-```
-vita-forge/
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── core/          # Router, layouts, SEO, config
-│   │   ├── website/       # Home, About, Products, Contact, NotFound
-│   │   ├── apps/
-│   │   │   ├── resume-builder/
-│   │   │   └── cover-letter/
-│   │   ├── components/    # Shared UI: Toolbar, templates, editors, preview
-│   │   ├── data/
-│   │   └── routes/
-│   ├── .gitignore
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── index.html
-├── .github/
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── ROADMAP.md
-├── SECURITY.md
-├── SUPPORT.md
-├── LICENSE
-└── api/
+### Full stack with Docker
+
+```bash
+cd vita-forge
+docker compose up --build
 ```
 
-## Contributing and support
+Then use:
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3000
+- Health: http://localhost:3000/api/health
+- Swagger: http://localhost:3000/docs
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) — Git Flow, commit format, PR checklist
-- [CHANGELOG.md](CHANGELOG.md) — version history
-- [ROADMAP.md](ROADMAP.md) — planned features
-- [SECURITY.md](SECURITY.md) — vulnerability reporting
-- [SUPPORT.md](SUPPORT.md) — how to get help
+## Workspace commands
+
+```bash
+npm install
+npm run dev:frontend
+npm run dev:backend
+npm run build:frontend
+npm run build:backend
+npm run test:backend
+```
+
+The backend Docker image uses Node.js 22 and includes OpenSSL for Prisma.
+
+## Product focus
+
+- Resume builder
+- Cover letter writer
+- Live preview and export flows
+- ATS-friendly document styling
+- Browser-first workflows for career assets
+
+## Contribution and support
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [TODO.md](TODO.md)
+- [Documentation](docs/index.md)
+- [ROADMAP.md](ROADMAP.md)
+- [SECURITY.md](SECURITY.md)
+- [SUPPORT.md](SUPPORT.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE) or [LICENSE.md](LICENSE.md)

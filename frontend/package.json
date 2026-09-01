@@ -1,12 +1,13 @@
 {
   "name": "vita-forge",
   "private": true,
-  "version": "0.5.12",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
@@ -17,6 +18,7 @@
     "react-to-print": "^3.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",

@@ -1,0 +1,16 @@
+{
+  "name": "vitaforge-monorepo",
+  "private": true,
+  "version": "0.6.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run start:dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "test:backend": "npm --prefix backend run test -- --runInBand"
+  }
+}

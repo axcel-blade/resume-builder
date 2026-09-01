@@ -25,20 +25,46 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
 
-      - name: Build project
-        run: npm run build
+      - name: Install backend dependencies
+        run: npm ci --prefix backend
 
-      - name: Upload build artifact
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          if-no-files-found: error
-          retention-days: 7
+      - name: Start PostgreSQL and Redis
+        run: docker compose up -d postgres redis
+
+      - name: Apply database migrations
+        working-directory: backend
+        run: npm run prisma:migrate:deploy
+        env:
+          DATABASE_URL: postgresql://vitaforge:vitaforge@localhost:5432/vitaforge?schema=public
+
+      - name: Build frontend
+        run: npm run build --prefix frontend
+
+      - name: Build backend
+        run: npm run build --prefix backend
+
+      - name: Test backend
+        run: npm run test --prefix backend -- --runInBand
+
+      - name: Test backend integration flows
+        working-directory: backend
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://vitaforge:vitaforge@localhost:5432/vitaforge?schema=public
+          REDIS_URL: redis://localhost:6379
+
+      - name: Install Playwright browser
+        run: npx --prefix frontend playwright install --with-deps chromium
+
+      - name: Test frontend workflows
+        run: npm run test:e2e --prefix frontend
+
+      - name: Stop services
+        if: always()
+        run: docker compose down -v

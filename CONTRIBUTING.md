@@ -6,13 +6,13 @@ Thank you for your interest in contributing. Please read this guide before openi
 
 ## Code of Conduct
 
-This project follows the [Code of Conduct](CODE_OF_CONDUCT.md). By contributing, you agree to uphold it.
+Please keep discussions respectful, constructive, and focused on the project and its users.
 
 ---
 
 ## Project Rules
 
-Before contributing, review [CLAUDE.md](CLAUDE.md) for the non-negotiable project rules:
+Before contributing, follow these project rules:
 
 - Do not use open-source runtime libraries. Use native browser APIs.
 - Frontend and backend must work together — do not break the integration.
@@ -23,7 +23,7 @@ Before contributing, review [CLAUDE.md](CLAUDE.md) for the non-negotiable projec
 
 ## Git Flow
 
-This project uses Git Flow. All contributions must follow the branch model defined in [CLAUDE.md](CLAUDE.md).
+This project uses Git Flow. All contributions must follow the branch model below.
 
 | Branch | Purpose |
 |---|---|
@@ -75,10 +75,11 @@ Rules:
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
 npm install
-npm run dev
+npm run dev:frontend
+npm run dev:backend
 ```
 
-Requires Node.js 20+ and npm 10+.
+Requires Node.js 22+ and npm 10+.
 
 ---
 
@@ -86,7 +87,9 @@ Requires Node.js 20+ and npm 10+.
 
 Before submitting a PR, confirm the following:
 
-- [ ] `npm run build` passes without errors
+- [ ] `npm run build:frontend` passes without errors
+- [ ] `npm run build:backend` passes without errors
+- [ ] `npm run test:backend` passes without errors
 - [ ] Relevant markdown files (`README.md`, `CHANGELOG.md`) are updated
 - [ ] No new runtime libraries added to `dependencies`
 - [ ] Branch targets `develop`, not `main`

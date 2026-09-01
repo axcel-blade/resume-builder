@@ -7,7 +7,18 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [0.6.0] - 2026-09-01
+
+### Added
+- Live backend health endpoint at `/api/health` reporting server and database status
+
+### Changed
+- Moved the frontend and backend applications from `apps/` to the repository root
+- Updated Docker Compose and Markdown documentation for the root-level layout
+
+### Quality
+- Added Redis health checks, Prisma deployment migrations, backend CRUD integration tests, and frontend E2E coverage
+- Added accessible loading and error states to the AI summary flow
 
 ## [0.5.12] - 2026-08-31
 
