@@ -30,7 +30,7 @@ describe('AppController', () => {
     it('should return the API metadata', () => {
       expect(appController.getHello()).toEqual({
         name: 'VitaForge API',
-        version: '0.6.0',
+        version: '0.6.1',
         status: 'running',
       });
     });

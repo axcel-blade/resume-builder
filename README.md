@@ -2,7 +2,7 @@
 
 A full-stack resume and career-tools platform built as a modern monorepo.
 
-Current version: `0.6.0`
+Current version: `0.6.1`
 
 ## Overview
 

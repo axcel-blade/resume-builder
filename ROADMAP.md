@@ -48,6 +48,7 @@ _None at this time._
 
 | Version | Feature |
 |---------|---------|
+| 0.6.1 | Release metadata synchronization and markdown refresh for the root-level deployment layout |
 | 0.6.0 | Root-level apps, dependency health checks, migrations, test coverage, and deployment docs |
 | 0.5.12 | Repo cleanup: Vite app moved into `frontend/`, onboarding docs updated |
 | 0.5.11 | PDF title wrap; consistent bold Title Case university names |

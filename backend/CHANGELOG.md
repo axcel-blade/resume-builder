@@ -2,6 +2,10 @@
 
 All notable changes to the VitaForge backend will be documented in this file.
 
+## [0.6.1] - 2026-09-01
+### Changed
+- Aligned the backend API version metadata with the repository-wide 0.6.1 release update.
+
 ## [0.6.0] - 2026-09-01
 ### Added
 - `GET /api/health` reports API and PostgreSQL availability.

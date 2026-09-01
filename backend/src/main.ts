@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api/v1');
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -19,7 +19,8 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('VitaForge API')
     .setDescription('REST API for the VitaForge experience platform.')
-    .setVersion('0.6.0')
+    // Keep Swagger metadata aligned with the current release version.
+    .setVersion('0.6.1')
     .addServer(process.env.API_BASE_URL ?? 'http://localhost:3000')
     .build();
 

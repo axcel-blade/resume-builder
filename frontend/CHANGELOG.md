@@ -2,6 +2,10 @@
 
 All notable changes to the VitaForge frontend will be documented in this file.
 
+## [0.6.1] - 2026-09-01
+### Changed
+- Updated the frontend release metadata to match the 0.6.1 repository version bump.
+
 ## [0.6.0] - 2026-09-01
 ### Changed
 - Frontend remains a root-level application and is built through the root Compose configuration.

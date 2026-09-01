@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.1] - 2026-09-01
+
+### Changed
+- Synced package, app, and documentation version metadata for the 0.6.1 release
+- Refreshed markdown release notes to reflect the finalized root-level project layout
+
+---
+
 ## [0.6.0] - 2026-09-01
 
 ### Added

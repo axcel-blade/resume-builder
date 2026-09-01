@@ -10,9 +10,10 @@ export class AppService {
   ) {}
 
   getHello() {
+    // Release metadata shared with API clients and Swagger documentation.
     return {
       name: 'VitaForge API',
-      version: '0.6.0',
+      version: '0.6.1',
       status: 'running',
     };
   }

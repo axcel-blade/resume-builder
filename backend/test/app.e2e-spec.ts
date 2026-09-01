@@ -24,7 +24,7 @@ describe('AppController (e2e)', () => {
       .expect((res) => {
         expect(res.body).toEqual({
           name: 'VitaForge API',
-          version: '0.6.0',
+          version: '0.6.1',
           status: 'running',
         });
       });
