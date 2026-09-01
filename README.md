@@ -1,6 +1,6 @@
 # VitaForge
 
-A full-stack resume and career-tools platform built as a modern monorepo.
+VitaForge is a full-stack resume and career-tools platform built as a monorepo. It combines a Vite + React frontend with a NestJS + Prisma backend to support resume building, cover-letter authoring, live preview workflows, and deployment-ready local development.
 
 Current version: `0.6.1`
 
@@ -14,19 +14,21 @@ Current version: `0.6.1`
 - Deployment: Docker + Docker Compose
 - Health check: `GET /api/health`
 
-## Repository structure
+## Project structure
 
 ```text
 vita-forge/
 ├── frontend/              # Vite React client
 ├── backend/               # NestJS API service
-├── .github/
+├── docs/                  # product and deployment docs
+├── wiki/                  # GitHub wiki content
+├── .github/               # issue and PR templates
 ├── .gitignore
 ├── .dockerignore
-├── docker-compose.yml     # local full-stack orchestration
-├── package.json           # workspace-level scripts and setup
-├── README.md
-├── CHANGELOG.md
+├── docker-compose.yml     # full-stack local orchestration
+├── package.json           # workspace scripts
+├── README.md              # overall project overview
+├── CHANGELOG.md           # monorepo changelog
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
 ├── TODO.md
@@ -34,10 +36,18 @@ vita-forge/
 ├── SECURITY.md
 ├── SUPPORT.md
 ├── LICENSE.md
-├── docs/
-├── wiki/
 └── LICENSE
 ```
+
+## App entry points
+
+- Frontend application: [frontend/README.md](frontend/README.md)
+- Backend API: [backend/README.md](backend/README.md)
+- Frontend changelog: [frontend/CHANGELOG.md](frontend/CHANGELOG.md)
+- Backend changelog: [backend/CHANGELOG.md](backend/CHANGELOG.md)
+- Product roadmap: [ROADMAP.md](ROADMAP.md)
+- Task tracking: [TODO.md](TODO.md)
+- Security policy: [SECURITY.md](SECURITY.md)
 
 ## Quick start
 
@@ -90,8 +100,6 @@ npm run build:frontend
 npm run build:backend
 npm run test:backend
 ```
-
-The backend Docker image uses Node.js 22 and includes OpenSSL for Prisma.
 
 ## Product focus
 

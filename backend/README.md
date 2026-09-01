@@ -1,7 +1,6 @@
 # VitaForge Backend
 
-A NestJS + TypeScript backend for the VitaForge platform, using Prisma with PostgreSQL, Redis caching, Swagger/OpenAPI documentation, and Docker-ready deployment.
-The backend is a root-level application in the repository.
+The backend is the NestJS + TypeScript API layer for VitaForge. It exposes the application endpoints, handles data access through Prisma, manages Redis health checks, and serves Swagger-driven API documentation.
 
 ## Stack
 
@@ -33,12 +32,12 @@ The backend is a root-level application in the repository.
    npm run start:dev
    ```
 
-The API will be available at:
+The API is available at:
 - http://localhost:3000/api
 - http://localhost:3000/api/health
 - http://localhost:3000/docs
 
-The health endpoint returns server and database status. A healthy response is:
+A healthy response looks like:
 
 ```json
 {"status":"ok","server":"ok","database":"ok","redis":"ok"}
@@ -58,7 +57,7 @@ cd ..
 docker compose up --build
 ```
 
-The Docker image uses Node.js 22 and installs OpenSSL for Prisma.
+The Docker image uses Node.js 22 and includes OpenSSL for Prisma compatibility.
 
 ## Useful scripts
 
@@ -68,3 +67,11 @@ npm run test
 npm run test:e2e
 npx prisma studio
 ```
+
+## Related documentation
+
+- [CHANGELOG.md](CHANGELOG.md)
+- [ROADMAP.md](ROADMAP.md)
+- [TODO.md](TODO.md)
+- [SECURITY.md](SECURITY.md)
+- [../README.md](../README.md)
