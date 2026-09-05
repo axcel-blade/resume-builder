@@ -47,9 +47,11 @@ vita-forge/
 │       ├── components/
 │       └── layouts/
 ├── backend/            # NestJS API
-│   ├── src/            # auth, users, ai, repositories
+│   ├── src/            # auth, users, ai, health, collab, templates, repositories
 │   ├── database/       # Prisma schema + migrations
 │   └── tests/
+├── docker/             # Dockerfiles + nginx
+├── docker-compose.yml
 ├── docs/
 └── wiki/
 ```
@@ -71,6 +73,8 @@ vita-forge/
 
 - JWT register / login / refresh
 - Profile JSON stored per user (Prisma when `DATABASE_URL` is set)
+- Collaboration rooms and template catalog endpoints
+- Health probes at `/api/health`, `/live`, and `/ready`
 
 ## Development Workflow
 
@@ -80,6 +84,19 @@ cd backend && npm run dev
 cd backend && npm test
 cd frontend && npm run build
 ```
+
+## Docker
+
+From the repo root:
+
+```bash
+docker compose up --build
+```
+
+- UI: http://localhost:8080  
+- API: http://localhost:3001/api  
+
+Optional Postgres: `docker compose --profile db up --build -d`. See the root [README.md](../README.md#docker) for details.
 
 ## Configuration
 
@@ -106,4 +123,4 @@ MIT — see [LICENSE](../LICENSE).
 ---
 
 **Last Updated**: September 2026  
-**Version**: 0.7.0
+**Version**: 0.8.0

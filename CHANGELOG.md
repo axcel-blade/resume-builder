@@ -9,6 +9,21 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-05
+
+### Added
+- Docker Compose stack (`docker/`, `docker-compose.yml`) for frontend + backend with healthchecks
+- Optional Postgres service via Compose profile `db`
+- Collaboration rooms with SSE streaming (`/api/collab/*`)
+- Template marketplace catalog API (`/api/templates`) and frontend presets
+- Health readiness probe with persistence mode (`/api/health/ready`, `/live`)
+
+### Fixed
+- Nest `AIService` DI crash when optional `Partial<LmStudioConfig>` was treated as an injectable
+
+### Changed
+- Compose and docs default CORS origins include the Docker UI on port 8080
+
 ## [0.7.0] - 2026-09-05
 
 ### Added

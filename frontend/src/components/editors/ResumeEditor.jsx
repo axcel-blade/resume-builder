@@ -13,6 +13,7 @@ import InterestsEditor from "./InterestsEditor";
 import ReferencesEditor from "./ReferencesEditor";
 import { IconButton, SectionCard } from "../SharedInputs";
 import { getSectionOrder } from "../TemplateSharedParts";
+import { applyMarketplaceTemplate, MARKETPLACE_TEMPLATES } from "../../constants/templates";
 
 // ─── Section maps ──────────────────────────────────────────────────────────
 // Labels match the headings rendered on the resume itself, so the editor
@@ -42,13 +43,10 @@ const SECTION_EDITORS = {
 export default function ResumeEditor({ data, set }) {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
-  const templates = [
-    { id: "modern", name: "Modern", icon: "✨" },
-    { id: "basic", name: "Basic", icon: "📋" },
-  ];
+  const templates = MARKETPLACE_TEMPLATES;
 
   const selectTemplate = (templateId) => {
-    set({ meta: { ...data.meta, template: templateId } });
+    set({ meta: applyMarketplaceTemplate(data.meta, templateId) });
     setShowTemplateSelector(false);
   };
 

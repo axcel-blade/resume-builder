@@ -42,8 +42,8 @@ describe('AIService', () => {
     expect(service.getConfig()).toEqual(LmStudio_DEFAULT_CONFIG);
   });
 
-  it('merges constructor overrides into the default config', () => {
-    const custom = new AIService({
+  it('merges config overrides into the default config', () => {
+    const custom = AIService.withConfig({
       apiUrl: 'http://custom.example.com:5000/v1',
       modelName: 'custom-model',
     });

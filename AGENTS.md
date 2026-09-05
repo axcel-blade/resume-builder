@@ -50,8 +50,8 @@ main (Production)          develop (Integration)
 | Component | When to Increment | Example Transition |
 |-----------|------------------|-------------------|
 | MAJOR | Incompatible API changes, breaking changes | 0.6.x → 1.0.0 |
-| MINOR | New features (backward compatible) | 0.6.1 → 0.7.0 |
-| PATCH | Bug fixes only | 0.6.1 → 0.6.2 |
+| MINOR | New features (backward compatible) | 0.7.0 → 0.8.0 |
+| PATCH | Bug fixes only | 0.8.0 → 0.8.1 |
 
 ### Version Update Checklist
 
@@ -115,4 +115,4 @@ const users = await userRepository.find({ where: { status: 'active' } });
 
 ---
 
-*Last updated: 2026-09-05 (v0.7.0)*
+*Last updated: 2026-09-05 (v0.8.0)*

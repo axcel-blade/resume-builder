@@ -105,7 +105,7 @@ Use these tags to organize your contributions:
 
 ## Version Info
 
-**Current Version:** 0.7.0  
+**Current Version:** 0.8.0  
 **Last Updated:** September 2026  
 **License:** MIT
 

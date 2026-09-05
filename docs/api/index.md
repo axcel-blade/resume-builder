@@ -6,6 +6,9 @@ Complete REST API reference for Vita Forge backend services.
 
 - [Authentication](./auth.md) - JWT token authentication
 - [Users](./users.md) - User account management
+- [Health](./health.md) - Liveness and readiness probes
+- [Collaboration](./collab.md) - Shared resume rooms (SSE)
+- [Templates](./templates.md) - Marketplace template catalog
 - [Resumes](./resumes.md) - Resume profile operations
 - [Cover Letters](./coverletters.md) - Cover letter operations
 - [Error Handling](./errors.md) - Error codes and messages

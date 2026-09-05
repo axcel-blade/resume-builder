@@ -52,3 +52,12 @@ npm run prisma:deploy
 | `npm run build` | Compile to `dist/` |
 | `npm start` | Run compiled server |
 | `npm run prisma:migrate` | Create/apply migrations |
+
+## Health
+
+```bash
+curl http://localhost:3001/api/health
+curl http://localhost:3001/api/health/ready
+```
+
+See [docs/api/health.md](../docs/api/health.md).

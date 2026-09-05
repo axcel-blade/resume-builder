@@ -32,3 +32,6 @@ dist-ssr
 # CLAUDE AI
 .claude/
 CLAUDE.md
+
+# TypeScript incremental build caches
+*.tsbuildinfo
