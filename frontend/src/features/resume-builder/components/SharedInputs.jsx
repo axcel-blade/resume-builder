@@ -1,4 +1,4 @@
-/* src/components/SharedInputs.jsx */
+/* src/features/resume-builder/components/SharedInputs.jsx */
 
 import React from "react";
 

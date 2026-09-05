@@ -1,4 +1,4 @@
-/* src/components/editors/VoluntaryEditor.jsx */
+/* src/features/resume-builder/components/editors/VoluntaryEditor.jsx */
 
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";

@@ -1,4 +1,4 @@
-/* src/components/preview/A4PaginatedPreview.jsx */
+/* src/features/resume-builder/components/preview/A4PaginatedPreview.jsx */
 
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 

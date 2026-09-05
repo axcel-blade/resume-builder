@@ -1,4 +1,4 @@
-/* src/components/Toolbar.jsx */
+/* src/features/resume-builder/components/Toolbar.jsx */
 
 import React, { useRef } from "react";
 import jsPDF from "jspdf";
@@ -8,15 +8,15 @@ import {
   sortByRecencyDesc,
   normalizeBullets,
   formatInstitutionName,
-} from "../utils/format";
-import { getSectionOrder } from "./TemplateSharedParts";
+} from "../../../utils/format";
+import { getSectionOrder } from "../../../components/TemplateSharedParts";
 import {
   buildProfileExport,
   normalizeImportedProfile,
   readProfileBundle,
   writeProfileBundle,
-} from "../features/shared/services/profileBundle";
-import { defaultCoverLetterData, defaultData } from "../constants/defaultData";
+} from "../../shared/services/profileBundle";
+import { defaultCoverLetterData, defaultData } from "../../../constants/defaultData";
 
 // ─── Layout (mm) ────────────────────────────────────────────────────────────
 // Community checkers measure *visual* whitespace to the glyph, not the jsPDF

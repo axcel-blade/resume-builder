@@ -1,4 +1,4 @@
-/* src/components/editors/ReferencesEditor.jsx */
+/* src/features/resume-builder/components/editors/ReferencesEditor.jsx */
 
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";

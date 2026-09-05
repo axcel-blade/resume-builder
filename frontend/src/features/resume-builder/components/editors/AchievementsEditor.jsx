@@ -1,4 +1,4 @@
-/* src/components/editors/AchievementsEditor.jsx */
+/* src/features/resume-builder/components/editors/AchievementsEditor.jsx */
 
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";

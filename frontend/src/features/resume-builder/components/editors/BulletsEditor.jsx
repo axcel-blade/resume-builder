@@ -1,4 +1,4 @@
-/* src/components/editors/BulletsEditor.jsx
+/* src/features/resume-builder/components/editors/BulletsEditor.jsx
  *
  * Shared bullet list used by Experience, Education, Projects, Skills,
  * Achievements, Volunteer Work, Certificates, and Interests. New lines

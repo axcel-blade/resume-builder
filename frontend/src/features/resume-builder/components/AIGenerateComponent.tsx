@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { generateResumeSummary } from '../services/ai';
+import { generateResumeSummary } from '../../../services/ai';
 
 export const AIGenerateComponent: React.FC<{ profileData: any }> = ({ profileData }) => {
   const [loading, setLoading] = useState(false);

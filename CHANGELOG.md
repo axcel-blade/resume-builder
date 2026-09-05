@@ -9,6 +9,9 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- Moved Resume Builder-only components (editors, preview, templates, toolbar) from `frontend/src/components/` into `frontend/src/features/resume-builder/components/`; `frontend/src/components/` now holds only cross-feature shared pieces (`ErrorBoundary`, `Seo`, `Toast`, `TemplateSharedParts`)
+
 ## [0.8.0] - 2026-09-05
 
 ### Added
