@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Toolbar from "../../../components/Toolbar";
+import { useToast } from "../../../components/Toast";
+import { useKeyboardShortcuts } from "../../../utils/keyboardShortcuts";
 import ResumeEditor from "../../../components/editors/ResumeEditor";
 import A4PaginatedPreview from "../../../components/preview/A4PaginatedPreview";
 import TemplateModern from "../../../components/TemplateModern";
@@ -41,6 +43,7 @@ export default function Builder() {
   const lastGoodRef = useRef(defaultData);
   const clientIdRef = useRef(getCollabClientId());
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const toast = useToast();
 
   const set = (patch) => setData((prev) => ({ ...prev, ...patch }));
 
@@ -101,6 +104,7 @@ export default function Builder() {
         setSyncing(false);
         if (result.error) {
           setSyncError(result.error);
+          toast.error(result.error);
           skipNextPush.current = true;
           setData(lastGoodRef.current);
           writeProfileBundle({ resume: lastGoodRef.current });
@@ -180,15 +184,32 @@ export default function Builder() {
     const result = await pushRemoteProfile(data, readProfileBundle().coverLetter);
     if (result.error) {
       setSyncError(result.error);
+      toast.error(result.error);
       return;
     }
     try {
       await createProfileVersion(`Restore point ${new Date().toLocaleString()}`);
       await refreshVersions();
+      toast.success("Restore point saved");
     } catch (error) {
-      setSyncError(error instanceof Error ? error.message : "Could not save restore point");
+      const message = error instanceof Error ? error.message : "Could not save restore point";
+      setSyncError(message);
+      toast.error(message);
     }
   };
+
+  useKeyboardShortcuts(
+    {
+      "ctrl+s": () => {
+        if (isAuthenticated) {
+          void saveRestorePoint();
+        } else {
+          toast.info("Sign in to save restore points");
+        }
+      },
+    },
+    [isAuthenticated, data]
+  );
 
   const restorePoint = async (versionId) => {
     if (!versionId) {
