@@ -1,4 +1,4 @@
-/* src/components/editors/ProjectsEditor.jsx */
+/* src/features/resume-builder/components/editors/EducationEditor.jsx */
 
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";
@@ -11,33 +11,33 @@ const swap = (arr, i, j) => {
   return a;
 };
 
-export default function ProjectsEditor({ data, set }) {
+export default function EducationEditor({ data, set }) {
   const add = () =>
     set({
-      projects: [
-        ...data.projects,
-        { id: uid(), title: "", organization: "", start: "", end: "", bullets: [] },
+      education: [
+        ...data.education,
+        { id: uid(), degree: "", school: "", location: "", start: "", end: "", bullets: [] },
       ],
     });
 
   const upd = (i, patch) =>
     set({
-      projects: data.projects.map((p, idx) => (idx === i ? { ...p, ...patch } : p)),
+      education: data.education.map((e, idx) => (idx === i ? { ...e, ...patch } : e)),
     });
 
-  const del = (i) => set({ projects: data.projects.filter((_, idx) => idx !== i) });
+  const del = (i) => set({ education: data.education.filter((_, idx) => idx !== i) });
 
-  const up = (i) => i > 0 && set({ projects: swap(data.projects, i, i - 1) });
+  const up = (i) => i > 0 && set({ education: swap(data.education, i, i - 1) });
   const dn = (i) =>
-    i < data.projects.length - 1 && set({ projects: swap(data.projects, i, i + 1) });
+    i < data.education.length - 1 && set({ education: swap(data.education, i, i + 1) });
 
   return (
-    <SectionCard title="Projects" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Education" action={<IconButton onClick={add}>+ Add</IconButton>}>
       <div className="space-y-4">
-        {data.projects.map((p, i) => (
-          <div key={p.id} className="rounded-xl border border-gray-200 p-3">
+        {data.education.map((e, i) => (
+          <div key={e.id} className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 flex items-center justify-between">
-              <div className="text-xs text-gray-500">Project {i + 1}</div>
+              <div className="text-xs text-gray-500">Item {i + 1}</div>
               <div className="space-x-1">
                 <IconButton onClick={() => up(i)}>↑</IconButton>
                 <IconButton onClick={() => dn(i)}>↓</IconButton>
@@ -46,23 +46,28 @@ export default function ProjectsEditor({ data, set }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Text
-                value={p.title}
-                onChange={(v) => upd(i, { title: v })}
-                placeholder="Title"
+                value={e.degree}
+                onChange={(v) => upd(i, { degree: v })}
+                placeholder="Degree"
               />
               <Text
-                value={p.organization}
-                onChange={(v) => upd(i, { organization: v })}
-                placeholder="Organization"
+                value={e.school}
+                onChange={(v) => upd(i, { school: v })}
+                placeholder="School"
+              />
+              <Text
+                value={e.location}
+                onChange={(v) => upd(i, { location: v })}
+                placeholder="Location"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Text
-                  value={p.start}
+                  value={e.start}
                   onChange={(v) => upd(i, { start: v })}
                   placeholder="Start (YYYY-MM)"
                 />
                 <Text
-                  value={p.end}
+                  value={e.end}
                   onChange={(v) => upd(i, { end: v })}
                   placeholder="End (YYYY-MM)"
                 />
@@ -70,7 +75,7 @@ export default function ProjectsEditor({ data, set }) {
             </div>
             <div className="mt-2">
               <BulletsEditor
-                items={p.bullets}
+                items={e.bullets}
                 onChange={(bullets) => upd(i, { bullets })}
               />
             </div>

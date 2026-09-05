@@ -1,4 +1,4 @@
-/* src/components/editors/EducationEditor.jsx */
+/* src/features/resume-builder/components/editors/ExperienceEditor.jsx */
 
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";
@@ -11,30 +11,30 @@ const swap = (arr, i, j) => {
   return a;
 };
 
-export default function EducationEditor({ data, set }) {
+export default function ExperienceEditor({ data, set }) {
   const add = () =>
     set({
-      education: [
-        ...data.education,
-        { id: uid(), degree: "", school: "", location: "", start: "", end: "", bullets: [] },
+      experience: [
+        ...data.experience,
+        { id: uid(), role: "", company: "", location: "", start: "", end: "", bullets: [] },
       ],
     });
 
   const upd = (i, patch) =>
     set({
-      education: data.education.map((e, idx) => (idx === i ? { ...e, ...patch } : e)),
+      experience: data.experience.map((e, idx) => (idx === i ? { ...e, ...patch } : e)),
     });
 
-  const del = (i) => set({ education: data.education.filter((_, idx) => idx !== i) });
+  const del = (i) => set({ experience: data.experience.filter((_, idx) => idx !== i) });
 
-  const up = (i) => i > 0 && set({ education: swap(data.education, i, i - 1) });
+  const up = (i) => i > 0 && set({ experience: swap(data.experience, i, i - 1) });
   const dn = (i) =>
-    i < data.education.length - 1 && set({ education: swap(data.education, i, i + 1) });
+    i < data.experience.length - 1 && set({ experience: swap(data.experience, i, i + 1) });
 
   return (
-    <SectionCard title="Education" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Professional Experience" action={<IconButton onClick={add}>+ Add</IconButton>}>
       <div className="space-y-4">
-        {data.education.map((e, i) => (
+        {data.experience.map((e, i) => (
           <div key={e.id} className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 flex items-center justify-between">
               <div className="text-xs text-gray-500">Item {i + 1}</div>
@@ -46,14 +46,14 @@ export default function EducationEditor({ data, set }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Text
-                value={e.degree}
-                onChange={(v) => upd(i, { degree: v })}
-                placeholder="Degree"
+                value={e.role}
+                onChange={(v) => upd(i, { role: v })}
+                placeholder="Role"
               />
               <Text
-                value={e.school}
-                onChange={(v) => upd(i, { school: v })}
-                placeholder="School"
+                value={e.company}
+                onChange={(v) => upd(i, { company: v })}
+                placeholder="Company"
               />
               <Text
                 value={e.location}

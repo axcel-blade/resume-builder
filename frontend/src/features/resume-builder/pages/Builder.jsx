@@ -1,14 +1,14 @@
-/* src/apps/resume-builder/pages/Builder.jsx */
+/* src/features/resume-builder/pages/Builder.jsx */
 
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import Toolbar from "../../../components/Toolbar";
+import Toolbar from "../components/Toolbar";
 import { useToast } from "../../../components/Toast";
 import { useKeyboardShortcuts } from "../../../utils/keyboardShortcuts";
-import ResumeEditor from "../../../components/editors/ResumeEditor";
-import A4PaginatedPreview from "../../../components/preview/A4PaginatedPreview";
-import TemplateModern from "../../../components/TemplateModern";
-import TemplateBasic from "../../../components/TemplateBasic";
+import ResumeEditor from "../components/editors/ResumeEditor";
+import A4PaginatedPreview from "../components/preview/A4PaginatedPreview";
+import TemplateModern from "../components/templates/TemplateModern";
+import TemplateBasic from "../components/templates/TemplateBasic";
 import { defaultData } from "../../../constants/defaultData";
 import { applyMarketplaceTemplate } from "../../../constants/templates";
 import { readProfileBundle, writeProfileBundle } from "../../shared/services/profileBundle";

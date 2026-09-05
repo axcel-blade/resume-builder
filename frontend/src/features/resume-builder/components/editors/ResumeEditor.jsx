@@ -1,4 +1,4 @@
-/* src/components/editors/ResumeEditor.jsx */
+/* src/features/resume-builder/components/editors/ResumeEditor.jsx */
 
 import React, { useState } from "react";
 import ProfileEditor from "./ProfileEditor";
@@ -12,8 +12,8 @@ import CertificatesEditor from "./CertificatesEditor";
 import InterestsEditor from "./InterestsEditor";
 import ReferencesEditor from "./ReferencesEditor";
 import { IconButton, SectionCard } from "../SharedInputs";
-import { getSectionOrder } from "../TemplateSharedParts";
-import { applyMarketplaceTemplate, MARKETPLACE_TEMPLATES } from "../../constants/templates";
+import { getSectionOrder } from "../../../../components/TemplateSharedParts";
+import { applyMarketplaceTemplate, MARKETPLACE_TEMPLATES } from "../../../../constants/templates";
 
 // ─── Section maps ──────────────────────────────────────────────────────────
 // Labels match the headings rendered on the resume itself, so the editor

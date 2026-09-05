@@ -1,4 +1,4 @@
-/* src/components/editors/InterestsEditor.jsx */
+/* src/features/resume-builder/components/editors/InterestsEditor.jsx */
 
 import React from "react";
 import { SectionCard } from "../SharedInputs";

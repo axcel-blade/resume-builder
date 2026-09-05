@@ -1,4 +1,4 @@
-/* src/components/editors/ExperienceEditor.jsx */
+/* src/features/resume-builder/components/editors/ProjectsEditor.jsx */
 
 import React from "react";
 import { SectionCard, IconButton, Text } from "../SharedInputs";
@@ -11,33 +11,33 @@ const swap = (arr, i, j) => {
   return a;
 };
 
-export default function ExperienceEditor({ data, set }) {
+export default function ProjectsEditor({ data, set }) {
   const add = () =>
     set({
-      experience: [
-        ...data.experience,
-        { id: uid(), role: "", company: "", location: "", start: "", end: "", bullets: [] },
+      projects: [
+        ...data.projects,
+        { id: uid(), title: "", organization: "", start: "", end: "", bullets: [] },
       ],
     });
 
   const upd = (i, patch) =>
     set({
-      experience: data.experience.map((e, idx) => (idx === i ? { ...e, ...patch } : e)),
+      projects: data.projects.map((p, idx) => (idx === i ? { ...p, ...patch } : p)),
     });
 
-  const del = (i) => set({ experience: data.experience.filter((_, idx) => idx !== i) });
+  const del = (i) => set({ projects: data.projects.filter((_, idx) => idx !== i) });
 
-  const up = (i) => i > 0 && set({ experience: swap(data.experience, i, i - 1) });
+  const up = (i) => i > 0 && set({ projects: swap(data.projects, i, i - 1) });
   const dn = (i) =>
-    i < data.experience.length - 1 && set({ experience: swap(data.experience, i, i + 1) });
+    i < data.projects.length - 1 && set({ projects: swap(data.projects, i, i + 1) });
 
   return (
-    <SectionCard title="Professional Experience" action={<IconButton onClick={add}>+ Add</IconButton>}>
+    <SectionCard title="Projects" action={<IconButton onClick={add}>+ Add</IconButton>}>
       <div className="space-y-4">
-        {data.experience.map((e, i) => (
-          <div key={e.id} className="rounded-xl border border-gray-200 p-3">
+        {data.projects.map((p, i) => (
+          <div key={p.id} className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 flex items-center justify-between">
-              <div className="text-xs text-gray-500">Item {i + 1}</div>
+              <div className="text-xs text-gray-500">Project {i + 1}</div>
               <div className="space-x-1">
                 <IconButton onClick={() => up(i)}>↑</IconButton>
                 <IconButton onClick={() => dn(i)}>↓</IconButton>
@@ -46,28 +46,23 @@ export default function ExperienceEditor({ data, set }) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Text
-                value={e.role}
-                onChange={(v) => upd(i, { role: v })}
-                placeholder="Role"
+                value={p.title}
+                onChange={(v) => upd(i, { title: v })}
+                placeholder="Title"
               />
               <Text
-                value={e.company}
-                onChange={(v) => upd(i, { company: v })}
-                placeholder="Company"
-              />
-              <Text
-                value={e.location}
-                onChange={(v) => upd(i, { location: v })}
-                placeholder="Location"
+                value={p.organization}
+                onChange={(v) => upd(i, { organization: v })}
+                placeholder="Organization"
               />
               <div className="grid grid-cols-2 gap-2">
                 <Text
-                  value={e.start}
+                  value={p.start}
                   onChange={(v) => upd(i, { start: v })}
                   placeholder="Start (YYYY-MM)"
                 />
                 <Text
-                  value={e.end}
+                  value={p.end}
                   onChange={(v) => upd(i, { end: v })}
                   placeholder="End (YYYY-MM)"
                 />
@@ -75,7 +70,7 @@ export default function ExperienceEditor({ data, set }) {
             </div>
             <div className="mt-2">
               <BulletsEditor
-                items={e.bullets}
+                items={p.bullets}
                 onChange={(bullets) => upd(i, { bullets })}
               />
             </div>

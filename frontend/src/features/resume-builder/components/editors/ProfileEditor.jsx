@@ -1,4 +1,4 @@
-/* src/components/editors/ProfileEditor.jsx */
+/* src/features/resume-builder/components/editors/ProfileEditor.jsx */
 
 import React, { useState } from "react";
 import { SectionCard, Label, Text, TextArea, IconButton } from "../SharedInputs";
