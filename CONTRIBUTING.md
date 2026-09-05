@@ -59,7 +59,7 @@ Use the conventional commit format:
 ```
 feat: add dark-mode accent picker to resume editor
 fix: prevent cover letter PDF export from silently failing
-docs: update CHANGELOG for v0.5.11
+docs: update CHANGELOG for v0.7.0
 ```
 
 Rules:
@@ -74,11 +74,14 @@ Rules:
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
-npm install
-npm run dev
+cp frontend/.env.example frontend/.env
+cp backend/.env.example backend/.env
+cd frontend && npm install && npm run dev
+# in another terminal
+cd backend && npm install && npm run dev
 ```
 
-Requires Node.js 20+ and npm 10+.
+Requires Node.js 20+ and npm 10+. PostgreSQL is optional.
 
 ---
 

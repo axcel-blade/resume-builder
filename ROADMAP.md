@@ -26,7 +26,7 @@ _None at this time._
 - [ ] Multiple tone options (formal, conversational, confident)
 - [ ] Opening paragraph variant selector
 - [ ] Company name and role autofill from resume data
-- [ ] Saved drafts support via localStorage
+- [x] Saved drafts for signed-in users via the profile API
 
 ### Platform
 
@@ -48,6 +48,8 @@ _None at this time._
 
 | Version | Feature |
 |---------|---------|
+| 0.7.0 | Prisma profiles, API sync, Nest/Vite folder cleanup |
+| 0.5.12 | Repo cleanup: Vite app moved into `frontend/`, onboarding docs updated |
 | 0.5.11 | PDF title wrap; consistent bold Title Case university names |
 | 0.5.10 | VMock: 11pt title/body, hyphen date ranges, recency sort |
 | 0.5.9 | Reorder bullet points within resume entries |
@@ -65,7 +67,6 @@ _None at this time._
 
 The following will not be added to this project:
 
-- Server-side resume storage or user accounts
 - Third-party integrations (LinkedIn import, job board APIs)
 - AI-generated resume content (beyond the optional summary endpoint)
 - Mobile native apps

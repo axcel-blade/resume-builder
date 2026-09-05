@@ -6,22 +6,26 @@ Only the latest release of Vita Forge receives security fixes.
 
 | Version | Supported |
 |---------|-----------|
-| Latest  | Yes       |
+| 0.7.0   | Yes       |
 | Older   | No        |
 
 ---
 
 ## Scope
 
-Vita Forge is a client-side web application. All resume and cover letter data is stored exclusively in the user's browser (`localStorage`). No user data is transmitted to or stored on any server, with the following exception:
+Vita Forge stores resume and cover letter data in two ways:
 
-- **AI summary generation** (`api/generate_summary.js`): an optional serverless function that proxies a request to the Anthropic API. It requires a valid API key and does not persist any data.
+- **Guests:** browser `localStorage` only
+- **Signed-in users:** Nest API + optional PostgreSQL (`DATABASE_URL`)
+
+Optional AI endpoints (`POST /api/generate_summary` and `/api/ai/*`) send profile text to an AI provider. They require server-side API keys. Never put those keys in `VITE_*` frontend variables.
 
 Security concerns relevant to this project include:
 
 - Cross-site scripting (XSS) in rendered resume or cover letter content
-- Malicious JSON imported via the Import JSON feature
-- Vulnerabilities in the serverless API handler
+- Malicious JSON imported via Import JSON
+- Stolen JWTs or leaked `.env` secrets
+- Unauthorized access to another user’s profile API
 
 ---
 

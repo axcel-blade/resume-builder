@@ -1,0 +1,9 @@
+---
+globs: frontend/src/**
+alwaysApply: false
+---
+
+- Use functional React components. Colocate styles next to the component (`login.css`, `register.css`).
+- Put HTTP clients in `frontend/src/services/`, shared types in `frontend/src/types/`, and constants in `frontend/src/constants/`.
+- New UI belongs under `frontend/src/components/` or the matching feature folder (`features/resume-builder`, `features/cover-letter`, `features/website`, `features/auth`).
+- Prefer existing API helpers over ad-hoc `fetch` in components. See @frontend/src/services/index.ts
