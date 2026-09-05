@@ -1,0 +1,9 @@
+---
+description: Write a CONTEXT.md handoff when the chat is near the context limit
+alwaysApply: false
+---
+
+- When approaching the context limit, write a handoff under 200 words in `CONTEXT.md` (or append to @AGENTS.md).
+- Use full file paths. Include branch, pending tasks, known bugs, and next steps.
+- Use the "Session Continuation Context" template in @AGENTS.md.
+- On a new session, read that summary before changing code.

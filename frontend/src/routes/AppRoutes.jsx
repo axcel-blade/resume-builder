@@ -2,19 +2,20 @@
 
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
-import MainLayout from "../core/layouts/MainLayout";
-import Seo from "../core/seo/Seo";
-import { SITE_NAME, SITE_URL } from "../core/config/seo";
+import MainLayout from "../layouts/MainLayout";
+import Seo from "../components/Seo";
+import { SITE_NAME, SITE_URL } from "../constants/seo";
+import { LoginPage, RegisterPage } from "../features/auth";
 
-const Home = lazy(() => import("../website/pages/Home"));
-const About = lazy(() => import("../website/pages/About"));
-const Products = lazy(() => import("../website/pages/Products"));
-const Contact = lazy(() => import("../website/pages/Contact"));
-const NotFound = lazy(() => import("../website/pages/NotFound"));
-const Builder = lazy(() => import("../apps/resume-builder/pages/Builder"));
-const Templates = lazy(() => import("../apps/resume-builder/pages/Templates"));
-const Preview = lazy(() => import("../apps/resume-builder/pages/Preview"));
-const CoverLetterHome = lazy(() => import("../apps/cover-letter/pages/CoverLetterHome"));
+const Home = lazy(() => import("../features/website/pages/Home"));
+const About = lazy(() => import("../features/website/pages/About"));
+const Products = lazy(() => import("../features/website/pages/Products"));
+const Contact = lazy(() => import("../features/website/pages/Contact"));
+const NotFound = lazy(() => import("../features/website/pages/NotFound"));
+const Builder = lazy(() => import("../features/resume-builder/pages/Builder"));
+const Templates = lazy(() => import("../features/resume-builder/pages/Templates"));
+const Preview = lazy(() => import("../features/resume-builder/pages/Preview"));
+const CoverLetterHome = lazy(() => import("../features/cover-letter/pages/CoverLetterHome"));
 
 function withSeo(PageComponent, seoProps) {
   return (
@@ -46,7 +47,11 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route
+        {/* Auth Routes (Public) */}
+        <Route path="/login" element={withSeo(LoginPage, { title: "Login", path: "/login" })} />
+        <Route path="/register" element={withSeo(RegisterPage, { title: "Register", path: "/register" })} />
+
+        {/* Website Pages (Public) */}        <Route
           path="/"
           element={withSeo(Home, {
             title: "Home",
@@ -153,7 +158,7 @@ export default function AppRoutes() {
         <Route
           path="/apps/resume-builder/templates"
           element={withSeo(Templates, {
-            title: "Resume Templates",
+            title: "Template marketplace",
             path: "/apps/resume-builder/templates",
             description:
               "Browse resume templates and pick a professional, ATS-friendly layout for your job applications.",

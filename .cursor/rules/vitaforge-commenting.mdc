@@ -1,0 +1,8 @@
+---
+globs: "**/*.ts, **/*.tsx, **/*.js, **/*.jsx"
+alwaysApply: false
+---
+
+- Comment only complex logic, workarounds, performance tradeoffs, and non-obvious dependencies.
+- Do not comment trivial loops or "this fixes issue #N" (use the commit message).
+- Public functions use JSDoc (`@param`, `@returns`, `@throws`). TODOs include issue, owner, and status. Examples: @AGENTS.md

@@ -1,20 +1,22 @@
 # Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.12-blue)
+![Version](https://img.shields.io/badge/version-0.8.0-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A browser-based career-tools platform for building professional, ATS-friendly resumes and cover letters. No accounts, no server — all data stays in your browser.
+A backend-connected career-tools platform for building professional, ATS-friendly resumes and cover letters with user accounts and data persistence.
 
-The Vite application now lives in the `frontend/` directory so the repository root stays focused on project documentation and automation.
+The repo is split into a Vite frontend and a NestJS backend. The UI never talks to the database directly.
 
 ## What it is
 
 | Module | Description |
 |---|---|
 | **Website** | Home, About, Products, and Contact pages |
-| **Resume Builder** | Section editor with live A4 preview and PDF export |
+| **Resume Builder** | Section editor with live A4 preview, templates, and PDF export |
 | **Cover Letter Writer** | Guided form with live draft preview and PDF export |
+| **Collaboration** | Share a resume room over SSE (last-write-wins) |
+| **Templates** | Marketplace presets (Modern, Basic, Executive, Compact, Academic) |
 
 ## What it does
 
@@ -33,6 +35,12 @@ The Vite application now lives in the `frontend/` directory so the repository ro
 - Live A4 draft preview
 - Export to PDF or JSON; import a saved profile from JSON
 
+**Backend Integration**
+- User accounts with authentication (JWT tokens)
+- Persistent storage for profiles, resumes, and cover letters via PostgreSQL
+- User-specific data isolation between accounts
+- Profile sync across devices and browser sessions
+
 ## Built with
 
 | Layer | Technology |
@@ -47,51 +55,139 @@ The Vite application now lives in the `frontend/` directory so the repository ro
 
 ## How to run it
 
+**Requirements:** Node.js 20+, npm 10+. PostgreSQL is optional.
+
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
+```
+
+**Environment**
+
+```bash
+cp frontend/.env.example frontend/.env
+cp backend/.env.example backend/.env
+```
+
+Do not put backend secrets in `VITE_*` variables.
+
+**Frontend**
+
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173`
+Opens at `http://localhost:5173`.
+
+**Backend**
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+API at `http://localhost:3001/api`.
+
+Health probes:
+
+```bash
+curl http://localhost:3001/api/health
+curl http://localhost:3001/api/health/ready
+```
+
+**Database (optional)**
+
+Uncomment `DATABASE_URL` in `backend/.env`, then:
+
+```bash
+cd backend
+npm run prisma:generate
+npm run prisma:deploy
+```
+
+**Tests**
+
+```bash
+cd backend
+npm test
+```
 
 **Production build**
 
 ```bash
-cd frontend
-npm run build && npm run preview
+cd frontend && npm run build
+cd ../backend && npm run build
 ```
+
+## Docker
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose v2).
+
+**Start frontend + backend (in-memory API store)**
+
+```bash
+docker compose up --build
+```
+
+| Service  | URL |
+|----------|-----|
+| Frontend | http://localhost:8080 |
+| Backend  | http://localhost:3001/api |
+| Health   | http://localhost:3001/api/health |
+
+Stop with `Ctrl+C`, or run detached:
+
+```bash
+docker compose up --build -d
+docker compose down
+```
+
+**Optional Postgres**
+
+```bash
+docker compose --profile db up --build -d
+```
+
+Then point the API at the container (example):
+
+```bash
+set DATABASE_URL=postgresql://vita:vita@postgres:5432/vitaforge
+docker compose up --build -d
+```
+
+On PowerShell use `$env:DATABASE_URL="postgresql://vita:vita@postgres:5432/vitaforge"` before `docker compose up`.
+
+**Useful flags**
+
+```bash
+# Rebuild images after code changes
+docker compose up --build
+
+# View logs
+docker compose logs -f backend
+docker compose logs -f frontend
+```
+
+Image definitions live under `docker/`. Compose file is `docker-compose.yml` at the repo root.
 
 ## Where the code lives
 
 ```
 vita-forge/
-├── frontend/
-│   ├── public/
+├── frontend/          # User interface (Vite + React)
+├── backend/           # API and business logic (NestJS)
 │   ├── src/
-│   │   ├── core/          # Router, layouts, SEO, config
-│   │   ├── website/       # Home, About, Products, Contact, NotFound
-│   │   ├── apps/
-│   │   │   ├── resume-builder/
-│   │   │   └── cover-letter/
-│   │   ├── components/    # Shared UI: Toolbar, templates, editors, preview
-│   │   ├── data/
-│   │   └── routes/
-│   ├── .gitignore
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── index.html
-├── .github/
+│   ├── database/      # Prisma schema + migrations
+│   └── tests/
+├── docker/            # Dockerfiles and nginx config
+├── docker-compose.yml
+├── docs/              # Documentation
+├── .github/           # Workflows and templates
 ├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── ROADMAP.md
-├── SECURITY.md
-├── SUPPORT.md
-├── LICENSE
-└── api/
+└── LICENSE
 ```
 
 ## Contributing and support

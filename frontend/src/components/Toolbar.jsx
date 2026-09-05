@@ -15,8 +15,8 @@ import {
   normalizeImportedProfile,
   readProfileBundle,
   writeProfileBundle,
-} from "../apps/shared/services/profileBundle";
-import { defaultCoverLetterData, defaultData } from "../data/defaultData";
+} from "../features/shared/services/profileBundle";
+import { defaultCoverLetterData, defaultData } from "../constants/defaultData";
 
 // ─── Layout (mm) ────────────────────────────────────────────────────────────
 // Community checkers measure *visual* whitespace to the glyph, not the jsPDF
