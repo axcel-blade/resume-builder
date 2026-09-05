@@ -20,5 +20,8 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/database ./database
 COPY --from=build /app/package.json ./package.json
+# Prisma CLI is a prod dependency so migrate deploy works at container start.
+COPY docker/backend-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 EXPOSE 3001
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["/entrypoint.sh"]

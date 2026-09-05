@@ -96,7 +96,7 @@ docker compose up --build
 - UI: http://localhost:8080  
 - API: http://localhost:3001/api  
 
-Optional Postgres: `docker compose --profile db up --build -d`. See the root [README.md](../README.md#docker) for details.
+Optional Postgres: `docker compose -f docker-compose.yml -f docker-compose.db.yml --profile db up --build -d`. See the root [README.md](../README.md#docker) for details.
 
 ## Configuration
 
