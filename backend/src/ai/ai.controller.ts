@@ -11,14 +11,14 @@ export class AiController {
   @Post('resume-summary')
   @HttpCode(HttpStatus.OK)
   generateResumeSummary(@Body() body: GenerateResumeSummaryDto) {
-    return this.aiService.generateResumeSummary(body.profileData as ResumeProfileData);
+    return this.aiService.generateResumeSummary(body.profileData as unknown as ResumeProfileData);
   }
 
   @Post('cover-letter')
   @HttpCode(HttpStatus.OK)
   generateCoverLetter(@Body() body: GenerateCoverLetterDto) {
     return this.aiService.generateCoverLetter(
-      body.profileData as ResumeProfileData,
+      body.profileData as unknown as ResumeProfileData,
       body.jobDescription,
       body.companyName,
       body.targetPosition,

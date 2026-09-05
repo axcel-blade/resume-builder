@@ -14,6 +14,13 @@ const products = [
     image: resumeImage,
   },
   {
+    title: "Template marketplace",
+    description: "Browse resume layouts and apply a preset accent and type style in one click.",
+    to: "/apps/resume-builder/templates",
+    status: "Live",
+    image: resumeImage,
+  },
+  {
     title: "Cover Letter Writer",
     description: "Draft role-specific cover letters with guided inputs and live output preview.",
     to: "/apps/cover-letter",
@@ -30,7 +37,7 @@ export default function Products() {
         Choose a module based on where you are in your job application workflow. Both tools support live
         preview and export-ready output.
       </p>
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
         {products.map((product) => (
           <ProductCard key={product.title} {...product} />
         ))}

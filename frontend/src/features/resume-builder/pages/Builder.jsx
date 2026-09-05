@@ -1,12 +1,14 @@
 /* src/apps/resume-builder/pages/Builder.jsx */
 
 import React, { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Toolbar from "../../../components/Toolbar";
 import ResumeEditor from "../../../components/editors/ResumeEditor";
 import A4PaginatedPreview from "../../../components/preview/A4PaginatedPreview";
 import TemplateModern from "../../../components/TemplateModern";
 import TemplateBasic from "../../../components/TemplateBasic";
 import { defaultData } from "../../../constants/defaultData";
+import { applyMarketplaceTemplate } from "../../../constants/templates";
 import { readProfileBundle, writeProfileBundle } from "../../shared/services/profileBundle";
 import { useAuth } from "../../../services/auth-context";
 import { pullRemoteProfile, pushRemoteProfile } from "../../../services/profile-sync";
@@ -15,25 +17,42 @@ import {
   listProfileVersions,
   restoreProfileVersion,
 } from "../../../services/user";
+import {
+  createCollabRoom,
+  getCollabClientId,
+  joinCollabRoom,
+  openCollabStream,
+  publishCollabState,
+} from "../../../services/collab";
 
 export default function Builder() {
   const [data, setData] = useState(defaultData);
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState("");
   const [versions, setVersions] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [roomId, setRoomId] = useState(searchParams.get("room") || "");
+  const [roomInput, setRoomInput] = useState(searchParams.get("room") || "");
+  const [peers, setPeers] = useState(0);
+  const [collabError, setCollabError] = useState("");
   const previewRef = useRef(null);
   const skipNextPush = useRef(true);
+  const skipCollabPush = useRef(true);
   const lastGoodRef = useRef(defaultData);
+  const clientIdRef = useRef(getCollabClientId());
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const set = (patch) => setData((prev) => ({ ...prev, ...patch }));
 
   useEffect(() => {
     const bundle = readProfileBundle();
-    if (bundle.resume) {
-      setData(bundle.resume);
-      lastGoodRef.current = bundle.resume;
+    let next = bundle.resume || defaultData;
+    const templateId = searchParams.get("template");
+    if (templateId) {
+      next = { ...next, meta: applyMarketplaceTemplate(next.meta, templateId) };
     }
+    setData(next);
+    lastGoodRef.current = next;
   }, []);
 
   useEffect(() => {
@@ -95,6 +114,60 @@ export default function Builder() {
     return () => window.clearTimeout(timer);
   }, [data, isAuthenticated]);
 
+  useEffect(() => {
+    if (!roomId) {
+      return;
+    }
+    let cancelled = false;
+    joinCollabRoom(roomId, clientIdRef.current)
+      .then((joined) => {
+        if (cancelled) {
+          return;
+        }
+        setPeers(joined.peers || 1);
+        if (joined.resume) {
+          skipNextPush.current = true;
+          skipCollabPush.current = true;
+          setData(joined.resume);
+        }
+      })
+      .catch((error) => {
+        setCollabError(error instanceof Error ? error.message : "Could not join the room");
+      });
+
+    const close = openCollabStream(roomId, clientIdRef.current, (event) => {
+      if (event.peers != null) {
+        setPeers(event.peers);
+      }
+      if (event.type === "update" && event.clientId !== clientIdRef.current && event.resume) {
+        skipNextPush.current = true;
+        skipCollabPush.current = true;
+        setData(event.resume);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      close();
+    };
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!roomId) {
+      return;
+    }
+    if (skipCollabPush.current) {
+      skipCollabPush.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      publishCollabState(roomId, clientIdRef.current, data).catch(() => {
+        setCollabError("Live sync paused. Check the API and try again.");
+      });
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [data, roomId]);
+
   const refreshVersions = async () => {
     try {
       setVersions(await listProfileVersions());
@@ -137,9 +210,31 @@ export default function Builder() {
     }
   };
 
+  const startCollab = async () => {
+    try {
+      const created = await createCollabRoom();
+      setRoomId(created.roomId);
+      setRoomInput(created.roomId);
+      setSearchParams({ room: created.roomId });
+      setCollabError("");
+    } catch (error) {
+      setCollabError(error instanceof Error ? error.message : "Could not start a live session");
+    }
+  };
+
+  const joinCollab = async () => {
+    const nextRoom = roomInput.trim();
+    if (!nextRoom) {
+      return;
+    }
+    setRoomId(nextRoom);
+    setSearchParams({ room: nextRoom });
+    setCollabError("");
+  };
+
   const getTemplateComponent = () => {
-    const template = data.meta?.template || "modern";
-    if (template === "basic") return TemplateBasic;
+    const layout = data.meta?.layout || data.meta?.template || "modern";
+    if (layout === "basic") return TemplateBasic;
     return TemplateModern;
   };
 
@@ -158,6 +253,33 @@ export default function Builder() {
       {syncError ? (
         <p className="mt-2 text-sm text-red-600" role="alert">
           {syncError}
+        </p>
+      ) : null}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Link className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm" to="/apps/resume-builder/templates">
+          Template marketplace
+        </Link>
+        <button type="button" className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm" onClick={startCollab}>
+          Start live session
+        </button>
+        <input
+          className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+          placeholder="Room ID"
+          value={roomInput}
+          onChange={(event) => setRoomInput(event.target.value)}
+        />
+        <button type="button" className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm" onClick={joinCollab}>
+          Join
+        </button>
+        {roomId ? (
+          <span className="text-sm text-gray-600">
+            Live · {peers} {peers === 1 ? "peer" : "peers"}
+          </span>
+        ) : null}
+      </div>
+      {collabError ? (
+        <p className="mt-2 text-sm text-red-600" role="alert">
+          {collabError}
         </p>
       ) : null}
       {isAuthenticated ? (

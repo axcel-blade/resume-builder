@@ -13,8 +13,16 @@ export class AIService {
   private readonly logger = new Logger(AIService.name);
   private config: LmStudioConfigService;
 
-  constructor(config?: Partial<LmStudioConfig>) {
-    this.config = LmStudioConfigService.create(config);
+  constructor() {
+    // No ctor DI tokens: Partial<LmStudioConfig> erases to Object and breaks Nest.
+    this.config = LmStudioConfigService.create({});
+  }
+
+  /** Apply overrides after construction (tests and runtime reconfiguration). */
+  static withConfig(config: Partial<LmStudioConfig>): AIService {
+    const service = new AIService();
+    service.setConfig(config);
+    return service;
   }
 
   setConfig(config: Partial<LmStudioConfig>): void {
@@ -51,7 +59,9 @@ export class AIService {
       return {
         success: true,
         content: response.choices[0].message.content,
-        tokensUsed: response.usage ? (response.usage.prompts_tokens + response.usage.completion_tokens) : undefined,
+        tokensUsed: response.usage
+          ? (response.usage.prompts_tokens ?? 0) + (response.usage.completion_tokens ?? 0)
+          : undefined,
       };
     } catch (error) {
       this.logger.error('Error generating resume summary', error);
@@ -91,7 +101,9 @@ export class AIService {
       return {
         success: true,
         content: response.choices[0].message.content || '',
-        tokensUsed: response.usage ? (response.usage.prompts_tokens + response.usage.completion_tokens) : undefined,
+        tokensUsed: response.usage
+          ? (response.usage.prompts_tokens ?? 0) + (response.usage.completion_tokens ?? 0)
+          : undefined,
       };
     } catch (error) {
       this.logger.error('Error generating cover letter', error);

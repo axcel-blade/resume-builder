@@ -63,6 +63,12 @@ export const Optional = () => () => undefined;
 export const Inject = (_token?: unknown) => () => undefined;
 export const Global = () => (target: unknown) => target;
 export const Param = (_name?: string) => () => undefined;
+export const Query = (_name?: string) => () => undefined;
+export const Req = () => () => undefined;
+export const Res =
+  (_options?: unknown) =>
+  () =>
+    undefined;
 export const Controller = (_path?: string) => (target: unknown) => target;
 export const Post = (_path?: string) => () => undefined;
 export const Get = (_path?: string) => () => undefined;
@@ -75,6 +81,7 @@ export const HttpStatus = {
   CREATED: 201,
   NO_CONTENT: 204,
   UNAUTHORIZED: 401,
+  SERVICE_UNAVAILABLE: 503,
   INTERNAL_SERVER_ERROR: 500,
   BAD_GATEWAY: 502,
 };

@@ -14,6 +14,7 @@ _None at this time._
 
 ### Resume Builder
 
+- [x] Template marketplace with Modern, Basic, Executive, Compact, and Academic presets
 - [ ] Additional resume templates (minimal, timeline, two-column)
 - [ ] Drag-and-drop section reordering in the editor
 - [ ] Per-section visibility toggles (show/hide sections without deleting data)
@@ -30,6 +31,7 @@ _None at this time._
 
 ### Platform
 
+- [x] Real-time collaborative resume rooms (SSE last-write-wins)
 - [ ] Unified profile page showing both resume and cover letter side by side
 - [ ] Dark mode support
 - [ ] Keyboard navigation improvements across all editors
@@ -48,6 +50,7 @@ _None at this time._
 
 | Version | Feature |
 |---------|---------|
+| 0.8.0 | Docker Compose, collab SSE rooms, template marketplace API |
 | 0.7.0 | Prisma profiles, API sync, Nest/Vite folder cleanup |
 | 0.5.12 | Repo cleanup: Vite app moved into `frontend/`, onboarding docs updated |
 | 0.5.11 | PDF title wrap; consistent bold Title Case university names |

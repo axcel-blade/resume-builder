@@ -6,7 +6,7 @@ Only the latest release of Vita Forge receives security fixes.
 
 | Version | Supported |
 |---------|-----------|
-| 0.7.0   | Yes       |
+| 0.8.0   | Yes       |
 | Older   | No        |
 
 ---

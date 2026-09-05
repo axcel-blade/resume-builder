@@ -1,34 +1,32 @@
-# Frontend Development Tasks
+# Development Tasks
 
 ## Authentication & Backend Integration
 
-### Completed ✅
-- [x] Created AuthContext with user state management
-- [x] Implemented login/register components
-- [x] Added protected route wrappers in AppRoutes.jsx
-- [x] Wrapped app with AuthProvider in RouterProvider
-- [x] Created API services (auth.ts, user.ts)
-- [x] Set up VITE_API_URL environment variable
-- [x] Test /users/profile endpoint creation on backend
-- [x] Configure CORS settings on NestJS backend
-- [x] Implement profile data sync logic
-- [x] Add loading states during API calls
-- [x] Handle token refresh mechanism
-- [x] Test error scenarios (401, 500, network failures)
-- [x] Create /users/profile endpoint in NestJS backend
-- [x] Configure CORS middleware on NestJS app.module.ts
-- [x] Implement user data schema in Prisma
-- [x] Add database migrations for new tables
-- [x] Test full registration → profile sync flow
+### Completed
+- [x] AuthContext, login/register, protected routes
+- [x] API services (`auth`, `user`) and CORS on Nest
+- [x] Profile sync, optimistic saves, version restore points
+- [x] Prisma schema + migrations; optional in-memory store
 
-## Resume Builder Enhancement
+## Resume Builder
 
-### Completed ✅
-- [x] Connect resume data to backend storage
-- [x] Replace localStorage with API calls
-- [x] Implement optimistic UI updates
-- [x] Version history and restore points
+### Completed
+- [x] Backend-backed resume storage for signed-in users
+- [x] Collaborative editing rooms (SSE, last-write-wins)
+- [x] Template marketplace (Modern, Basic, Executive, Compact, Academic)
 
-### Planned 📝
-- [ ] Add collaborative editing (real-time)
-- [ ] Template marketplace
+### Planned
+- [ ] Additional templates (minimal, timeline, two-column)
+- [ ] Drag-and-drop section reordering
+- [ ] Per-section visibility toggles
+
+## Platform / Ops
+
+### Completed
+- [x] Docker Compose for frontend + backend (+ optional Postgres profile)
+- [x] Health liveness and readiness probes
+
+### Planned
+- [ ] Dark mode
+- [ ] PWA / offline support
+- [ ] Accessibility WCAG 2.1 AA pass

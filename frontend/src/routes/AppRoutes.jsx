@@ -158,7 +158,7 @@ export default function AppRoutes() {
         <Route
           path="/apps/resume-builder/templates"
           element={withSeo(Templates, {
-            title: "Resume Templates",
+            title: "Template marketplace",
             path: "/apps/resume-builder/templates",
             description:
               "Browse resume templates and pick a professional, ATS-friendly layout for your job applications.",
