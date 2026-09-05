@@ -1,8 +1,14 @@
-/* src/core/router/RouterProvider.jsx */
-
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "../api/auth-context";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 export default function RouterProvider({ children }) {
-  return <BrowserRouter>{children}</BrowserRouter>;
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>{children}</AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
 }

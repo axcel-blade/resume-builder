@@ -1,10 +1,10 @@
 # Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.5.12-blue)
+![Version](https://img.shields.io/badge/version-0.6.1-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A browser-based career-tools platform for building professional, ATS-friendly resumes and cover letters. No accounts, no server — all data stays in your browser.
+A backend-connected career-tools platform for building professional, ATS-friendly resumes and cover letters with user accounts and data persistence.
 
 The Vite application now lives in the `frontend/` directory so the repository root stays focused on project documentation and automation.
 
@@ -32,6 +32,12 @@ The Vite application now lives in the `frontend/` directory so the repository ro
 - Auto-populates name, email, and phone from a saved resume profile
 - Live A4 draft preview
 - Export to PDF or JSON; import a saved profile from JSON
+
+**Backend Integration**
+- User accounts with authentication (JWT tokens)
+- Persistent storage for profiles, resumes, and cover letters via PostgreSQL
+- User-specific data isolation between accounts
+- Profile sync across devices and browser sessions
 
 ## Built with
 

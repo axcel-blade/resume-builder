@@ -1,0 +1,8 @@
+---
+globs: README.md,CHANGELOG.md,**/package.json,**/CHANGELOG.md,**/.env.example
+alwaysApply: false
+---
+
+- SemVer is `MAJOR.MINOR.PATCH`. MAJOR = breaking, MINOR = feature, PATCH = fix.
+- Before a release, bump the same version in root `README.md`, `frontend/package.json`, `backend/package.json`, both changelogs, Docker labels if present, and `.env.example`.
+- Checklist and examples live in @AGENTS.md.

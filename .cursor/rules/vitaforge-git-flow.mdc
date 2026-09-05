@@ -1,0 +1,10 @@
+---
+description: Git Flow branches, naming, and where to branch from for VitaForge
+alwaysApply: false
+---
+
+- Do not commit or push unless the user asks.
+- Features: `git checkout -b feature/<short-desc> develop`
+- Releases: `release/<version>` from `develop`
+- Hotfixes: `hotfix/<version>-<issue>` from `main`
+- Merge to `main` through a PR. Full table and diagram: @AGENTS.md

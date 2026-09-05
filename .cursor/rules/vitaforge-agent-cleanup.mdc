@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+- Keep real project work (`backend/`, `docs/`, `frontend/src/**`, `.env.example`). Delete scratch files when the task is done: `*.tmp`, `temp*.txt`, `temp*.md`, numbered drafts, empty accidental filenames.
+- Do not commit real `.env` files. Put templates in `.env.example`.
+- Never edit generated output in `dist/` or `build/`.
+- Follow the keep/delete lists in @AGENTS.md.

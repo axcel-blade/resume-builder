@@ -1,10 +1,11 @@
-/* src/website/components/Navbar.jsx */
-
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { websiteNavLinks } from "../../core/config/navLinks";
+import { useAuth } from "../../core/api/auth-context";
 
 export default function Navbar() {
+  const { isAuthenticated, isLoading, logout } = useAuth();
+
   return (
     <header className="border-b border-gray-200 bg-white">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
@@ -24,6 +25,30 @@ export default function Navbar() {
               </NavLink>
             </li>
           ))}
+          {!isLoading && (
+            <li>
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  onClick={() => {
+                    void logout();
+                  }}
+                >
+                  Log out
+                </button>
+              ) : (
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `text-sm font-medium ${isActive ? "text-sky-600" : "text-gray-600 hover:text-gray-900"}`
+                  }
+                >
+                  Log in
+                </NavLink>
+              )}
+            </li>
+          )}
         </ul>
       </nav>
     </header>

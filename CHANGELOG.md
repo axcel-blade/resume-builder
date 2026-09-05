@@ -9,6 +9,25 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- User authentication with JWT tokens (login, register, logout)
+- Backend API integration via NestJS microservices
+- Persistent user profile storage in PostgreSQL database
+- AuthContext for centralized auth state management
+- Protected routes for resume and cover letter apps
+- Profile synchronization across devices
+- User-specific data isolation
+
+### Changed
+- Moved the Vite application into a dedicated `frontend/` folder to keep the repository root focused on project docs and automation
+- Updated run instructions to install and launch the app from the new frontend directory
+- Refreshed markdown references and version metadata to match the new repository structure
+- Replaced browser-only storage with backend-connected API calls
+
+### Fixed
+- Auth state persistence across page reloads
+- Protected route access control (unauthenticated users redirected to login)
+
 ## [0.5.12] - 2026-08-31
 
 ### Changed

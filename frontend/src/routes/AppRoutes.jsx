@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import MainLayout from "../core/layouts/MainLayout";
 import Seo from "../core/seo/Seo";
 import { SITE_NAME, SITE_URL } from "../core/config/seo";
+import { LoginPage, RegisterPage } from "../components/auth";
 
 const Home = lazy(() => import("../website/pages/Home"));
 const About = lazy(() => import("../website/pages/About"));
@@ -46,7 +47,11 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route
+        {/* Auth Routes (Public) */}
+        <Route path="/login" element={withSeo(LoginPage, { title: "Login", path: "/login" })} />
+        <Route path="/register" element={withSeo(RegisterPage, { title: "Register", path: "/register" })} />
+
+        {/* Website Pages (Public) */}        <Route
           path="/"
           element={withSeo(Home, {
             title: "Home",
