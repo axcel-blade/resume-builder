@@ -18,9 +18,9 @@ Coverage: `npm run test:coverage`.
 
 ## Conventions
 
-- Specs live in `backend/src/test/` and match `*.spec.ts`.
+- Specs live in `backend/tests/unit/` and `backend/tests/integration/` and match `*.spec.ts`.
 - Prefer constructing services/controllers with mocks over `@nestjs/testing` unless those packages are installed.
-- Jest maps `@nestjs/common`, `bcrypt`, `jsonwebtoken`, and `cors` to `backend/src/test/stubs/` until those deps are fully installed.
+- Jest maps `@nestjs/common`, `bcrypt`, `jsonwebtoken`, and `cors` to `backend/tests/stubs/` until those deps are fully installed.
 - After changing auth or AI contracts, update the matching spec in the same change.
 
 ## Do not

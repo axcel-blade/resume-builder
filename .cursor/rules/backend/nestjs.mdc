@@ -3,8 +3,8 @@ globs: backend/src/**
 alwaysApply: false
 ---
 
-- NestJS layout: controllers stay thin; business logic lives in services (`auth/`, `services/`, `users/`).
+- NestJS layout: controllers stay thin; business logic lives in feature services (`auth/`, `users/`, `ai/`). Persistence goes through `repositories/`.
 - Validate request bodies with class-validator DTOs in `dto/` folders. Do not accept untyped `any` bodies on new endpoints.
 - AI generation goes through `AIService` and prompt builders—do not call LM Studio from controllers.
-- Add or update Jest specs under `backend/src/test/` for new services and controllers. Run `npm test` in `backend/`.
-- Config defaults live in @backend/src/services/lm-studio-config.ts
+- Add or update Jest specs under `backend/tests/` for new services and controllers. Run `npm test` in `backend/`.
+- Config defaults live in @backend/src/ai/lm-studio-config.ts

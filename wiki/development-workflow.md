@@ -271,4 +271,4 @@ npm run type-check
 ---
 
 **Last Updated:** September 2026  
-**Version:** 0.6.1
+**Version:** 0.7.0

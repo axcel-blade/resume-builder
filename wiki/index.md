@@ -34,7 +34,7 @@ This wiki serves as a comprehensive resource for developers, contributors, and u
 - ✨ **Resume Builder** - Create ATS-friendly resumes with live A4 preview
 - 📝 **Cover Letter Writer** - Guided form with tone selection
 - 🔒 **User Profiles** - Secure user accounts with PostgreSQL storage
-- ☁️ **Cloud Sync** - Redis-based caching for cross-device access
+- ☁️ **Cloud Sync** - Profile API (Prisma/PostgreSQL when configured)
 
 ---
 
@@ -105,7 +105,7 @@ Use these tags to organize your contributions:
 
 ## Version Info
 
-**Current Version:** 0.6.1  
+**Current Version:** 0.7.0  
 **Last Updated:** September 2026  
 **License:** MIT
 

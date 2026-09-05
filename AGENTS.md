@@ -115,4 +115,4 @@ const users = await userRepository.find({ where: { status: 'active' } });
 
 ---
 
-*Last updated: 2026-09-05*
+*Last updated: 2026-09-05 (v0.7.0)*

@@ -2,12 +2,11 @@
 export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/main.ts',
     '!src/**/*.test.ts',
-    '!src/config/**/*.ts'
   ],
   transform: {
     '^.+\\.tsx?$': [
@@ -22,22 +21,22 @@ export default {
           experimentalDecorators: true,
           emitDecoratorMetadata: true,
           strict: false,
-          types: ['jest', 'node']
-        }
-      }
-    ]
+          types: ['jest', 'node'],
+        },
+      },
+    ],
   },
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@nestjs/common$': '<rootDir>/src/test/stubs/nestjs-common.ts',
-    '^cors$': '<rootDir>/src/test/stubs/cors.ts',
-    '^bcrypt$': '<rootDir>/src/test/stubs/bcrypt.ts',
-    '^jsonwebtoken$': '<rootDir>/src/test/stubs/jsonwebtoken.ts'
+    '^@nestjs/common$': '<rootDir>/tests/stubs/nestjs-common.ts',
+    '^cors$': '<rootDir>/tests/stubs/cors.ts',
+    '^bcrypt$': '<rootDir>/tests/stubs/bcrypt.ts',
+    '^jsonwebtoken$': '<rootDir>/tests/stubs/jsonwebtoken.ts',
+    '^@prisma/client$': '<rootDir>/tests/stubs/prisma-client.ts',
   },
-  globals: {},
-  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   verbose: true,
   forceExit: true,
-  detectOpenHandles: true
+  detectOpenHandles: true,
 };

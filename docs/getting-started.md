@@ -1,6 +1,6 @@
 # Getting Started with Vita Forge
 
-Welcome to **Vita Forge**, a comprehensive career-tools platform for building professional resumes and cover letters.
+Welcome to **Vita Forge**, a career-tools platform for building professional resumes and cover letters.
 
 ## Quick Start
 
@@ -9,130 +9,101 @@ Welcome to **Vita Forge**, a comprehensive career-tools platform for building pr
 - [Git](https://git-scm.com/) (v2.0+)
 - [Node.js](https://nodejs.org/) (v20 or higher)
 - [npm](https://www.npmjs.com/) (v10 or higher)
-- [PostgreSQL](https://www.postgresql.org/download/) (database)
-- [Redis](https://redis.io/download/) (caching)
+- [PostgreSQL](https://www.postgresql.org/download/) (optional — omit `DATABASE_URL` to use the in-memory store)
 
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
 
-# Navigate to frontend and install dependencies
+cp frontend/.env.example frontend/.env
+cp backend/.env.example backend/.env
+
 cd frontend
 npm install
 npm run dev
 ```
 
-The application will open at `http://localhost:5173`
+In a second terminal:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+UI: `http://localhost:5173`  
+API: `http://localhost:3001/api`
 
 ## Project Structure
 
 ```
 vita-forge/
-├── frontend/           # React + TypeScript + Vite frontend
-│   ├── src/
-│   │   ├── core/          # Router, layouts, SEO, config
-│   │   ├── website/       # Home, About, Products, Contact pages
-│   │   ├── apps/
-│   │   │   ├── resume-builder/
-│   │   │   └── cover-letter/
-│   │   ├── components/    # Shared UI components
-│   │   ├── data/          # Data management
-│   │   └── routes/        # Route definitions
-├── backend/             # NestJS + TypeScript API
-│   ├── src/
-│   │   ├── modules/       # Feature modules (auth, profiles, etc.)
-│   │   └── main.ts        # Application entry point
-├── docs/                # Project documentation
-└── wiki/                # GitHub Wiki pages
+├── frontend/           # React + Vite UI
+│   └── src/
+│       ├── features/   # auth, website, resume-builder, cover-letter
+│       ├── services/   # REST clients
+│       ├── components/
+│       └── layouts/
+├── backend/            # NestJS API
+│   ├── src/            # auth, users, ai, repositories
+│   ├── database/       # Prisma schema + migrations
+│   └── tests/
+├── docs/
+└── wiki/
 ```
 
 ## Features Overview
 
 ### Resume Builder
 
-- Edit all resume sections: profile, experience, education, skills, projects, certificates
-- Reorder bullet points with up/down controls
-- Live A4-paginated preview that updates in real-time
-- Professional formatting following community standards
-- Export to PDF or JSON, import profiles from JSON
+- Edit profile, experience, education, skills, projects, and more
+- Live A4 preview and PDF/JSON export
+- Signed-in users sync to the backend, with restore points
 
 ### Cover Letter Writer
 
-- Guided form with tone selection
-- Auto-populates personal info from resume profile
-- Live draft preview on A4 format
-- Export to PDF or JSON
+- Guided form, live preview, PDF/JSON export
+- Signed-in sessions sync cover letter data with the same profile API
 
-### Backend Integration
+### Backend
 
-- User authentication with JWT tokens
-- PostgreSQL for persistent storage
-- Redis for caching
-- User-specific data isolation
-- Profile sync across devices
+- JWT register / login / refresh
+- Profile JSON stored per user (Prisma when `DATABASE_URL` is set)
 
 ## Development Workflow
 
 ```bash
-# Start development server
-npm run dev
-
-# Run tests
-npm test
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+cd frontend && npm run dev
+cd backend && npm run dev
+cd backend && npm test
+cd frontend && npm run build
 ```
 
 ## Configuration
 
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/vitaforge"
-
-# Redis
-REDIS_URL="redis://localhost:6379"
-
-# JWT Secret
-JWT_SECRET="your-secret-key-here"
-```
+Use `frontend/.env` for `VITE_*` values and `backend/.env` for `PORT`, `JWT_SECRET`, `DATABASE_URL`, and `ANTHROPIC_API_KEY`. Never put server secrets in frontend env files.
 
 ## First Steps
 
-1. **Create a database** - Set up PostgreSQL database
-2. **Configure Redis** - Start Redis server
-3. **Install dependencies** - Run `npm install` in frontend
-4. **Start development** - Run `npm run dev`
-5. **Explore the UI** - Build your first resume or cover letter
-
-## Next Steps
-
-- Read the [Architecture Guide](./architecture.md) to understand the system design
-- Check the [API Guide](./api-guide.md) for backend endpoints
-- Review the [Deployment Guide](./deployment.md) for production setup
+1. Copy both `.env.example` files
+2. Install frontend and backend dependencies
+3. Start both servers
+4. Register an account and edit a resume
 
 ## Getting Help
 
-- [CONTRIBUTING.md](../../CONTRIBUTING.md) - Git flow and commit guidelines
-- [CHANGELOG.md](../../CHANGELOG.md) - Version history
-- [SUPPORT.md](../../SUPPORT.md) - How to get help
-- [ROADMAP.md](../../ROADMAP.md) - Planned features
+- [CONTRIBUTING.md](../CONTRIBUTING.md)
+- [CHANGELOG.md](../CHANGELOG.md)
+- [SUPPORT.md](../SUPPORT.md)
+- [ROADMAP.md](../ROADMAP.md)
 
 ## License
 
-MIT License - See [LICENSE](../../LICENSE) for details.
+MIT — see [LICENSE](../LICENSE).
 
 ---
 
 **Last Updated**: September 2026  
-**Version**: 0.6.1
+**Version**: 0.7.0

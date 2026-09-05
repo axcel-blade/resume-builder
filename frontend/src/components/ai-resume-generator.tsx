@@ -3,13 +3,13 @@
  */
 
 import React, { useState } from 'react';
-import { generateResumeSummary, type AiGenerationResponse } from '../core/api/ai';
+import { generateResumeSummary } from '../services/ai';
 
 export const AIGenerateComponent: React.FC<{ profileData: any }> = ({ profileData }) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [targetRole, setTargetRole] = useState('');
+  const [targetRole] = useState('');
 
   const handleGenerate = async () => {
     if (!profileData || Object.keys(profileData).length === 0) {
@@ -25,7 +25,7 @@ export const AIGenerateComponent: React.FC<{ profileData: any }> = ({ profileDat
       const response = await generateResumeSummary(profileData, targetRole || undefined);
       
       if (response.success) {
-        setResult(response.content);
+        setResult(response.content ?? null);
       } else {
         setError(response.error || 'Failed to generate summary');
       }

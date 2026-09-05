@@ -12,7 +12,7 @@ When invoked:
 2. Check Nest module wiring (controllers stay thin, services hold logic, AuthModule exported where Users inject AuthService).
 3. Confirm auth uses JWT `access_token` and `Authorization: Bearer`.
 4. Confirm AI endpoints use object `profileData` DTOs and shared prompt builders.
-5. Confirm Jest specs in `backend/src/test/` match the new contracts.
+5. Confirm Jest specs in `backend/tests/` match the new contracts.
 
 Report:
 - Critical (must fix)

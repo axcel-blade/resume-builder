@@ -9,30 +9,26 @@
 - [x] Wrapped app with AuthProvider in RouterProvider
 - [x] Created API services (auth.ts, user.ts)
 - [x] Set up VITE_API_URL environment variable
-
-### In Progress 🚧
-- [ ] Test /users/profile endpoint creation on backend
-- [ ] Configure CORS settings on NestJS backend
-- [ ] Implement profile data sync logic
-- [ ] Add loading states during API calls
-- [ ] Handle token refresh mechanism
-- [ ] Test error scenarios (401, 500, network failures)
-
-### Next Steps 📋
-- [ ] Create /users/profile endpoint in NestJS backend
-- [ ] Configure CORS middleware on NestJS app.module.ts
-- [ ] Implement user data schema in Prisma
-- [ ] Add database migrations for new tables
-- [ ] Test full registration → profile sync flow
+- [x] Test /users/profile endpoint creation on backend
+- [x] Configure CORS settings on NestJS backend
+- [x] Implement profile data sync logic
+- [x] Add loading states during API calls
+- [x] Handle token refresh mechanism
+- [x] Test error scenarios (401, 500, network failures)
+- [x] Create /users/profile endpoint in NestJS backend
+- [x] Configure CORS middleware on NestJS app.module.ts
+- [x] Implement user data schema in Prisma
+- [x] Add database migrations for new tables
+- [x] Test full registration → profile sync flow
 
 ## Resume Builder Enhancement
 
-### In Progress 🚧
-- [ ] Connect resume data to backend storage
-- [ ] Replace localStorage with API calls
-- [ ] Implement optimistic UI updates
+### Completed ✅
+- [x] Connect resume data to backend storage
+- [x] Replace localStorage with API calls
+- [x] Implement optimistic UI updates
+- [x] Version history and restore points
 
 ### Planned 📝
 - [ ] Add collaborative editing (real-time)
-- [ ] Version history and restore points
 - [ ] Template marketplace

@@ -8,7 +8,7 @@ This is the AI-powered resume summary and cover letter generation module for Vit
 
 ### Backend (NestJS)
 
-1. **AI Controller** (`src/core/api/ai/ai.controller.ts`)
+1. **AI Controller** (`backend/src/ai/ai.controller.ts`)
    - `POST /api/ai/resume-summary` - Generate resume summary
    - `POST /api/ai/cover-letter` - Generate cover letter  
    - `POST /api/ai/config` - Get LM Studio configuration
@@ -29,7 +29,7 @@ This is the AI-powered resume summary and cover letter generation module for Vit
 
 ### Frontend (React)
 
-1. **AI API Client** (`frontend/src/core/api/ai.ts`)
+1. **AI API Client** (`frontend/src/services/ai.ts`)
    - TypeScript client for AI endpoints
    - Type-safe requests with error handling
 
@@ -111,7 +111,7 @@ curl -X POST http://localhost:3000/api/ai/cover-letter \
 ### Frontend Usage
 
 ```javascript
-import { AIApiClient } from './core/api/ai';
+import { AIApiClient } from './services/ai';
 
 // Generate resume summary
 const response = await AIApiClient.generateResumeSummary(
@@ -183,13 +183,13 @@ To add an AI agent that uses these features:
 
 ## Files Created
 
-- ✅ `backend/src/core/api/ai/ai.controller.ts`
+- ✅ `backend/src/ai/ai.controller.ts`
 - ✅ `backend/src/core/dto/ai/generate-resume-summary.dto.ts`
 - ✅ `backend/src/core/dto/ai/generate-cover-letter.dto.ts`
 - ✅ `backend/src/core/ai.module.ts`
 - ✅ `backend/src/services/ai.service.ts` (pre-existed)
 - ✅ `backend/src/core/services/prompt-builders.ts`
-- ✅ `frontend/src/core/api/ai.ts`
+- ✅ `frontend/src/services/ai.ts`
 - ✅ `frontend/src/components/ai-resume-generator.tsx`
 - ✅ `frontend/.env.example`
 

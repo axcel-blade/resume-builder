@@ -1,12 +1,12 @@
 # Vita Forge
 
-![Version](https://img.shields.io/badge/version-0.6.1-blue)
+![Version](https://img.shields.io/badge/version-0.7.0-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 A backend-connected career-tools platform for building professional, ATS-friendly resumes and cover letters with user accounts and data persistence.
 
-The Vite application now lives in the `frontend/` directory so the repository root stays focused on project documentation and automation.
+The repo is split into a Vite frontend and a NestJS backend. The UI never talks to the database directly.
 
 ## What it is
 
@@ -53,52 +53,82 @@ The Vite application now lives in the `frontend/` directory so the repository ro
 
 ## How to run it
 
+**Requirements:** Node.js 20+, npm 10+. PostgreSQL is optional.
+
 ```bash
 git clone https://github.com/axcel-blade/vita-forge.git
 cd vita-forge
+```
+
+**Environment**
+
+```bash
+cp frontend/.env.example frontend/.env
+cp backend/.env.example backend/.env
+```
+
+Do not put backend secrets in `VITE_*` variables.
+
+**Frontend**
+
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173`
+Opens at `http://localhost:5173`.
+
+**Backend**
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+API at `http://localhost:3001/api`.
+
+**Database (optional)**
+
+Uncomment `DATABASE_URL` in `backend/.env`, then:
+
+```bash
+cd backend
+npm run prisma:generate
+npm run prisma:deploy
+```
+
+**Tests**
+
+```bash
+cd backend
+npm test
+```
 
 **Production build**
 
 ```bash
-cd frontend
-npm run build && npm run preview
+cd frontend && npm run build
+cd ../backend && npm run build
 ```
 
 ## Where the code lives
 
 ```
 vita-forge/
-├── frontend/
-│   ├── public/
+├── frontend/          # User interface (Vite + React)
+├── backend/           # API and business logic (NestJS)
 │   ├── src/
-│   │   ├── core/          # Router, layouts, SEO, config
-│   │   ├── website/       # Home, About, Products, Contact, NotFound
-│   │   ├── apps/
-│   │   │   ├── resume-builder/
-│   │   │   └── cover-letter/
-│   │   ├── components/    # Shared UI: Toolbar, templates, editors, preview
-│   │   ├── data/
-│   │   └── routes/
-│   ├── .gitignore
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── index.html
-├── .github/
+│   ├── database/      # Prisma schema + migrations
+│   └── tests/
+├── docs/              # Documentation
+├── .github/           # Workflows and templates
 ├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── ROADMAP.md
-├── SECURITY.md
-├── SUPPORT.md
-├── LICENSE
-└── api/
+└── LICENSE
 ```
+
+`scripts/` and `docker/` are not present yet — add them when we have real automation or images.
 
 ## Contributing and support
 

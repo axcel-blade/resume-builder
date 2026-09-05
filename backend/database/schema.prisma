@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String          @id @default(uuid())
+  email        String          @unique
+  name         String?
+  passwordHash String?
+  role         String          @default("user")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  profile      ResumeProfile?
+  versions     ResumeVersion[]
+
+  @@map("users")
+}
+
+model ResumeProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("resume_profiles")
+}
+
+model ResumeVersion {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payload   Json
+  label     String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("resume_versions")
+}

@@ -18,16 +18,16 @@ This document provides a comprehensive overview of the Vita Forge system archite
 │                   Backend API Server                          │
 │              (NestJS + TypeScript + Express)                   │
 │  ┌──────────────┬──────────────┬──────────────┬───────────┐ │
-│  │   Auth       │ Profiles     │ Documents    │ Cache      │ │
-│  │ Module       │ Module       │ Module       │ (Redis)    │ │
+│  │   Auth       │ Users /      │ AI           │ Health     │ │
+│  │ Module       │ profiles     │ Module       │            │ │
 │  └──────────────┴──────────────┴──────────────┴───────────┘ │
 └─────────────────────────────────────────────────────────────┘
-                           ↓ PostgreSQL
+                           ↓ Prisma DataStore (optional Postgres)
 ┌─────────────────────────────────────────────────────────────┐
 │                      Database Layer                           │
-│                (PostgreSQL - Relational DB)                    │
+│         PostgreSQL when DATABASE_URL is set, else memory      │
 │  ┌────────────────┬────────────────┬────────────────────┐   │
-│  │  users         │  profiles      │  documents          │   │
+│  │  users         │ resume_profiles│ resume_versions     │ │
 │  └────────────────┴────────────────┴────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -52,13 +52,13 @@ This document provides a comprehensive overview of the Vita Forge system archite
 | Framework | NestJS | Latest | Structured Node.js framework |
 | Language | TypeScript | 5.8 | Type-safe development |
 | Database ORM | Prisma | - | Type-safe database access |
-| Cache | Redis | - | Session storage and caching |
+| Persistence | Prisma DataStore | - | PostgreSQL or in-memory |
 | Authentication | JWT | - | Stateless user authentication |
 
 ### Infrastructure
 
 - **Database**: PostgreSQL (relational, ACID-compliant)
-- **Cache**: Redis (in-memory data store)
+- **Persistence**: Prisma when `DATABASE_URL` is set
 - **Hosting**: Platform-agnostic (can deploy to Vercel, Netlify, Heroku, AWS, etc.)
 
 ## Key Architectural Decisions
@@ -69,8 +69,8 @@ Vita Forge uses a monorepo architecture:
 
 ```
 vita-forge/
-├── frontend/    # React SPA
-├── backend/     # NestJS API server
+├── frontend/    # React SPA (features + services)
+├── backend/     # NestJS API (modules + repositories + database/)
 └── docs/        # Shared documentation
 ```
 
